@@ -1,6 +1,6 @@
-# Flutter DropdownSearch
+# Flutter DropdownTextfield
 
-A new Flutter project using TDD development technique.
+A DropdownTextfield is a material design button. The DropDownButton is a widget that we can use to select one unique value from a set of values. It lets the user select one value from a number of items.
 
 ## Getting Started
 
