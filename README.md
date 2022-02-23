@@ -12,9 +12,9 @@ A DropdownTextfield is a material design TextField. The DropDownButton is a widg
 6. ToolTip dialogue for multi selection dropdown item.
 
 
-##Example
+## Example
 
-###Single Selection dropdown
+### Single Selection dropdown
 ```dart
 CustomDropDown(
 // initialValue: "name4",
