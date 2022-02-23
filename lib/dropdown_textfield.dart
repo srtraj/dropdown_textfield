@@ -135,7 +135,7 @@ class _CustomDropDownState extends State<CustomDropDown>
         ? dropDownList.length < maxListItem
             ? dropDownList.length * 50
             : 50 * maxListItem.toDouble()
-        : dropDownList.length < 6
+        : dropDownList.length < maxListItem
             ? dropDownList.length * 50
             : 50 * maxListItem.toDouble();
 

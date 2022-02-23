@@ -51,7 +51,7 @@ class _TestPageState extends State<TestPage> {
                     DropDownValues(name: 'name7', value: "value7"),
                     DropDownValues(name: 'name8', value: "value8"),
                   ],
-                  maxItemCount: 3,
+                  maxItemCount: 6,
                   onChanged: (val) {
                     print(val);
                   },
