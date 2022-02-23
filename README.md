@@ -1,19 +1,21 @@
 # Flutter DropdownTextfield
 
-A DropdownTextfield is a material design button. The DropDownButton is a widget that we can use to select one unique value from a set of values. It lets the user select one value from a number of items.
+A DropdownTextfield is a material design button. The DropDownButton is a widget that we can use to select one unique value or multivalue from a set of values.
 
-## Getting Started
-
-This project is a starting point for a Flutter application based on Rodrigo Manguinhos course.
-
+##Key Features
+* (asterisk) Sync and/or Async items (online, offline, DB, ...)
+Searchable dropdown
+Three dropdown mode: Menu/ BottomSheet/ Dialog
+Single & multi selection
+Material dropdown
+Easy customizable UI
+Handle Light and Dark theme
+Easy implementation into statelessWidget
 A few resources to get you started if this is your first Flutter project:
 
 - [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
 - [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
 
 ## Section 1
 
