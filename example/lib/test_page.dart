@@ -47,6 +47,9 @@ class _TestPageState extends State<TestPage> {
                     DropDownValues(name: 'name3', value: "value3"),
                     DropDownValues(name: 'name4', value: "value4"),
                   ],
+                  onChanged: (val) {
+                    print(val);
+                  },
                 ),
                 const SizedBox(
                   height: 50,
@@ -100,7 +103,9 @@ class _TestPageState extends State<TestPage> {
                         toolTipMsg:
                             "DropDownButton is a widget that we can use to select one unique value from a set of values"),
                   ],
-                  onChanged: (val) {},
+                  onChanged: (val) {
+                    print(val);
+                  },
                 )
               ],
             ),

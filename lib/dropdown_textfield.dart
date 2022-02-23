@@ -186,8 +186,6 @@ class _CustomDropDownState extends State<CustomDropDown>
             _showOverlay();
           } else {
             hideOverlay();
-            if (widget.isMultiSelection) {
-            } else {}
           }
         },
         validator: (value) => widget.validator != null
@@ -196,17 +194,53 @@ class _CustomDropDownState extends State<CustomDropDown>
         decoration: widget.textFieldDecoration != null
             ? widget.textFieldDecoration!.copyWith(
                 hintText: hintText,
-                suffixIcon: const Icon(
+                suffixIcon:_cnt.text.isEmpty
+                    ? const Icon(
                   Icons.arrow_drop_down_outlined,
+                )
+                    : InkWell(
+                  onTap: () {
+                    _cnt.clear();
+                    if (widget.onChanged != null) {
+                      widget
+                          .onChanged!(widget.isMultiSelection ? [] : "");
+                    }
+                    multiSelectionValue = [];
+                    for (int i = 0; i < dropDownList.length; i++) {
+                      multiSelectionValue.add(false);
+                    }
+                    setState(() {});
+                  },
+                  child: const Icon(
+                    Icons.clear,
+                  ),
                 ),
               )
             : InputDecoration(
                 floatingLabelBehavior: FloatingLabelBehavior.always,
                 hintText: hintText,
                 hintStyle: const TextStyle(fontWeight: FontWeight.normal),
-                suffixIcon: const Icon(
-                  Icons.arrow_drop_down_outlined,
-                ),
+                suffixIcon: _cnt.text.isEmpty
+                    ? const Icon(
+                        Icons.arrow_drop_down_outlined,
+                      )
+                    : InkWell(
+                        onTap: () {
+                          _cnt.clear();
+                          if (widget.onChanged != null) {
+                            widget
+                                .onChanged!(widget.isMultiSelection ? [] : "");
+                          }
+                          multiSelectionValue = [];
+                          for (int i = 0; i < dropDownList.length; i++) {
+                            multiSelectionValue.add(false);
+                          }
+                          setState(() {});
+                        },
+                        child: const Icon(
+                          Icons.clear,
+                        ),
+                      ),
               ),
       ),
     );

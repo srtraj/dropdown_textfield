@@ -1,6 +1,6 @@
 # Flutter DropdownTextfield
 
-A DropdownTextfield is a material design button. The DropDownButton is a widget that we can use to select one unique value or multivalue from a set of values.
+A DropdownTextfield is a material design TextField. The DropDownButton is a widget that we can use to select one unique value or multivalue from a set of values.
 
 ## Key Features
 
