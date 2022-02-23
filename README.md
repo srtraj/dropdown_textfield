@@ -45,9 +45,6 @@ A DropdownTextfield is a material design TextField. The DropDownButton is a widg
 ```
 
 
-### dropdownRadius
-define the radius of dropdown List ,default value is 12
-
 
 ### initialValue
 initial value ,if it is null or not exist in dropDownList then it will not display value
@@ -81,6 +78,9 @@ set displayCompleteItem=true, if you want show complete list of item in textfiel
 
 ### maxItemCount
 you can define maximum number dropdown item length,default value is 6
+
+### dropdownRadius
+define the radius of dropdown List ,default value is 12
 
 
 
