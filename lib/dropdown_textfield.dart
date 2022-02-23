@@ -4,19 +4,20 @@ import 'package:dropdown_textfield/tooltip_widget.dart';
 import 'package:flutter/material.dart';
 
 class CustomDropDown extends StatefulWidget {
-  const CustomDropDown(
-      {Key? key,
-      this.initialValue,
-      required this.dropDownList,
-      this.padding,
-      this.textStyle,
-      this.onChanged,
-      this.validator,
-      this.isEnabled = true,
-      this.enableSearch = false,
-      this.dropdownRadius = 12,
-      this.textFieldDecoration})
-      : isMultiSelection = false,
+  const CustomDropDown({
+    Key? key,
+    this.initialValue,
+    required this.dropDownList,
+    this.padding,
+    this.textStyle,
+    this.onChanged,
+    this.validator,
+    this.isEnabled = true,
+    this.enableSearch = false,
+    this.dropdownRadius = 12,
+    this.textFieldDecoration,
+    this.maxItemCount = 6,
+  })  : isMultiSelection = false,
         isForceMultiSelectionClear = false,
         displayCompleteItem = false,
         super(key: key);
@@ -33,6 +34,7 @@ class CustomDropDown extends StatefulWidget {
     this.isEnabled = true,
     this.dropdownRadius = 12,
     this.textFieldDecoration,
+    this.maxItemCount = 6,
   })  : isMultiSelection = true,
         enableSearch = false,
         super(key: key);
@@ -72,6 +74,9 @@ class CustomDropDown extends StatefulWidget {
 
   ///set displayCompleteItem=true, if you want show complete list of item in textfield else it will display like "number_of_item item selected"
   final bool displayCompleteItem;
+
+  ///you can define maximum number dropdown item length,default value is 6
+  final int maxItemCount;
 
   @override
   _CustomDropDownState createState() => _CustomDropDownState();
@@ -125,7 +130,7 @@ class _CustomDropDownState extends State<CustomDropDown>
       }
     }
     _cnt = TextEditingController(text: initialValue);
-    maxListItem = 6;
+    maxListItem = widget.maxItemCount;
     height = !widget.isMultiSelection
         ? dropDownList.length < maxListItem
             ? dropDownList.length * 50
@@ -194,27 +199,27 @@ class _CustomDropDownState extends State<CustomDropDown>
         decoration: widget.textFieldDecoration != null
             ? widget.textFieldDecoration!.copyWith(
                 hintText: hintText,
-                suffixIcon:_cnt.text.isEmpty
+                suffixIcon: _cnt.text.isEmpty
                     ? const Icon(
-                  Icons.arrow_drop_down_outlined,
-                )
+                        Icons.arrow_drop_down_outlined,
+                      )
                     : InkWell(
-                  onTap: () {
-                    _cnt.clear();
-                    if (widget.onChanged != null) {
-                      widget
-                          .onChanged!(widget.isMultiSelection ? [] : "");
-                    }
-                    multiSelectionValue = [];
-                    for (int i = 0; i < dropDownList.length; i++) {
-                      multiSelectionValue.add(false);
-                    }
-                    setState(() {});
-                  },
-                  child: const Icon(
-                    Icons.clear,
-                  ),
-                ),
+                        onTap: () {
+                          _cnt.clear();
+                          if (widget.onChanged != null) {
+                            widget
+                                .onChanged!(widget.isMultiSelection ? [] : "");
+                          }
+                          multiSelectionValue = [];
+                          for (int i = 0; i < dropDownList.length; i++) {
+                            multiSelectionValue.add(false);
+                          }
+                          setState(() {});
+                        },
+                        child: const Icon(
+                          Icons.clear,
+                        ),
+                      ),
               )
             : InputDecoration(
                 floatingLabelBehavior: FloatingLabelBehavior.always,
