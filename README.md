@@ -12,6 +12,79 @@ A DropdownTextfield is a material design TextField. The DropDownButton is a widg
 6. ToolTip dialogue for multi selection dropdown item.
 
 
+#Single selection argument
+```dart
+    initialValue,
+    dropDownList,
+    padding,
+    textStyle,
+    onChanged,
+    validator,
+    isEnabled,
+    enableSearch,
+    dropdownRadius,
+    textFieldDecoration,
+    maxItemCount,
+```
+
+#Multi selection argument
+
+```dart
+    displayCompleteItem,
+    initialValue,
+    dropDownList,
+    padding,
+    textStyle,
+    isForceMultiSelectionClear,
+    onChanged,
+    validator,
+    isEnabled ,
+    dropdownRadius ,
+    textFieldDecoration,
+    maxItemCount ,
+```
+
+
+### dropdownRadius
+define the radius of dropdown List ,default value is 12
+
+
+### initialValue
+initial value ,if it is null or not exist in dropDownList then it will not display value
+
+### dropDownList
+List<DropDownValues>,List of dropdown values
+
+### onChanged
+it is a function,called when value selected from dropdown.
+for single Selection Dropdown it will return single DropDownValues object,
+and for multi Selection Dropdown ,it will return list of DropDownValues object,
+
+### isMultiSelection
+by setting isMultiSelection=true to make multi selection dropdown
+
+#isForceMultiSelectionClear
+by setting isForceMultiSelectionClear=true to deselect selected item,only applicable for multi selection dropdown
+
+### textFieldDecoration
+to override default textfield decoration
+
+### isEnabled
+by setting isEnabled=false to disable textfield,default value true
+
+
+### enableSearch
+by setting enableSearch=true enable search option in dropdown,as of now this feature enabled only for single selection dropdown
+
+### displayCompleteItem
+set displayCompleteItem=true, if you want show complete list of item in textfield else it will display like "number_of_item item selected"
+
+### maxItemCount
+you can define maximum number dropdown item length,default value is 6
+
+
+
+
 ## Example
 
 ### Single Selection dropdown
