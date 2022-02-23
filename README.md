@@ -57,7 +57,7 @@ it is a function,called when value selected from dropdown.
 for single Selection Dropdown it will return single DropDownValues object,
 and for multi Selection Dropdown ,it will return list of DropDownValues object,
 
-#isForceMultiSelectionClear
+### isForceMultiSelectionClear
 by setting isForceMultiSelectionClear=true to deselect selected item,only applicable for multi selection dropdown
 
 ### textFieldDecoration
