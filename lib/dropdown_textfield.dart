@@ -53,6 +53,8 @@ class CustomDropDown extends StatefulWidget {
   ///and for multi Selection Dropdown ,it will return list of DropDownValues object,
   final ValueSetter? onChanged;
 
+  ///by setting isMultiSelection=true to make multi selection dropdown
+  final bool isMultiSelection;
   final TextStyle? textStyle;
   final EdgeInsets? padding;
 
