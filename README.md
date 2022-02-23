@@ -85,7 +85,7 @@ define the radius of dropdown List ,default value is 12
 ## Example
 
 ### Single Selection dropdown
-
+<p>
 ```dart
 CustomDropDown(
 // initialValue: "name4",
@@ -113,15 +113,8 @@ CustomDropDown(
     ),
 ```
 <a href="url"><img src="https://drive.google.com/uc?export=view&id=1jMFMeMwPDnQnvaemzE6fnx3Gb-vy_NMk" align="left" height="600" width="350" ></a> <br />
-
-
-
-
-
-
-\
+</p>
 ### Single Selection dropdown with search option
-
 ```dart
  CustomDropDown(
 dropDownList: [
