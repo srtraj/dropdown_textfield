@@ -11,6 +11,4 @@ A DropdownTextfield is a material design TextField. The DropDownButton is a widg
 5. Easy implementation into statelessWidget
 6. ToolTip dialogue for multi selection dropdown item.
 
-<img src="https://drive.google.com/file/d/1qL3MYm3X8na2bnZRjlj3RS8d7dkN-x8N/view?usp=sharing">
-
-
+![image](https://drive.google.com/uc?export=view&id=1qL3MYm3X8na2bnZRjlj3RS8d7dkN-x8N)
