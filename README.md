@@ -12,7 +12,7 @@ A DropdownTextfield is a material design TextField. The DropDownButton is a widg
 6. ToolTip dialogue for multi selection dropdown item.
 
 
-#Single selection argument
+# Single selection argument
 ```dart
     initialValue,
     dropDownList,
@@ -27,7 +27,7 @@ A DropdownTextfield is a material design TextField. The DropDownButton is a widg
     maxItemCount,
 ```
 
-#Multi selection argument
+# Multi selection argument
 
 ```dart
     displayCompleteItem,
