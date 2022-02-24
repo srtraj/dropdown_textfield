@@ -71,13 +71,13 @@ by setting isEnabled=false to disable textfield,default value true
 by setting enableSearch=true enable search option in dropdown,as of now this feature enabled only for single selection dropdown
 
 ### displayCompleteItem
-set displayCompleteItem=true, if you want show complete list of item in textfield else it will display like "number_of_item item selected"
+set displayCompleteItem=true, if you want display complete list of selected item in textfield else it will display in shorten form.
 
 ### maxItemCount
-you can define maximum number dropdown item length,default value is 6
+you can define maximum number of dropdown item length,default value is 6
 
 ### dropdownRadius
-define the radius of dropdown List ,default value is 12
+define the radius of dropdown List widget ,default value is 12
 
 
 
