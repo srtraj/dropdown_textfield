@@ -167,9 +167,9 @@ CustomDropDown(
 
 <img src="https://github.com/srtraj/imagefiles/blob/main/single_search.gif" align="left" height="600" width="350" >
 
-<img src="https://github.com/srtraj/imagefiles/blob/main/multiselectionDropdown.gif" align="left" height="600" width="350" >
+<img src="https://github.com/srtraj/imagefiles/blob/main/multiselection%20dropdown.gif" align="left" height="600" width="350" >
 
-<img src="https://github.com/srtraj/imagefiles/blob/main/multiselection_fullList.gif" align="left" height="600" width="350" >
+<img src="https://github.com/srtraj/imagefiles/blob/main/multiSelectionDropdown2.gif" align="left" height="600" width="350" >
 
 
 
