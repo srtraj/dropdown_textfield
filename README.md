@@ -112,7 +112,6 @@ CustomDropDown(
     },
     ),
 ```
-<a href="url"><img src="https://drive.google.com/uc?export=view&id=1jMFMeMwPDnQnvaemzE6fnx3Gb-vy_NMk" align="left" height="600" width="350" ></a> <br />
 
 
 
@@ -131,7 +130,47 @@ enableSearch: true,
 onChanged: (val) {},
 ),
 ```
-<a href="url"><img src="https://drive.google.com/uc?export=view&id=1-_bfd2qX8cfDKfyj9GY-JKl0XxgyocrX" align="left" height="600" width="350" ></a><br />
+
+
+### Multi Selection dropdown with search option
+```dart
+         CustomDropDown.multiSelection(
+                  displayCompleteItem: true,#if true ,it will display complete list of selected item or else it will display in shorten form
+                  dropDownList: [
+                    DropDownValues(name: 'name1', value: "value1"),
+                    DropDownValues(
+                        name: 'name2',
+                        value: "value2",
+                        toolTipMsg:
+                            "DropDownButton is a widget that we can use to select one unique value from a set of values"),
+                    DropDownValues(name: 'name3', value: "value3"),
+                    DropDownValues(
+                        name: 'name4',
+                        value: "value4",
+                        toolTipMsg:
+                            "DropDownButton is a widget that we can use to select one unique value from a set of values"),
+                    DropDownValues(name: 'name5', value: "value5"),
+                    DropDownValues(name: 'name6', value: "value6"),
+                    DropDownValues(name: 'name7', value: "value7"),
+                    DropDownValues(name: 'name8', value: "value8"),
+                  ],
+                  onChanged: (val) {
+                  },
+                )
+```
+
+
+
+
+<img src="https://github.com/srtraj/imagefiles/blob/main/single%20dropdown.gif" align="left" height="600" width="350" >
+
+
+<img src="https://github.com/srtraj/imagefiles/blob/main/single_search.gif" align="left" height="600" width="350" >
+
+<img src="https://github.com/srtraj/imagefiles/blob/main/multiselectionDropdown.gif" align="left" height="600" width="350" >
+
+<img src="https://github.com/srtraj/imagefiles/blob/main/multiselection_fullList.gif" align="left" height="600" width="350" >
+
 
 
 
