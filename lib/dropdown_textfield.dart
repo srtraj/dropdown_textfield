@@ -4,39 +4,49 @@ import 'package:dropdown_textfield/tooltip_widget.dart';
 import 'package:flutter/material.dart';
 
 class CustomDropDown extends StatefulWidget {
-  const CustomDropDown({
-    Key? key,
-    this.initialValue,
-    required this.dropDownList,
-    this.padding,
-    this.textStyle,
-    this.onChanged,
-    this.validator,
-    this.isEnabled = true,
-    this.enableSearch = false,
-    this.dropdownRadius = 12,
-    this.textFieldDecoration,
-    this.maxItemCount = 6,
-  })  : isMultiSelection = false,
+  const CustomDropDown(
+      {Key? key,
+      this.initialValue,
+      required this.dropDownList,
+      this.padding,
+      this.textStyle,
+      this.onChanged,
+      this.validator,
+      this.isEnabled = true,
+      this.enableSearch = false,
+      this.dropdownRadius = 12,
+      this.textFieldDecoration,
+      this.maxItemCount = 6,
+      this.searchFocusNode,
+      this.textFieldFocusNode,
+      this.searchAutofocus = false,
+      this.searchShowCursor,
+      this.searchKeyboardType})
+      : isMultiSelection = false,
         isForceMultiSelectionClear = false,
         displayCompleteItem = false,
         super(key: key);
-  const CustomDropDown.multiSelection({
-    Key? key,
-    this.displayCompleteItem = false,
-    this.initialValue,
-    required this.dropDownList,
-    this.padding,
-    this.textStyle,
-    this.isForceMultiSelectionClear = false,
-    this.onChanged,
-    this.validator,
-    this.isEnabled = true,
-    this.dropdownRadius = 12,
-    this.textFieldDecoration,
-    this.maxItemCount = 6,
-  })  : isMultiSelection = true,
+  const CustomDropDown.multiSelection(
+      {Key? key,
+      this.displayCompleteItem = false,
+      this.initialValue,
+      required this.dropDownList,
+      this.padding,
+      this.textStyle,
+      this.isForceMultiSelectionClear = false,
+      this.onChanged,
+      this.validator,
+      this.isEnabled = true,
+      this.dropdownRadius = 12,
+      this.textFieldDecoration,
+      this.maxItemCount = 6,
+      this.searchFocusNode,
+      this.textFieldFocusNode})
+      : isMultiSelection = true,
         enableSearch = false,
+        searchAutofocus = false,
+        searchKeyboardType = null,
+        searchShowCursor = null,
         super(key: key);
 
   ///define the radius of dropdown List ,default value is 12
@@ -78,6 +88,19 @@ class CustomDropDown extends StatefulWidget {
   ///you can define maximum number dropdown item length,default value is 6
   final int maxItemCount;
 
+  final FocusNode? searchFocusNode;
+  final FocusNode? textFieldFocusNode;
+
+  ///override default search keyboard type,only applicable if enableSearch=true,
+  final TextInputType? searchKeyboardType;
+
+  ///by setting searchAutofocus=true to autofocus search textfield,only applicable if enableSearch=true,
+  ///  ///default value is false
+  final bool searchAutofocus;
+
+  ///by setting searchShowCursor=false to hide cursor from search textfield,only applicable if enableSearch=true,
+  final bool? searchShowCursor;
+
   @override
   _CustomDropDownState createState() => _CustomDropDownState();
 }
@@ -106,8 +129,8 @@ class _CustomDropDownState extends State<CustomDropDown>
   late bool isSearch;
   @override
   void initState() {
-    searchFocusNode = FocusNode();
-    textFieldFocusNode = FocusNode();
+    searchFocusNode = widget.searchFocusNode ?? FocusNode();
+    textFieldFocusNode = widget.textFieldFocusNode ?? FocusNode();
     isSearch = false;
     dropDownList = List.from(widget.dropDownList);
     isExpanded = false;
@@ -161,8 +184,8 @@ class _CustomDropDownState extends State<CustomDropDown>
 
   @override
   void dispose() {
-    searchFocusNode.dispose();
-    textFieldFocusNode.dispose();
+    if (widget.searchFocusNode == null) searchFocusNode.dispose();
+    if (widget.textFieldFocusNode == null) textFieldFocusNode.dispose();
     super.dispose();
   }
 
@@ -198,13 +221,16 @@ class _CustomDropDownState extends State<CustomDropDown>
             : null,
         decoration: widget.textFieldDecoration != null
             ? widget.textFieldDecoration!.copyWith(
-                hintText: hintText,
                 suffixIcon: _cnt.text.isEmpty
                     ? const Icon(
                         Icons.arrow_drop_down_outlined,
                       )
                     : InkWell(
                         onTap: () {
+                          if (isExpanded) {
+                            !isExpanded;
+                            hideOverlay();
+                          }
                           _cnt.clear();
                           if (widget.onChanged != null) {
                             widget
@@ -231,6 +257,10 @@ class _CustomDropDownState extends State<CustomDropDown>
                       )
                     : InkWell(
                         onTap: () {
+                          if (isExpanded) {
+                            !isExpanded;
+                            hideOverlay();
+                          }
                           _cnt.clear();
                           if (widget.onChanged != null) {
                             widget
@@ -326,6 +356,9 @@ class _CustomDropDownState extends State<CustomDropDown>
                         hideOverlay();
                       },
                       searchHeight: searchWidgetHeight,
+                      searchKeyboardType: widget.searchKeyboardType,
+                      searchAutofocus: widget.searchAutofocus,
+                      searchShowCursor: widget.searchShowCursor,
                     )
                   : MultiSelection(
                       height: height,
@@ -377,7 +410,10 @@ class SingleSelection extends StatefulWidget {
       required this.enableSearch,
       required this.searchHeight,
       required this.searchFocusNode,
-      required this.mainFocusNode})
+      required this.mainFocusNode,
+      this.searchKeyboardType,
+      required this.searchAutofocus,
+      this.searchShowCursor})
       : super(key: key);
   final List<DropDownValues> dropDownList;
   final ValueSetter onChanged;
@@ -386,6 +422,9 @@ class SingleSelection extends StatefulWidget {
   final double searchHeight;
   final FocusNode searchFocusNode;
   final FocusNode mainFocusNode;
+  final TextInputType? searchKeyboardType;
+  final bool searchAutofocus;
+  final bool? searchShowCursor;
 
   @override
   State<SingleSelection> createState() => _SingleSelectionState();
@@ -411,6 +450,9 @@ class _SingleSelectionState extends State<SingleSelection> {
 
   @override
   void initState() {
+    if (widget.searchAutofocus) {
+      widget.searchFocusNode.requestFocus();
+    }
     newDropDownList = List.from(widget.dropDownList);
     _searchCnt = TextEditingController();
     isSearch = false;
@@ -435,6 +477,8 @@ class _SingleSelectionState extends State<SingleSelection> {
               padding: const EdgeInsets.all(12.0),
               child: TextField(
                 focusNode: widget.searchFocusNode,
+                showCursor: widget.searchShowCursor,
+                keyboardType: widget.searchKeyboardType,
                 controller: _searchCnt,
                 decoration: InputDecoration(
                   hintText: 'Search Here...',
