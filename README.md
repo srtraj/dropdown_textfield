@@ -87,8 +87,7 @@ define the radius of dropdown List widget ,default value is 12
 override default search keyboard type
 
 ### searchAutofocus
-by setting searchAutofocus=true to autofocus search textfield
-default value is false
+by setting searchAutofocus=true to autofocus search textfield,default value is false
 
 
 ### searchShowCursor
