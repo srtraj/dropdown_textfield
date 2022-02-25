@@ -25,6 +25,9 @@ A DropdownTextfield is a material design TextField. The DropDownButton is a widg
     dropdownRadius,
     textFieldDecoration,
     maxItemCount,
+    searchAutofocus,
+    searchShowCursor,
+    searchKeyboardType
 ```
 
 ## Multi selection argument
@@ -78,6 +81,18 @@ you can define maximum number of dropdown item length,default value is 6
 
 ### dropdownRadius
 define the radius of dropdown List widget ,default value is 12
+
+
+### searchKeyboardType
+override default search keyboard type
+
+### searchAutofocus
+by setting searchAutofocus=true to autofocus search textfield
+default value is false
+
+
+### searchShowCursor
+by setting searchShowCursor=false to hide cursor from search textfield
 
 
 
