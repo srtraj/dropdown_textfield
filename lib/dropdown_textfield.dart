@@ -228,7 +228,7 @@ class _CustomDropDownState extends State<CustomDropDown>
                     : InkWell(
                         onTap: () {
                           if (isExpanded) {
-                            isExpanded=!isExpanded;
+                            isExpanded = !isExpanded;
                             hideOverlay();
                           }
                           _cnt.clear();
@@ -258,7 +258,7 @@ class _CustomDropDownState extends State<CustomDropDown>
                     : InkWell(
                         onTap: () {
                           if (isExpanded) {
-                            isExpanded=!isExpanded;
+                            isExpanded = !isExpanded;
                             hideOverlay();
                           }
                           _cnt.clear();
