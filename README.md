@@ -53,12 +53,12 @@ A DropdownTextfield is a material design TextField. The DropDownButton is a widg
 initial value ,if it is null or not exist in dropDownList then it will not display value
 
 ### dropDownList
-List<DropDownValues>,List of dropdown values
+List<DropDownValueModel>,List of dropdown values
 
 ### onChanged
 it is a function,called when value selected from dropdown.
-for single Selection Dropdown it will return single DropDownValues object,
-and for multi Selection Dropdown ,it will return list of DropDownValues object,
+for single Selection Dropdown it will return single DropDownValueModel object,
+and for multi Selection Dropdown ,it will return list of DropDownValueModel object,
 
 ### isForceMultiSelectionClear
 by setting isForceMultiSelectionClear=true to deselect selected item,only applicable for multi selection dropdown
@@ -93,6 +93,10 @@ by setting searchAutofocus=true to autofocus search textfield,default value is f
 ### searchShowCursor
 by setting searchShowCursor=false to hide cursor from search textfield
 
+### clearOption
+by set clearOption=false to hide clear suffix icon button from textfield
+
+
 
 
 
@@ -101,7 +105,7 @@ by setting searchShowCursor=false to hide cursor from search textfield
 ### Single Selection dropdown
 
 ```dart
-CustomDropDown(
+DropDownTextField(
                   // initialValue: "name4",
                   validator: (value) {
                     if (value == null) {
@@ -111,14 +115,14 @@ CustomDropDown(
                     }
                   },
                   dropDownList: [
-                    DropDownValues(name: 'name1', value: "value1"),
-                    DropDownValues(name: 'name2', value: "value2"),
-                    DropDownValues(name: 'name3', value: "value3"),
-                    DropDownValues(name: 'name4', value: "value4"),
-                    DropDownValues(name: 'name5', value: "value5"),
-                    DropDownValues(name: 'name6', value: "value6"),
-                    DropDownValues(name: 'name7', value: "value7"),
-                    DropDownValues(name: 'name8', value: "value8"),
+                    DropDownValueModel(name: 'name1', value: "value1"),
+                    DropDownValueModel(name: 'name2', value: "value2"),
+                    DropDownValueModel(name: 'name3', value: "value3"),
+                    DropDownValueModel(name: 'name4', value: "value4"),
+                    DropDownValueModel(name: 'name5', value: "value5"),
+                    DropDownValueModel(name: 'name6', value: "value6"),
+                    DropDownValueModel(name: 'name7', value: "value7"),
+                    DropDownValueModel(name: 'name8', value: "value8"),
                   ],
                   maxItemCount: 6,
                   onChanged: (val) {
@@ -133,12 +137,12 @@ CustomDropDown(
 
 ### Single Selection dropdown with search option
 ```dart
-   CustomDropDown(
+   DropDownTextField(
                   dropDownList: [
-                    DropDownValues(name: 'aaa', value: "aaa"),
-                    DropDownValues(name: 'bbb', value: "bbb"),
-                    DropDownValues(name: 'acc', value: "acc"),
-                    DropDownValues(name: 'dbb', value: "dbb"),
+                    DropDownValueModel(name: 'aaa', value: "aaa"),
+                    DropDownValueModel(name: 'bbb', value: "bbb"),
+                    DropDownValueModel(name: 'acc', value: "acc"),
+                    DropDownValueModel(name: 'dbb', value: "dbb"),
                   ],
                   enableSearch: true,
                   onChanged: (val) {},
@@ -148,25 +152,25 @@ CustomDropDown(
 
 ### Multi Selection dropdown with search option
 ```dart
-         CustomDropDown.multiSelection(
+         DropDownTextField.multiSelection(
                   displayCompleteItem: true,#if true ,it will display complete list of selected item or else it will display in shorten form
                   dropDownList: [
-                    DropDownValues(name: 'name1', value: "value1"),
-                    DropDownValues(
+                    DropDownValueModel(name: 'name1', value: "value1"),
+                    DropDownValueModel(
                         name: 'name2',
                         value: "value2",
                         toolTipMsg:
                             "DropDownButton is a widget that we can use to select one unique value from a set of values"),
-                    DropDownValues(name: 'name3', value: "value3"),
-                    DropDownValues(
+                    DropDownValueModel(name: 'name3', value: "value3"),
+                    DropDownValueModel(
                         name: 'name4',
                         value: "value4",
                         toolTipMsg:
                             "DropDownButton is a widget that we can use to select one unique value from a set of values"),
-                    DropDownValues(name: 'name5', value: "value5"),
-                    DropDownValues(name: 'name6', value: "value6"),
-                    DropDownValues(name: 'name7', value: "value7"),
-                    DropDownValues(name: 'name8', value: "value8"),
+                    DropDownValueModel(name: 'name5', value: "value5"),
+                    DropDownValueModel(name: 'name6', value: "value6"),
+                    DropDownValueModel(name: 'name7', value: "value7"),
+                    DropDownValueModel(name: 'name8', value: "value8"),
                   ],
                   onChanged: (val) {
                   },

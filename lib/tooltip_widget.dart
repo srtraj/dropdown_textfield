@@ -114,7 +114,8 @@ class _ToolTipWidgetState extends State<ToolTipWidget> {
             child: Align(
               alignment: Alignment.center,
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                 width: MediaQuery.of(context).size.width * 0.85,
                 decoration: const BoxDecoration(
                   color: Colors.white,

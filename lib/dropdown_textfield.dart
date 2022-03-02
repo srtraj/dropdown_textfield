@@ -1,10 +1,8 @@
-library dropdown_textfield;
-
 import 'package:dropdown_textfield/tooltip_widget.dart';
 import 'package:flutter/material.dart';
 
-class CustomDropDown extends StatefulWidget {
-  const CustomDropDown(
+class DropDownTextField extends StatefulWidget {
+  const DropDownTextField(
       {Key? key,
       this.initialValue,
       required this.dropDownList,
@@ -21,12 +19,13 @@ class CustomDropDown extends StatefulWidget {
       this.textFieldFocusNode,
       this.searchAutofocus = false,
       this.searchShowCursor,
-      this.searchKeyboardType})
+      this.searchKeyboardType,
+      this.clearOption = true})
       : isMultiSelection = false,
         isForceMultiSelectionClear = false,
         displayCompleteItem = false,
         super(key: key);
-  const CustomDropDown.multiSelection(
+  const DropDownTextField.multiSelection(
       {Key? key,
       this.displayCompleteItem = false,
       this.initialValue,
@@ -41,7 +40,8 @@ class CustomDropDown extends StatefulWidget {
       this.textFieldDecoration,
       this.maxItemCount = 6,
       this.searchFocusNode,
-      this.textFieldFocusNode})
+      this.textFieldFocusNode,
+      this.clearOption = true})
       : isMultiSelection = true,
         enableSearch = false,
         searchAutofocus = false,
@@ -55,12 +55,12 @@ class CustomDropDown extends StatefulWidget {
   ///initial value ,if it is null or not exist in dropDownList then it will not display value
   final String? initialValue;
 
-  ///List<DropDownValues>,List of dropdown values
-  final List<DropDownValues> dropDownList;
+  ///List<DropDownValueModel>,List of dropdown values
+  final List<DropDownValueModel> dropDownList;
 
   ///it is a function,called when value selected from dropdown.
-  ///for single Selection Dropdown it will return single DropDownValues object,
-  ///and for multi Selection Dropdown ,it will return list of DropDownValues object,
+  ///for single Selection Dropdown it will return single DropDownValueModel object,
+  ///and for multi Selection Dropdown ,it will return list of DropDownValueModel object,
   final ValueSetter? onChanged;
 
   ///by setting isMultiSelection=true to make multi selection dropdown
@@ -101,11 +101,14 @@ class CustomDropDown extends StatefulWidget {
   ///by setting searchShowCursor=false to hide cursor from search textfield,only applicable if enableSearch=true,
   final bool? searchShowCursor;
 
+  ///by set clearOption=false to hide clear suffix icon button from textfield
+  final bool clearOption;
+
   @override
-  _CustomDropDownState createState() => _CustomDropDownState();
+  _DropDownTextFieldState createState() => _DropDownTextFieldState();
 }
 
-class _CustomDropDownState extends State<CustomDropDown>
+class _DropDownTextFieldState extends State<DropDownTextField>
     with TickerProviderStateMixin {
   static final Animatable<double> _easeInTween =
       CurveTween(curve: Curves.easeIn);
@@ -121,7 +124,7 @@ class _CustomDropDownState extends State<CustomDropDown>
   List<bool> multiSelectionValue = [];
   // late String selectedItem;
   late double height;
-  late List<DropDownValues> dropDownList;
+  late List<DropDownValueModel> dropDownList;
   late int maxListItem;
   late double searchWidgetHeight;
   late FocusNode searchFocusNode;
@@ -189,6 +192,22 @@ class _CustomDropDownState extends State<CustomDropDown>
     super.dispose();
   }
 
+  clearFun() {
+    if (isExpanded) {
+      isExpanded = !isExpanded;
+      hideOverlay();
+    }
+    _cnt.clear();
+    if (widget.onChanged != null) {
+      widget.onChanged!(widget.isMultiSelection ? [] : "");
+    }
+    multiSelectionValue = [];
+    for (int i = 0; i < dropDownList.length; i++) {
+      multiSelectionValue.add(false);
+    }
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.isForceMultiSelectionClear) {
@@ -221,61 +240,35 @@ class _CustomDropDownState extends State<CustomDropDown>
             : null,
         decoration: widget.textFieldDecoration != null
             ? widget.textFieldDecoration!.copyWith(
-                suffixIcon: _cnt.text.isEmpty
+                suffixIcon: (_cnt.text.isEmpty || !widget.clearOption)
                     ? const Icon(
                         Icons.arrow_drop_down_outlined,
                       )
-                    : InkWell(
-                        onTap: () {
-                          if (isExpanded) {
-                            isExpanded = !isExpanded;
-                            hideOverlay();
-                          }
-                          _cnt.clear();
-                          if (widget.onChanged != null) {
-                            widget
-                                .onChanged!(widget.isMultiSelection ? [] : "");
-                          }
-                          multiSelectionValue = [];
-                          for (int i = 0; i < dropDownList.length; i++) {
-                            multiSelectionValue.add(false);
-                          }
-                          setState(() {});
-                        },
-                        child: const Icon(
-                          Icons.clear,
-                        ),
-                      ),
+                    : widget.clearOption
+                        ? InkWell(
+                            onTap: clearFun,
+                            child: const Icon(
+                              Icons.clear,
+                            ),
+                          )
+                        : null,
               )
             : InputDecoration(
                 floatingLabelBehavior: FloatingLabelBehavior.always,
                 hintText: hintText,
                 hintStyle: const TextStyle(fontWeight: FontWeight.normal),
-                suffixIcon: _cnt.text.isEmpty
+                suffixIcon: (_cnt.text.isEmpty || !widget.clearOption)
                     ? const Icon(
                         Icons.arrow_drop_down_outlined,
                       )
-                    : InkWell(
-                        onTap: () {
-                          if (isExpanded) {
-                            isExpanded = !isExpanded;
-                            hideOverlay();
-                          }
-                          _cnt.clear();
-                          if (widget.onChanged != null) {
-                            widget
-                                .onChanged!(widget.isMultiSelection ? [] : "");
-                          }
-                          multiSelectionValue = [];
-                          for (int i = 0; i < dropDownList.length; i++) {
-                            multiSelectionValue.add(false);
-                          }
-                          setState(() {});
-                        },
-                        child: const Icon(
-                          Icons.clear,
-                        ),
-                      ),
+                    : widget.clearOption
+                        ? InkWell(
+                            onTap: clearFun,
+                            child: const Icon(
+                              Icons.clear,
+                            ),
+                          )
+                        : null,
               ),
       ),
     );
@@ -367,7 +360,7 @@ class _CustomDropDownState extends State<CustomDropDown>
                       onChanged: (val) {
                         isExpanded = !isExpanded;
                         multiSelectionValue = val;
-                        List result = [];
+                        List<DropDownValueModel> result = [];
                         List completeList = [];
                         for (int i = 0; i < multiSelectionValue.length; i++) {
                           if (multiSelectionValue[i]) {
@@ -415,7 +408,7 @@ class SingleSelection extends StatefulWidget {
       required this.searchAutofocus,
       this.searchShowCursor})
       : super(key: key);
-  final List<DropDownValues> dropDownList;
+  final List<DropDownValueModel> dropDownList;
   final ValueSetter onChanged;
   final double height;
   final bool enableSearch;
@@ -431,7 +424,7 @@ class SingleSelection extends StatefulWidget {
 }
 
 class _SingleSelectionState extends State<SingleSelection> {
-  late List<DropDownValues> newDropDownList;
+  late List<DropDownValueModel> newDropDownList;
   late TextEditingController _searchCnt;
   late bool isSearch;
 
@@ -538,7 +531,7 @@ class MultiSelection extends StatefulWidget {
     required this.list,
     required this.height,
   }) : super(key: key);
-  final List<DropDownValues> dropDownList;
+  final List<DropDownValueModel> dropDownList;
   final ValueSetter onChanged;
   final List<bool> list;
   final double height;
@@ -639,12 +632,13 @@ class _MultiSelectionState extends State<MultiSelection> {
   }
 }
 
-class DropDownValues {
+class DropDownValueModel {
   final String name;
-  final String value;
+  final dynamic value;
 
   ///as of now only added for multiselection dropdown
   final String? toolTipMsg;
 
-  DropDownValues({required this.name, required this.value, this.toolTipMsg});
+  DropDownValueModel(
+      {required this.name, required this.value, this.toolTipMsg});
 }

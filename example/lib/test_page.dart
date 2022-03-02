@@ -34,7 +34,7 @@ class _TestPageState extends State<TestPage> {
                 const SizedBox(
                   height: 20,
                 ),
-                CustomDropDown(
+                DropDownTextField(
                   // initialValue: "name4",
                   validator: (value) {
                     if (value == null) {
@@ -44,19 +44,17 @@ class _TestPageState extends State<TestPage> {
                     }
                   },
                   dropDownList: [
-                    DropDownValues(name: 'name1', value: "value1"),
-                    DropDownValues(name: 'name2', value: "value2"),
-                    DropDownValues(name: 'name3', value: "value3"),
-                    DropDownValues(name: 'name4', value: "value4"),
-                    DropDownValues(name: 'name5', value: "value5"),
-                    DropDownValues(name: 'name6', value: "value6"),
-                    DropDownValues(name: 'name7', value: "value7"),
-                    DropDownValues(name: 'name8', value: "value8"),
+                    DropDownValueModel(name: 'name1', value: "value1"),
+                    DropDownValueModel(name: 'name2', value: "value2"),
+                    DropDownValueModel(name: 'name3', value: "value3"),
+                    DropDownValueModel(name: 'name4', value: "value4"),
+                    DropDownValueModel(name: 'name5', value: "value5"),
+                    DropDownValueModel(name: 'name6', value: "value6"),
+                    DropDownValueModel(name: 'name7', value: "value7"),
+                    DropDownValueModel(name: 'name8', value: "value8"),
                   ],
                   maxItemCount: 6,
-                  onChanged: (val) {
-                    print(val);
-                  },
+                  onChanged: (val) {},
                 ),
                 const SizedBox(
                   height: 50,
@@ -68,7 +66,8 @@ class _TestPageState extends State<TestPage> {
                 const SizedBox(
                   height: 20,
                 ),
-                CustomDropDown(
+                DropDownTextField(
+                  clearOption: false,
                   textFieldFocusNode: textFieldFocusNode,
                   searchFocusNode: searchFocusNode,
                   searchAutofocus: true,
@@ -76,10 +75,10 @@ class _TestPageState extends State<TestPage> {
                   enableSearch: true,
                   searchKeyboardType: TextInputType.number,
                   dropDownList: [
-                    DropDownValues(name: 'aaa', value: "aaa"),
-                    DropDownValues(name: 'bbb', value: "bbb"),
-                    DropDownValues(name: 'acc', value: "acc"),
-                    DropDownValues(name: 'dbb', value: "dbb"),
+                    DropDownValueModel(name: 'aaa', value: "aaa"),
+                    DropDownValueModel(name: 'bbb', value: "bbb"),
+                    DropDownValueModel(name: 'acc', value: "acc"),
+                    DropDownValueModel(name: 'dbb', value: "dbb"),
                   ],
                   onChanged: (val) {},
                 ),
@@ -93,24 +92,24 @@ class _TestPageState extends State<TestPage> {
                 const SizedBox(
                   height: 20,
                 ),
-                CustomDropDown.multiSelection(
+                DropDownTextField.multiSelection(
                   dropDownList: [
-                    DropDownValues(name: 'name1', value: "value1"),
-                    DropDownValues(
+                    DropDownValueModel(name: 'name1', value: "value1"),
+                    DropDownValueModel(
                         name: 'name2',
                         value: "value2",
                         toolTipMsg:
                             "DropDownButton is a widget that we can use to select one unique value from a set of values"),
-                    DropDownValues(name: 'name3', value: "value3"),
-                    DropDownValues(
+                    DropDownValueModel(name: 'name3', value: "value3"),
+                    DropDownValueModel(
                         name: 'name4',
                         value: "value4",
                         toolTipMsg:
                             "DropDownButton is a widget that we can use to select one unique value from a set of values"),
-                    DropDownValues(name: 'name5', value: "value5"),
-                    DropDownValues(name: 'name6', value: "value6"),
-                    DropDownValues(name: 'name7', value: "value7"),
-                    DropDownValues(name: 'name8', value: "value8"),
+                    DropDownValueModel(name: 'name5', value: "value5"),
+                    DropDownValueModel(name: 'name6', value: "value6"),
+                    DropDownValueModel(name: 'name7', value: "value7"),
+                    DropDownValueModel(name: 'name8', value: "value8"),
                   ],
                   onChanged: (val) {},
                 )

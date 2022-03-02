@@ -1,3 +1,8 @@
+## 0.0.4
+
+added a attribute to hide clear suffix icon button from textfield
+Changed class name "DropDownTextField"
+
 ## 0.0.3
 
 bug fix
