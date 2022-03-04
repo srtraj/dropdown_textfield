@@ -1,3 +1,7 @@
+## 0.0.5
+
+state change issue fixed
+
 ## 0.0.4
 
 added a attribute to hide clear suffix icon button from textfield

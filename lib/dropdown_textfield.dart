@@ -129,42 +129,19 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   late double searchWidgetHeight;
   late FocusNode searchFocusNode;
   late FocusNode textFieldFocusNode;
-  late bool isSearch;
   @override
   void initState() {
+    _cnt = TextEditingController();
     searchFocusNode = widget.searchFocusNode ?? FocusNode();
     textFieldFocusNode = widget.textFieldFocusNode ?? FocusNode();
-    isSearch = false;
-    dropDownList = List.from(widget.dropDownList);
     isExpanded = false;
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 150),
     );
     _heightFactor = _controller.drive(_easeInTween);
-    for (int i = 0; i < dropDownList.length; i++) {
-      multiSelectionValue.add(false);
-    }
     searchWidgetHeight = 60;
     hintText = "Select Item";
-    String? initialValue;
-    if (widget.initialValue != null) {
-      var index = dropDownList.indexWhere(
-          (element) => element.name.trim() == widget.initialValue!.trim());
-      if (index != -1) {
-        initialValue = widget.initialValue;
-      }
-    }
-    _cnt = TextEditingController(text: initialValue);
-    maxListItem = widget.maxItemCount;
-    height = !widget.isMultiSelection
-        ? dropDownList.length < maxListItem
-            ? dropDownList.length * 50
-            : 50 * maxListItem.toDouble()
-        : dropDownList.length < maxListItem
-            ? dropDownList.length * 50
-            : 50 * maxListItem.toDouble();
-
     searchFocusNode.addListener(() {
       if (!searchFocusNode.hasFocus &&
           !textFieldFocusNode.hasFocus &&
@@ -210,6 +187,25 @@ class _DropDownTextFieldState extends State<DropDownTextField>
 
   @override
   Widget build(BuildContext context) {
+    dropDownList = List.from(widget.dropDownList);
+    if (widget.initialValue != null) {
+      var index = dropDownList.indexWhere(
+          (element) => element.name.trim() == widget.initialValue!.trim());
+      if (index != -1) {
+        _cnt = TextEditingController(text: widget.initialValue);
+      }
+    }
+    for (int i = 0; i < dropDownList.length; i++) {
+      multiSelectionValue.add(false);
+    }
+    maxListItem = widget.maxItemCount;
+    height = !widget.isMultiSelection
+        ? dropDownList.length < maxListItem
+            ? dropDownList.length * 50
+            : 50 * maxListItem.toDouble()
+        : dropDownList.length < maxListItem
+            ? dropDownList.length * 50
+            : 50 * maxListItem.toDouble();
     if (widget.isForceMultiSelectionClear) {
       multiSelectionValue = [];
       _cnt.text = "";
@@ -426,7 +422,6 @@ class SingleSelection extends StatefulWidget {
 class _SingleSelectionState extends State<SingleSelection> {
   late List<DropDownValueModel> newDropDownList;
   late TextEditingController _searchCnt;
-  late bool isSearch;
 
   onItemChanged(String value) {
     setState(() {
@@ -448,7 +443,6 @@ class _SingleSelectionState extends State<SingleSelection> {
     }
     newDropDownList = List.from(widget.dropDownList);
     _searchCnt = TextEditingController();
-    isSearch = false;
     super.initState();
   }
 
