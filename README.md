@@ -16,7 +16,7 @@ A DropdownTextfield is a material design TextField. The DropDownButton is a widg
 ```dart
 singleController
 initialValue
-required dropDownList
+dropDownList
 padding
 textStyle
 onChanged
@@ -40,7 +40,7 @@ clearOption
     multiController
 displayCompleteItem 
 initialValue
-required dropDownList
+dropDownList
 padding
 textStyle
 isForceMultiSelectionClear
