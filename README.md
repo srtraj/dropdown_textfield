@@ -37,7 +37,7 @@ clearOption
 ## Multi selection argument
 
 ```dart
-    multiController
+multiController
 displayCompleteItem 
 initialValue
 dropDownList
