@@ -14,37 +14,45 @@ A DropdownTextfield is a material design TextField. The DropDownButton is a widg
 
 ## Single selection argument
 ```dart
-    initialValue,
-    dropDownList,
-    padding,
-    textStyle,
-    onChanged,
-    validator,
-    isEnabled,
-    enableSearch,
-    dropdownRadius,
-    textFieldDecoration,
-    maxItemCount,
-    searchAutofocus,
-    searchShowCursor,
-    searchKeyboardType
+singleController
+initialValue
+required dropDownList
+padding
+textStyle
+onChanged
+validator
+isEnabled
+enableSearch
+dropdownRadius
+textFieldDecoration
+maxItemCount
+searchFocusNode
+textFieldFocusNode
+searchAutofocus
+searchShowCursor
+searchKeyboardType
+clearOption
 ```
 
 ## Multi selection argument
 
 ```dart
-    displayCompleteItem,
-    initialValue,
-    dropDownList,
-    padding,
-    textStyle,
-    isForceMultiSelectionClear,
-    onChanged,
-    validator,
-    isEnabled ,
-    dropdownRadius ,
-    textFieldDecoration,
-    maxItemCount ,
+    multiController
+displayCompleteItem 
+initialValue
+required dropDownList
+padding
+textStyle
+isForceMultiSelectionClear
+onChanged
+validator
+isEnabled 
+dropdownRadius 
+textFieldDecoration
+maxItemCount
+searchFocusNode
+textFieldFocusNode
+clearOption 
 ```
 
 
