@@ -1,9 +1,13 @@
+import 'package:collection/collection.dart';
 import 'package:dropdown_textfield/tooltip_widget.dart';
 import 'package:flutter/material.dart';
+
+bool calledFromOutside = true;
 
 class DropDownTextField extends StatefulWidget {
   const DropDownTextField(
       {Key? key,
+      this.singleController,
       this.initialValue,
       required this.dropDownList,
       this.padding,
@@ -21,12 +25,16 @@ class DropDownTextField extends StatefulWidget {
       this.searchShowCursor,
       this.searchKeyboardType,
       this.clearOption = true})
-      : isMultiSelection = false,
+      : assert(!(initialValue != null && singleController != null),
+            "you cannot add both,add initial value by SingleValueDropDownController(data:initial value) "),
+        isMultiSelection = false,
         isForceMultiSelectionClear = false,
         displayCompleteItem = false,
+        multiController = null,
         super(key: key);
   const DropDownTextField.multiSelection(
       {Key? key,
+      this.multiController,
       this.displayCompleteItem = false,
       this.initialValue,
       required this.dropDownList,
@@ -42,18 +50,27 @@ class DropDownTextField extends StatefulWidget {
       this.searchFocusNode,
       this.textFieldFocusNode,
       this.clearOption = true})
-      : isMultiSelection = true,
+      : assert(initialValue == null || multiController == null,
+            "you cannot add both,add initial value by MultiValueDropDownController(data:initial value) "),
+        isMultiSelection = true,
         enableSearch = false,
         searchAutofocus = false,
         searchKeyboardType = null,
         searchShowCursor = null,
+        singleController = null,
         super(key: key);
+
+  ///single dropdown controller,
+  final SingleValueDropDownController? singleController;
+
+  ///multi dropdown controlleer
+  final MultiValueDropDownController? multiController;
 
   ///define the radius of dropdown List ,default value is 12
   final double dropdownRadius;
 
   ///initial value ,if it is null or not exist in dropDownList then it will not display value
-  final String? initialValue;
+  final dynamic initialValue;
 
   ///List<DropDownValueModel>,List of dropdown values
   final List<DropDownValueModel> dropDownList;
@@ -159,7 +176,114 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         hideOverlay();
       }
     });
+    for (int i = 0; i < widget.dropDownList.length; i++) {
+      multiSelectionValue.add(false);
+    }
+    updateFunction();
     super.initState();
+  }
+
+  updateFunction({DropDownTextField? oldWidget}) {
+    Function eq = const ListEquality().equals;
+    dropDownList = List.from(widget.dropDownList);
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      if (widget.isMultiSelection) {
+        if (oldWidget != null && !eq(oldWidget.dropDownList, dropDownList)) {
+          multiSelectionValue = [];
+          _cnt.text = "";
+          for (int i = 0; i < dropDownList.length; i++) {
+            multiSelectionValue.add(false);
+          }
+        }
+        if (widget.isForceMultiSelectionClear &&
+            multiSelectionValue.isNotEmpty) {
+          multiSelectionValue = [];
+          _cnt.text = "";
+          for (int i = 0; i < dropDownList.length; i++) {
+            multiSelectionValue.add(false);
+          }
+        }
+
+        if (widget.multiController != null) {
+          List<DropDownValueModel> multiCnt = [];
+          for (int i = 0; i < dropDownList.length; i++) {
+            if (multiSelectionValue[i]) {
+              multiCnt.add(dropDownList[i]);
+            }
+          }
+          widget.multiController!
+              .setDropDown(multiCnt.isNotEmpty ? multiCnt : null);
+        }
+        if (widget.initialValue != null) {
+          for (int i = 0; i < widget.initialValue.length; i++) {
+            var index = dropDownList.indexWhere((element) =>
+                element.name.trim() == widget.initialValue[i].trim());
+            if (index != -1) {
+              multiSelectionValue[i] = true;
+            }
+          }
+          int count =
+              multiSelectionValue.where((element) => element).toList().length;
+
+          _cnt.text = (count == 0
+              ? ""
+              : widget.displayCompleteItem
+                  ? widget.initialValue.join(",")
+                  : "$count item selected");
+        }
+        if (widget.multiController != null &&
+            widget.multiController!.dropDownValueList != null) {
+          for (int i = 0;
+              i < widget.multiController!.dropDownValueList!.length;
+              i++) {
+            var index = dropDownList.indexWhere((element) =>
+                element.value ==
+                widget.multiController!.dropDownValueList![i].value);
+            if (index != -1) {
+              multiSelectionValue[i] = true;
+            }
+          }
+          int count =
+              multiSelectionValue.where((element) => element).toList().length;
+
+          _cnt.text = (count == 0
+              ? ""
+              : widget.displayCompleteItem
+                  ? widget.initialValue.join(",")
+                  : "$count item selected");
+        }
+      } else {
+        if (widget.initialValue != null) {
+          var index = dropDownList.indexWhere(
+              (element) => element.name.trim() == widget.initialValue.trim());
+          if (index != -1) {
+            WidgetsBinding.instance!
+                .addPostFrameCallback((_) => _cnt.text = widget.initialValue);
+            // if (widget.singleController != null) {
+            //   widget.singleController!.setDropDown(widget.dropDownList[index]);
+            // }
+          }
+        }
+        if (widget.singleController != null &&
+            widget.singleController!.dropDownValue != null) {
+          _cnt.text = widget.singleController!.dropDownValue!.name;
+        }
+      }
+    });
+    maxListItem = widget.maxItemCount;
+    height = !widget.isMultiSelection
+        ? dropDownList.length < maxListItem
+            ? dropDownList.length * 50
+            : 50 * maxListItem.toDouble()
+        : dropDownList.length < maxListItem
+            ? dropDownList.length * 50
+            : 50 * maxListItem.toDouble();
+  }
+
+  @override
+  void didUpdateWidget(covariant DropDownTextField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    updateFunction(oldWidget: oldWidget);
   }
 
   @override
@@ -175,44 +299,31 @@ class _DropDownTextFieldState extends State<DropDownTextField>
       hideOverlay();
     }
     _cnt.clear();
-    if (widget.onChanged != null) {
-      widget.onChanged!(widget.isMultiSelection ? [] : "");
-    }
-    multiSelectionValue = [];
-    for (int i = 0; i < dropDownList.length; i++) {
-      multiSelectionValue.add(false);
+    if (widget.isMultiSelection) {
+      if (widget.multiController != null) {
+        widget.multiController!.setDropDown(null);
+      }
+      if (widget.onChanged != null) {
+        widget.onChanged!([]);
+      }
+
+      multiSelectionValue = [];
+      for (int i = 0; i < dropDownList.length; i++) {
+        multiSelectionValue.add(false);
+      }
+    } else {
+      if (widget.singleController != null) {
+        widget.singleController!.setDropDown(null);
+      }
+      if (widget.onChanged != null) {
+        widget.onChanged!("");
+      }
     }
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    dropDownList = List.from(widget.dropDownList);
-    if (widget.initialValue != null) {
-      var index = dropDownList.indexWhere(
-          (element) => element.name.trim() == widget.initialValue!.trim());
-      if (index != -1) {
-        _cnt = TextEditingController(text: widget.initialValue);
-      }
-    }
-    for (int i = 0; i < dropDownList.length; i++) {
-      multiSelectionValue.add(false);
-    }
-    maxListItem = widget.maxItemCount;
-    height = !widget.isMultiSelection
-        ? dropDownList.length < maxListItem
-            ? dropDownList.length * 50
-            : 50 * maxListItem.toDouble()
-        : dropDownList.length < maxListItem
-            ? dropDownList.length * 50
-            : 50 * maxListItem.toDouble();
-    if (widget.isForceMultiSelectionClear) {
-      multiSelectionValue = [];
-      _cnt.text = "";
-      for (int i = 0; i < dropDownList.length; i++) {
-        multiSelectionValue.add(false);
-      }
-    }
     return CompositedTransformTarget(
       link: layerLink,
       child: TextFormField(
@@ -231,9 +342,8 @@ class _DropDownTextFieldState extends State<DropDownTextField>
             hideOverlay();
           }
         },
-        validator: (value) => widget.validator != null
-            ? widget.validator!(value != "" ? value : null)
-            : null,
+        validator: (value) =>
+            widget.validator != null ? widget.validator!(value) : null,
         decoration: widget.textFieldDecoration != null
             ? widget.textFieldDecoration!.copyWith(
                 suffixIcon: (_cnt.text.isEmpty || !widget.clearOption)
@@ -338,10 +448,14 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                           _cnt.text = item.name;
                           isExpanded = !isExpanded;
                         });
+                        if (widget.singleController != null) {
+                          widget.singleController!.setDropDown(item);
+                        }
                         if (widget.onChanged != null) {
                           widget.onChanged!(item);
                         }
                         // Navigator.pop(context, null);
+
                         hideOverlay();
                       },
                       searchHeight: searchWidgetHeight,
@@ -374,9 +488,14 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                             : widget.displayCompleteItem
                                 ? completeList.join(",")
                                 : "$count item selected");
+                        if (widget.multiController != null) {
+                          widget.multiController!
+                              .setDropDown(result.isNotEmpty ? result : null);
+                        }
                         if (widget.onChanged != null) {
                           widget.onChanged!(result);
                         }
+
                         hideOverlay();
 
                         setState(() {});
@@ -635,4 +754,49 @@ class DropDownValueModel {
 
   DropDownValueModel(
       {required this.name, required this.value, this.toolTipMsg});
+
+  factory DropDownValueModel.fromJson(Map<String, dynamic> json) =>
+      DropDownValueModel(
+        name: json["name"],
+        value: json["value"],
+        toolTipMsg: json["toolTipMsg"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "name": name,
+        "value": value,
+        "toolTipMsg": toolTipMsg,
+      };
+}
+
+class SingleValueDropDownController extends ChangeNotifier {
+  DropDownValueModel? dropDownValue;
+  SingleValueDropDownController({DropDownValueModel? data}) {
+    setDropDown(data);
+  }
+  setDropDown(DropDownValueModel? model) {
+    dropDownValue = model;
+    notifyListeners();
+  }
+
+  clearDropDown() {
+    dropDownValue = null;
+    notifyListeners();
+  }
+}
+
+class MultiValueDropDownController extends ChangeNotifier {
+  List<DropDownValueModel>? dropDownValueList;
+  MultiValueDropDownController({List<DropDownValueModel>? data}) {
+    setDropDown(dropDownValueList);
+  }
+  setDropDown(List<DropDownValueModel>? modelList) {
+    dropDownValueList = modelList;
+    notifyListeners();
+  }
+
+  clearDropDown() {
+    dropDownValueList = null;
+    notifyListeners();
+  }
 }

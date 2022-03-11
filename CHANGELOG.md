@@ -1,3 +1,7 @@
+## 0.0.6
+
+added controller for dropdown
+
 ## 0.0.5
 
 state change issue fixed
