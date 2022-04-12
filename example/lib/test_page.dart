@@ -36,6 +36,8 @@ class _TestPageState extends State<TestPage> {
                 ),
                 DropDownTextField(
                   // initialValue: "name4",
+                  clearOption: false,
+                  readOnly: false,
                   validator: (value) {
                     if (value == null) {
                       return "Required field";
@@ -43,17 +45,12 @@ class _TestPageState extends State<TestPage> {
                       return null;
                     }
                   },
+                  dropDownItemCount: 5,
                   dropDownList: [
                     DropDownValueModel(name: 'name1', value: "value1"),
                     DropDownValueModel(name: 'name2', value: "value2"),
                     DropDownValueModel(name: 'name3', value: "value3"),
-                    DropDownValueModel(name: 'name4', value: "value4"),
-                    DropDownValueModel(name: 'name5', value: "value5"),
-                    DropDownValueModel(name: 'name6', value: "value6"),
-                    DropDownValueModel(name: 'name7', value: "value7"),
-                    DropDownValueModel(name: 'name8', value: "value8"),
                   ],
-                  maxItemCount: 6,
                   onChanged: (val) {},
                 ),
                 const SizedBox(
@@ -70,7 +67,7 @@ class _TestPageState extends State<TestPage> {
                   clearOption: false,
                   textFieldFocusNode: textFieldFocusNode,
                   searchFocusNode: searchFocusNode,
-                  searchAutofocus: true,
+                  // searchAutofocus: true,
                   searchShowCursor: false,
                   enableSearch: true,
                   searchKeyboardType: TextInputType.number,
@@ -88,6 +85,45 @@ class _TestPageState extends State<TestPage> {
                 const Text(
                   "multi selection dropdown",
                   style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                DropDownTextField(
+                  // initialValue: "name4",
+                  readOnly: false,
+                  validator: (value) {
+                    if (value == null) {
+                      return "Required field";
+                    } else {
+                      return null;
+                    }
+                  },
+                  maxItemCount: 6,
+                  dropDownList: [
+                    DropDownValueModel(name: 'name1', value: "value1"),
+                    DropDownValueModel(name: 'name2', value: "value2"),
+                    DropDownValueModel(name: 'name3', value: "value3"),
+                    DropDownValueModel(name: 'name4', value: "value4"),
+                    DropDownValueModel(name: 'name5', value: "value5"),
+                    DropDownValueModel(name: 'name6', value: "value6"),
+                    DropDownValueModel(name: 'name7', value: "value7"),
+                    DropDownValueModel(name: 'name8', value: "value8"),
+                    DropDownValueModel(name: 'name1', value: "value1"),
+                    DropDownValueModel(name: 'name2', value: "value2"),
+                    DropDownValueModel(name: 'name3', value: "value3"),
+                    DropDownValueModel(name: 'name4', value: "value4"),
+                    DropDownValueModel(name: 'name5', value: "value5"),
+                    DropDownValueModel(name: 'name6', value: "value6"),
+                    DropDownValueModel(name: 'name7', value: "value7"),
+                    DropDownValueModel(name: 'name8', value: "value8"),
+                    DropDownValueModel(name: 'name1', value: "value1"),
+                    DropDownValueModel(name: 'name2', value: "value2"),
+                    DropDownValueModel(name: 'name3', value: "value3"),
+                    DropDownValueModel(name: 'name4', value: "value4"),
+                    DropDownValueModel(name: 'name5', value: "value5"),
+                    DropDownValueModel(name: 'name6', value: "value6"),
+                    DropDownValueModel(name: 'name7', value: "value7"),
+                    DropDownValueModel(name: 'name8', value: "value8"),
+                  ],
+                  onChanged: (val) {},
                 ),
                 const SizedBox(
                   height: 20,
@@ -112,7 +148,36 @@ class _TestPageState extends State<TestPage> {
                     DropDownValueModel(name: 'name8', value: "value8"),
                   ],
                   onChanged: (val) {},
-                )
+                ),
+                const Text(
+                  "Single selection dropdown",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                DropDownTextField(
+                  // initialValue: "name4",
+                  validator: (value) {
+                    if (value == null) {
+                      return "Required field";
+                    } else {
+                      return null;
+                    }
+                  },
+                  dropDownList: [
+                    DropDownValueModel(name: 'name1', value: "value1"),
+                    DropDownValueModel(name: 'name2', value: "value2"),
+                    DropDownValueModel(name: 'name3', value: "value3"),
+                    DropDownValueModel(name: 'name4', value: "value4"),
+                    DropDownValueModel(name: 'name5', value: "value5"),
+                    DropDownValueModel(name: 'name6', value: "value6"),
+                    DropDownValueModel(name: 'name7', value: "value7"),
+                    DropDownValueModel(name: 'name8', value: "value8"),
+                  ],
+                  maxItemCount: 6,
+                  onChanged: (val) {},
+                ),
               ],
             ),
           ),

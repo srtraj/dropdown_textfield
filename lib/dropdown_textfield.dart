@@ -16,14 +16,18 @@ class DropDownTextField extends StatefulWidget {
       this.validator,
       this.isEnabled = true,
       this.enableSearch = false,
+      this.readOnly = true,
       this.dropdownRadius = 12,
       this.textFieldDecoration,
-      this.maxItemCount = 6,
+      @Deprecated('Use `dropDownItemCount` instead. Will be removed in next version')
+          this.maxItemCount,
+      this.dropDownItemCount = 6,
       this.searchFocusNode,
       this.textFieldFocusNode,
       this.searchAutofocus = false,
       this.searchShowCursor,
       this.searchKeyboardType,
+      this.listSpace = 0,
       this.clearOption = true})
       : assert(!(initialValue != null && singleController != null),
             "you cannot add both,add initial value by SingleValueDropDownController(data:initial value) "),
@@ -46,14 +50,18 @@ class DropDownTextField extends StatefulWidget {
       this.isEnabled = true,
       this.dropdownRadius = 12,
       this.textFieldDecoration,
-      this.maxItemCount = 6,
+      @Deprecated('Use `dropDownItemCount` instead. Will be removed in next version')
+          this.maxItemCount,
+      this.dropDownItemCount = 6,
       this.searchFocusNode,
       this.textFieldFocusNode,
+      this.listSpace = 0,
       this.clearOption = true})
       : assert(initialValue == null || multiController == null,
             "you cannot add both,add initial value by MultiValueDropDownController(data:initial value) "),
         isMultiSelection = true,
         enableSearch = false,
+        readOnly = true,
         searchAutofocus = false,
         searchKeyboardType = null,
         searchShowCursor = null,
@@ -99,11 +107,15 @@ class DropDownTextField extends StatefulWidget {
   ///by setting enableSearch=true enable search option in dropdown,as of now this feature enabled only for single selection dropdown
   final bool enableSearch;
 
+  final bool readOnly;
+
   ///set displayCompleteItem=true, if you want show complete list of item in textfield else it will display like "number_of_item item selected"
   final bool displayCompleteItem;
 
   ///you can define maximum number dropdown item length,default value is 6
-  final int maxItemCount;
+
+  final int? maxItemCount;
+  final int dropDownItemCount;
 
   final FocusNode? searchFocusNode;
   final FocusNode? textFieldFocusNode;
@@ -120,6 +132,9 @@ class DropDownTextField extends StatefulWidget {
 
   ///by set clearOption=false to hide clear suffix icon button from textfield
   final bool clearOption;
+
+  ///you can add space between textfield and list ,default value is 0
+  final double listSpace;
 
   @override
   _DropDownTextFieldState createState() => _DropDownTextFieldState();
@@ -270,7 +285,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         }
       }
     });
-    maxListItem = widget.maxItemCount;
+    maxListItem = widget.maxItemCount ?? widget.dropDownItemCount;
     height = !widget.isMultiSelection
         ? dropDownList.length < maxListItem
             ? dropDownList.length * 50
@@ -290,6 +305,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   void dispose() {
     if (widget.searchFocusNode == null) searchFocusNode.dispose();
     if (widget.textFieldFocusNode == null) textFieldFocusNode.dispose();
+    _cnt.dispose();
     super.dispose();
   }
 
@@ -330,7 +346,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         focusNode: textFieldFocusNode,
         style: widget.textStyle,
         enabled: widget.isEnabled,
-        readOnly: true,
+        readOnly: widget.readOnly,
         controller: _cnt,
         onTap: () {
           setState(() {
@@ -388,7 +404,10 @@ class _DropDownTextFieldState extends State<DropDownTextField>
     final offset = renderBox.localToGlobal(Offset.zero);
     double posFromTop = offset.dy;
     double posFromBot = MediaQuery.of(context).size.height - posFromTop;
-    double ht = height + 120 + (widget.enableSearch ? searchWidgetHeight : 0);
+    double ht = height +
+        120 +
+        (widget.enableSearch ? searchWidgetHeight : 0) +
+        widget.listSpace;
     final double htPos = posFromBot < ht ? size.height - 100 : size.height;
     entry = OverlayEntry(
       builder: (context) => Positioned(
@@ -400,7 +419,12 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                   posFromBot < ht ? Alignment.bottomCenter : Alignment.topLeft,
               link: layerLink,
               showWhenUnlinked: false,
-              offset: Offset(0, htPos),
+              offset: Offset(
+                0,
+                posFromBot < ht
+                    ? htPos - widget.listSpace
+                    : htPos + widget.listSpace,
+              ),
               child: AnimatedBuilder(
                 animation: _controller.view,
                 builder: buildOverlay,
@@ -438,6 +462,8 @@ class _DropDownTextFieldState extends State<DropDownTextField>
               ),
               child: !widget.isMultiSelection
                   ? SingleSelection(
+                      mainController: _cnt,
+                      autoSort: !widget.readOnly,
                       mainFocusNode: textFieldFocusNode,
                       searchFocusNode: searchFocusNode,
                       enableSearch: widget.enableSearch,
@@ -521,7 +547,9 @@ class SingleSelection extends StatefulWidget {
       required this.mainFocusNode,
       this.searchKeyboardType,
       required this.searchAutofocus,
-      this.searchShowCursor})
+      this.searchShowCursor,
+      required this.mainController,
+      required this.autoSort})
       : super(key: key);
   final List<DropDownValueModel> dropDownList;
   final ValueSetter onChanged;
@@ -533,6 +561,8 @@ class SingleSelection extends StatefulWidget {
   final TextInputType? searchKeyboardType;
   final bool searchAutofocus;
   final bool? searchShowCursor;
+  final TextEditingController mainController;
+  final bool autoSort;
 
   @override
   State<SingleSelection> createState() => _SingleSelectionState();
@@ -562,6 +592,15 @@ class _SingleSelectionState extends State<SingleSelection> {
     }
     newDropDownList = List.from(widget.dropDownList);
     _searchCnt = TextEditingController();
+    if (widget.autoSort) {
+      onItemChanged(widget.mainController.text);
+      widget.mainController.addListener(() {
+        if (mounted) {
+          onItemChanged(widget.mainController.text);
+        }
+      });
+    }
+
     super.initState();
   }
 

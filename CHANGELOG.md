@@ -1,3 +1,7 @@
+## 0.0.7
+
+added attribute to add space between textfield and list widget
+
 ## 0.0.6
 
 added controller for dropdown
