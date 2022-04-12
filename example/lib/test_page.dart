@@ -12,6 +12,15 @@ class _TestPageState extends State<TestPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   FocusNode searchFocusNode = FocusNode();
   FocusNode textFieldFocusNode = FocusNode();
+  late SingleValueDropDownController _cnt;
+  late MultiValueDropDownController _cntMulti;
+
+  @override
+  void initState() {
+    _cnt = SingleValueDropDownController();
+    _cntMulti = MultiValueDropDownController();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +45,7 @@ class _TestPageState extends State<TestPage> {
                 ),
                 DropDownTextField(
                   // initialValue: "name4",
+                  singleController: _cnt,
                   clearOption: false,
                   readOnly: false,
                   validator: (value) {
@@ -96,7 +106,7 @@ class _TestPageState extends State<TestPage> {
                       return null;
                     }
                   },
-                  maxItemCount: 6,
+                  dropDownItemCount: 6,
                   dropDownList: [
                     DropDownValueModel(name: 'name1', value: "value1"),
                     DropDownValueModel(name: 'name2', value: "value2"),
@@ -129,6 +139,7 @@ class _TestPageState extends State<TestPage> {
                   height: 20,
                 ),
                 DropDownTextField.multiSelection(
+                  multiController: _cntMulti,
                   dropDownList: [
                     DropDownValueModel(name: 'name1', value: "value1"),
                     DropDownValueModel(
@@ -175,7 +186,7 @@ class _TestPageState extends State<TestPage> {
                     DropDownValueModel(name: 'name7', value: "value7"),
                     DropDownValueModel(name: 'name8', value: "value8"),
                   ],
-                  maxItemCount: 6,
+                  dropDownItemCount: 6,
                   onChanged: (val) {},
                 ),
               ],

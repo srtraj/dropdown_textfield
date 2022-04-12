@@ -1,3 +1,7 @@
+## 0.0.8
+
+Single dropdown controller text clear function fix
+
 ## 0.0.7
 
 added attribute to add space between textfield and list widget

@@ -282,6 +282,8 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         if (widget.singleController != null &&
             widget.singleController!.dropDownValue != null) {
           _cnt.text = widget.singleController!.dropDownValue!.name;
+        } else {
+          _cnt.clear();
         }
       }
     });
