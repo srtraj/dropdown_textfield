@@ -86,6 +86,11 @@ set displayCompleteItem=true, if you want display complete list of selected item
 
 ### maxItemCount
 you can define maximum number of dropdown item length,default value is 6
+maxItemCount removed ,Use `dropDownItemCount` instead.
+
+### dropDownItemCount
+you can define maximum number of dropdown item length,default value is 6
+
 
 ### dropdownRadius
 define the radius of dropdown List widget ,default value is 12
