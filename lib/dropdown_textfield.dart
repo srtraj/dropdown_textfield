@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:dropdown_textfield/tooltip_widget.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 bool calledFromOutside = true;
@@ -19,8 +20,6 @@ class DropDownTextField extends StatefulWidget {
       this.readOnly = true,
       this.dropdownRadius = 12,
       this.textFieldDecoration,
-      @Deprecated('Use `dropDownItemCount` instead. Will be removed in next version')
-          this.maxItemCount,
       this.dropDownItemCount = 6,
       this.searchFocusNode,
       this.textFieldFocusNode,
@@ -28,13 +27,17 @@ class DropDownTextField extends StatefulWidget {
       this.searchShowCursor,
       this.searchKeyboardType,
       this.listSpace = 0,
-      this.clearOption = true})
+      this.clearOption = true,
+      this.listTileHeight = 50})
       : assert(!(initialValue != null && singleController != null),
-            "you cannot add both,add initial value by SingleValueDropDownController(data:initial value) "),
+            "you cannot add both initialValue and singleController,\nset initial value using controller \n\tEg: SingleValueDropDownController(data:initial value) "),
         isMultiSelection = false,
         isForceMultiSelectionClear = false,
         displayCompleteItem = false,
         multiController = null,
+        buttonColor = null,
+        buttonText = null,
+        buttonTextStyle = null,
         super(key: key);
   const DropDownTextField.multiSelection(
       {Key? key,
@@ -50,15 +53,17 @@ class DropDownTextField extends StatefulWidget {
       this.isEnabled = true,
       this.dropdownRadius = 12,
       this.textFieldDecoration,
-      @Deprecated('Use `dropDownItemCount` instead. Will be removed in next version')
-          this.maxItemCount,
       this.dropDownItemCount = 6,
       this.searchFocusNode,
       this.textFieldFocusNode,
       this.listSpace = 0,
-      this.clearOption = true})
+      this.clearOption = true,
+      this.buttonColor,
+      this.buttonText,
+      this.buttonTextStyle,
+      this.listTileHeight = 50})
       : assert(initialValue == null || multiController == null,
-            "you cannot add both,add initial value by MultiValueDropDownController(data:initial value) "),
+            "you cannot add both initialValue and multiController\nset initial value using controller\n\tMultiValueDropDownController(data:initial value)"),
         isMultiSelection = true,
         enableSearch = false,
         readOnly = true,
@@ -71,7 +76,7 @@ class DropDownTextField extends StatefulWidget {
   ///single dropdown controller,
   final SingleValueDropDownController? singleController;
 
-  ///multi dropdown controlleer
+  ///multi dropdown controller
   final MultiValueDropDownController? multiController;
 
   ///define the radius of dropdown List ,default value is 12
@@ -113,8 +118,6 @@ class DropDownTextField extends StatefulWidget {
   final bool displayCompleteItem;
 
   ///you can define maximum number dropdown item length,default value is 6
-
-  final int? maxItemCount;
   final int dropDownItemCount;
 
   final FocusNode? searchFocusNode;
@@ -136,6 +139,17 @@ class DropDownTextField extends StatefulWidget {
   ///you can add space between textfield and list ,default value is 0
   final double listSpace;
 
+  ///multi dropdown submit button text
+  final String? buttonText;
+
+  ///multi dropdown submit button color
+  final Color? buttonColor;
+
+  ///submit button text style
+  final TextStyle? buttonTextStyle;
+
+  ///List tile height
+  final double listTileHeight;
   @override
   _DropDownTextFieldState createState() => _DropDownTextFieldState();
 }
@@ -194,12 +208,41 @@ class _DropDownTextFieldState extends State<DropDownTextField>
     for (int i = 0; i < widget.dropDownList.length; i++) {
       multiSelectionValue.add(false);
     }
+
+    ///initial value load
+    if (widget.initialValue != null) {
+      dropDownList = List.from(widget.dropDownList);
+      if (widget.isMultiSelection) {
+        for (int i = 0; i < widget.initialValue.length; i++) {
+          var index = dropDownList.indexWhere((element) =>
+              element.name.trim() == widget.initialValue[i].trim());
+          if (index != -1) {
+            multiSelectionValue[i] = true;
+          }
+        }
+        int count =
+            multiSelectionValue.where((element) => element).toList().length;
+
+        _cnt.text = (count == 0
+            ? ""
+            : widget.displayCompleteItem
+                ? widget.initialValue.join(",")
+                : "$count item selected");
+      } else {
+        var index = dropDownList.indexWhere(
+            (element) => element.name.trim() == widget.initialValue.trim());
+
+        if (index != -1) {
+          _cnt.text = widget.initialValue;
+        }
+      }
+    }
     updateFunction();
     super.initState();
   }
 
   updateFunction({DropDownTextField? oldWidget}) {
-    Function eq = const ListEquality().equals;
+    Function eq = const DeepCollectionEquality().equals;
     dropDownList = List.from(widget.dropDownList);
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       if (widget.isMultiSelection) {
@@ -219,82 +262,67 @@ class _DropDownTextFieldState extends State<DropDownTextField>
           }
         }
 
+        // if (widget.multiController != null) {
+        //   List<DropDownValueModel> multiCnt = [];
+        //   for (int i = 0; i < dropDownList.length; i++) {
+        //     if (multiSelectionValue[i]) {
+        //       multiCnt.add(dropDownList[i]);
+        //     }
+        //   }
+        //   widget.multiController!
+        //       .setDropDown(multiCnt.isNotEmpty ? multiCnt : null);
+        // }
+
         if (widget.multiController != null) {
-          List<DropDownValueModel> multiCnt = [];
-          for (int i = 0; i < dropDownList.length; i++) {
-            if (multiSelectionValue[i]) {
-              multiCnt.add(dropDownList[i]);
+          if (oldWidget != null &&
+              oldWidget.multiController!.dropDownValueList != null) {}
+          if (widget.multiController!.dropDownValueList != null) {
+            multiSelectionValue = [];
+            for (int i = 0; i < dropDownList.length; i++) {
+              multiSelectionValue.add(false);
+            }
+            for (int i = 0;
+                i < widget.multiController!.dropDownValueList!.length;
+                i++) {
+              var index = dropDownList.indexWhere((element) =>
+                  element == widget.multiController!.dropDownValueList![i]);
+              if (index != -1) {
+                multiSelectionValue[index] = true;
+              }
+            }
+            int count =
+                multiSelectionValue.where((element) => element).toList().length;
+            _cnt.text = (count == 0
+                ? ""
+                : widget.displayCompleteItem
+                    ? widget.initialValue.join(",")
+                    : "$count item selected");
+          } else {
+            multiSelectionValue = [];
+            _cnt.text = "";
+            for (int i = 0; i < dropDownList.length; i++) {
+              multiSelectionValue.add(false);
             }
           }
-          widget.multiController!
-              .setDropDown(multiCnt.isNotEmpty ? multiCnt : null);
-        }
-        if (widget.initialValue != null) {
-          for (int i = 0; i < widget.initialValue.length; i++) {
-            var index = dropDownList.indexWhere((element) =>
-                element.name.trim() == widget.initialValue[i].trim());
-            if (index != -1) {
-              multiSelectionValue[i] = true;
-            }
-          }
-          int count =
-              multiSelectionValue.where((element) => element).toList().length;
-
-          _cnt.text = (count == 0
-              ? ""
-              : widget.displayCompleteItem
-                  ? widget.initialValue.join(",")
-                  : "$count item selected");
-        }
-        if (widget.multiController != null &&
-            widget.multiController!.dropDownValueList != null) {
-          for (int i = 0;
-              i < widget.multiController!.dropDownValueList!.length;
-              i++) {
-            var index = dropDownList.indexWhere((element) =>
-                element.value ==
-                widget.multiController!.dropDownValueList![i].value);
-            if (index != -1) {
-              multiSelectionValue[i] = true;
-            }
-          }
-          int count =
-              multiSelectionValue.where((element) => element).toList().length;
-
-          _cnt.text = (count == 0
-              ? ""
-              : widget.displayCompleteItem
-                  ? widget.initialValue.join(",")
-                  : "$count item selected");
         }
       } else {
-        if (widget.initialValue != null) {
-          var index = dropDownList.indexWhere(
-              (element) => element.name.trim() == widget.initialValue.trim());
-          if (index != -1) {
-            WidgetsBinding.instance!
-                .addPostFrameCallback((_) => _cnt.text = widget.initialValue);
-            // if (widget.singleController != null) {
-            //   widget.singleController!.setDropDown(widget.dropDownList[index]);
-            // }
+        if (widget.singleController != null) {
+          if (widget.singleController!.dropDownValue != null) {
+            _cnt.text = widget.singleController!.dropDownValue!.name;
+          } else {
+            _cnt.clear();
           }
-        }
-        if (widget.singleController != null &&
-            widget.singleController!.dropDownValue != null) {
-          _cnt.text = widget.singleController!.dropDownValue!.name;
-        } else {
-          _cnt.clear();
         }
       }
     });
-    maxListItem = widget.maxItemCount ?? widget.dropDownItemCount;
+    maxListItem = widget.dropDownItemCount;
     height = !widget.isMultiSelection
         ? dropDownList.length < maxListItem
-            ? dropDownList.length * 50
-            : 50 * maxListItem.toDouble()
+            ? dropDownList.length * widget.listTileHeight
+            : widget.listTileHeight * maxListItem.toDouble()
         : dropDownList.length < maxListItem
-            ? dropDownList.length * 50
-            : 50 * maxListItem.toDouble();
+            ? dropDownList.length * widget.listTileHeight
+            : widget.listTileHeight * maxListItem.toDouble();
   }
 
   @override
@@ -399,6 +427,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   }
 
   Future<void> _showOverlay() async {
+    // _insertOverlay(context);
     _controller.forward();
     final overlay = Overlay.of(context);
     final renderBox = context.findRenderObject() as RenderBox;
@@ -406,19 +435,28 @@ class _DropDownTextFieldState extends State<DropDownTextField>
     final offset = renderBox.localToGlobal(Offset.zero);
     double posFromTop = offset.dy;
     double posFromBot = MediaQuery.of(context).size.height - posFromTop;
-    double ht = height +
-        120 +
+    double dropdownListHeight = height +
         (widget.enableSearch ? searchWidgetHeight : 0) +
         widget.listSpace;
-    final double htPos = posFromBot < ht ? size.height - 100 : size.height;
+    double ht = dropdownListHeight + 120;
+    final double topPaddingHeight = (widget.readOnly &&
+            dropdownListHeight >
+                (posFromTop - MediaQuery.of(context).padding.top - 15))
+        ? (dropdownListHeight -
+            (posFromTop - MediaQuery.of(context).padding.top - 15))
+        : 0;
+    final double htPos =
+        posFromBot < ht ? size.height - 100 + topPaddingHeight : size.height;
     entry = OverlayEntry(
       builder: (context) => Positioned(
           width: size.width,
           child: CompositedTransformFollower(
-              targetAnchor:
-                  posFromBot < ht ? Alignment.bottomCenter : Alignment.topLeft,
-              followerAnchor:
-                  posFromBot < ht ? Alignment.bottomCenter : Alignment.topLeft,
+              targetAnchor: posFromBot < ht
+                  ? Alignment.bottomCenter
+                  : Alignment.topCenter,
+              followerAnchor: posFromBot < ht
+                  ? Alignment.bottomCenter
+                  : Alignment.topCenter,
               link: layerLink,
               showWhenUnlinked: false,
               offset: Offset(
@@ -433,6 +471,24 @@ class _DropDownTextFieldState extends State<DropDownTextField>
               ))),
     );
     overlay?.insert(entry!);
+  }
+
+  _insertOverlay(BuildContext context) {
+    return Overlay.of(context)!.insert(
+      OverlayEntry(builder: (context) {
+        final size = MediaQuery.of(context).size;
+        return GestureDetector(
+          onTap: () {
+            hideOverlay();
+          },
+          child: Container(
+            width: size.width,
+            height: size.height,
+            color: Colors.transparent,
+          ),
+        );
+      }),
+    );
   }
 
   void hideOverlay() {
@@ -470,6 +526,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                       searchFocusNode: searchFocusNode,
                       enableSearch: widget.enableSearch,
                       height: height,
+                      listTileHeight: widget.listTileHeight,
                       dropDownList: dropDownList,
                       onChanged: (item) {
                         setState(() {
@@ -492,7 +549,11 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                       searchShowCursor: widget.searchShowCursor,
                     )
                   : MultiSelection(
+                      buttonTextStyle: widget.buttonTextStyle,
+                      buttonText: widget.buttonText,
+                      buttonColor: widget.buttonColor,
                       height: height,
+                      listTileHeight: widget.listTileHeight,
                       list: multiSelectionValue,
                       dropDownList: dropDownList,
                       onChanged: (val) {
@@ -551,11 +612,13 @@ class SingleSelection extends StatefulWidget {
       required this.searchAutofocus,
       this.searchShowCursor,
       required this.mainController,
-      required this.autoSort})
+      required this.autoSort,
+      required this.listTileHeight})
       : super(key: key);
   final List<DropDownValueModel> dropDownList;
   final ValueSetter onChanged;
   final double height;
+  final double listTileHeight;
   final bool enableSearch;
   final double searchHeight;
   final FocusNode searchFocusNode;
@@ -659,7 +722,7 @@ class _SingleSelectionState extends State<SingleSelection> {
                   },
                   child: Container(
                     width: double.infinity,
-                    height: 50,
+                    height: widget.listTileHeight,
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Align(
                       alignment: Alignment.centerLeft,
@@ -678,17 +741,25 @@ class _SingleSelectionState extends State<SingleSelection> {
 }
 
 class MultiSelection extends StatefulWidget {
-  const MultiSelection({
-    Key? key,
-    required this.onChanged,
-    required this.dropDownList,
-    required this.list,
-    required this.height,
-  }) : super(key: key);
+  const MultiSelection(
+      {Key? key,
+      required this.onChanged,
+      required this.dropDownList,
+      required this.list,
+      required this.height,
+      this.buttonColor,
+      this.buttonText,
+      this.buttonTextStyle,
+      required this.listTileHeight})
+      : super(key: key);
   final List<DropDownValueModel> dropDownList;
   final ValueSetter onChanged;
   final List<bool> list;
   final double height;
+  final Color? buttonColor;
+  final String? buttonText;
+  final TextStyle? buttonTextStyle;
+  final double listTileHeight;
 
   @override
   _MultiSelectionState createState() => _MultiSelectionState();
@@ -714,86 +785,95 @@ class _MultiSelectionState extends State<MultiSelection> {
                 padding: EdgeInsets.zero,
                 itemCount: widget.dropDownList.length,
                 itemBuilder: (BuildContext context, int index) {
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          width: double.infinity,
-                          height: 50,
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(widget.dropDownList[index].name,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .subtitle1),
-                                ),
-                                if (widget.dropDownList[index].toolTipMsg !=
-                                    null)
-                                  ToolTipWidget(
-                                      msg: widget
-                                          .dropDownList[index].toolTipMsg!)
-                              ],
+                  return SizedBox(
+                    height: widget.listTileHeight,
+                    width: double.infinity,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(widget.dropDownList[index].name,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .subtitle1),
+                                  ),
+                                  if (widget.dropDownList[index].toolTipMsg !=
+                                      null)
+                                    ToolTipWidget(
+                                        msg: widget
+                                            .dropDownList[index].toolTipMsg!)
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      Checkbox(
-                        value: multiSelectionValue[index],
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() {
-                              multiSelectionValue[index] = value;
-                            });
-                          }
-                        },
-                      ),
-                    ],
+                        Checkbox(
+                          value: multiSelectionValue[index],
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                multiSelectionValue[index] = value;
+                              });
+                            }
+                          },
+                        ),
+                      ],
+                    ),
                   );
                 }),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(right: 8.0, bottom: 5, top: 15),
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: SizedBox(
-                height: 40,
-                width: 50,
-                child: MaterialButton(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  color: Colors.green,
-                  child: const FittedBox(
-                    fit: BoxFit.contain,
-                    child: Text(
-                      "Ok",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+        Row(
+          children: [
+            const Expanded(
+              child: SizedBox.shrink(),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0, bottom: 5, top: 15),
+              child: InkWell(
+                onTap: () => widget.onChanged(multiSelectionValue),
+                child: Container(
+                  height: widget.listTileHeight * 0.9,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 5.0, horizontal: 12),
+                  decoration: BoxDecoration(
+                      color: widget.buttonColor ?? Colors.green,
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(12))),
+                  child: Align(
+                    child: FittedBox(
+                      fit: BoxFit.contain,
+                      child: Text(
+                        widget.buttonText ?? "Ok",
+                        style: widget.buttonTextStyle ??
+                            const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
-                  onPressed: () {
-                    widget.onChanged(multiSelectionValue);
-                  },
-                )),
-          ),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
 }
 
-class DropDownValueModel {
+class DropDownValueModel extends Equatable {
   final String name;
   final dynamic value;
 
   ///as of now only added for multiselection dropdown
   final String? toolTipMsg;
 
-  DropDownValueModel(
+  const DropDownValueModel(
       {required this.name, required this.value, this.toolTipMsg});
 
   factory DropDownValueModel.fromJson(Map<String, dynamic> json) =>
@@ -808,6 +888,8 @@ class DropDownValueModel {
         "value": value,
         "toolTipMsg": toolTipMsg,
       };
+  @override
+  List<Object> get props => [name, value];
 }
 
 class SingleValueDropDownController extends ChangeNotifier {
@@ -829,10 +911,20 @@ class SingleValueDropDownController extends ChangeNotifier {
 class MultiValueDropDownController extends ChangeNotifier {
   List<DropDownValueModel>? dropDownValueList;
   MultiValueDropDownController({List<DropDownValueModel>? data}) {
-    setDropDown(dropDownValueList);
+    setDropDown(data);
   }
   setDropDown(List<DropDownValueModel>? modelList) {
-    dropDownValueList = modelList;
+    if (modelList != null && modelList.isNotEmpty) {
+      List<DropDownValueModel> list = [];
+      for (DropDownValueModel item in modelList) {
+        if (!list.contains(item)) {
+          list.add(item);
+        }
+      }
+      dropDownValueList = list;
+    } else {
+      dropDownValueList = null;
+    }
     notifyListeners();
   }
 
