@@ -385,7 +385,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   Widget build(BuildContext context) {
     return CompositedTransformTarget(
       link: _layerLink,
-      child:TextFormField(
+      child: TextFormField(
         focusNode: _textFieldFocusNode,
         style: widget.textStyle,
         enabled: widget.isEnabled,
@@ -402,39 +402,39 @@ class _DropDownTextFieldState extends State<DropDownTextField>
           }
         },
         validator: (value) =>
-        widget.validator != null ? widget.validator!(value) : null,
+            widget.validator != null ? widget.validator!(value) : null,
         decoration: widget.textFieldDecoration != null
             ? widget.textFieldDecoration!.copyWith(
-          suffixIcon: (_cnt.text.isEmpty || !widget.clearOption)
-              ? const Icon(
-            Icons.arrow_drop_down_outlined,
-          )
-              : widget.clearOption
-              ? InkWell(
-            onTap: clearFun,
-            child: const Icon(
-              Icons.clear,
-            ),
-          )
-              : null,
-        )
+                suffixIcon: (_cnt.text.isEmpty || !widget.clearOption)
+                    ? const Icon(
+                        Icons.arrow_drop_down_outlined,
+                      )
+                    : widget.clearOption
+                        ? InkWell(
+                            onTap: clearFun,
+                            child: const Icon(
+                              Icons.clear,
+                            ),
+                          )
+                        : null,
+              )
             : InputDecoration(
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-          hintText: _hintText,
-          hintStyle: const TextStyle(fontWeight: FontWeight.normal),
-          suffixIcon: (_cnt.text.isEmpty || !widget.clearOption)
-              ? const Icon(
-            Icons.arrow_drop_down_outlined,
-          )
-              : widget.clearOption
-              ? InkWell(
-            onTap: clearFun,
-            child: const Icon(
-              Icons.clear,
-            ),
-          )
-              : null,
-        ),
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                hintText: _hintText,
+                hintStyle: const TextStyle(fontWeight: FontWeight.normal),
+                suffixIcon: (_cnt.text.isEmpty || !widget.clearOption)
+                    ? const Icon(
+                        Icons.arrow_drop_down_outlined,
+                      )
+                    : widget.clearOption
+                        ? InkWell(
+                            onTap: clearFun,
+                            child: const Icon(
+                              Icons.clear,
+                            ),
+                          )
+                        : null,
+              ),
       ),
     );
   }
