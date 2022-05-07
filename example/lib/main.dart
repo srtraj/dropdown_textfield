@@ -1,3 +1,4 @@
+import 'package:example/test2.dart';
 import 'package:example/test_page.dart';
 import 'package:flutter/material.dart';
 
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const TestPage(),
+      home: const TestPage2(),
     );
   }
 }

@@ -47,7 +47,6 @@ class _TestPageState extends State<TestPage> {
                   // initialValue: "name4",
                   singleController: _cnt,
                   clearOption: false,
-                  readOnly: false,
                   validator: (value) {
                     if (value == null) {
                       return "Required field";
@@ -98,7 +97,7 @@ class _TestPageState extends State<TestPage> {
                 ),
                 DropDownTextField(
                   // initialValue: "name4",
-                  readOnly: false,
+                  enableSearch: true,
                   validator: (value) {
                     if (value == null) {
                       return "Required field";

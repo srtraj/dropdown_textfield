@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:dropdown_textfield/tooltip_widget.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 bool calledFromOutside = true;
 
@@ -150,6 +151,7 @@ class DropDownTextField extends StatefulWidget {
 
   ///List tile height
   final double listTileHeight;
+
   @override
   _DropDownTextFieldState createState() => _DropDownTextFieldState();
 }
@@ -160,68 +162,77 @@ class _DropDownTextFieldState extends State<DropDownTextField>
       CurveTween(curve: Curves.easeIn);
 
   late TextEditingController _cnt;
-  late String hintText;
+  late String _hintText;
 
-  late bool isExpanded;
-  OverlayEntry? entry;
-  final layerLink = LayerLink();
+  late bool _isExpanded;
+  OverlayEntry? _entry;
+  OverlayEntry? _entry2;
+  final _layerLink = LayerLink();
   late AnimationController _controller;
   late Animation<double> _heightFactor;
-  List<bool> multiSelectionValue = [];
+  List<bool> _multiSelectionValue = [];
   // late String selectedItem;
-  late double height;
-  late List<DropDownValueModel> dropDownList;
-  late int maxListItem;
-  late double searchWidgetHeight;
-  late FocusNode searchFocusNode;
-  late FocusNode textFieldFocusNode;
+  late double _height;
+  late List<DropDownValueModel> _dropDownList;
+  late int _maxListItem;
+  late double _searchWidgetHeight;
+  late FocusNode _searchFocusNode;
+  late FocusNode _textFieldFocusNode;
+  late bool _isOutsideClickOverlay;
+  late ScrollController scrolCnt;
+
   @override
   void initState() {
     _cnt = TextEditingController();
-    searchFocusNode = widget.searchFocusNode ?? FocusNode();
-    textFieldFocusNode = widget.textFieldFocusNode ?? FocusNode();
-    isExpanded = false;
+    scrolCnt = ScrollController();
+    scrolCnt.addListener(() {
+      print(scrolCnt.position);
+    });
+    _isOutsideClickOverlay = false;
+    _searchFocusNode = widget.searchFocusNode ?? FocusNode();
+    _textFieldFocusNode = widget.textFieldFocusNode ?? FocusNode();
+    _isExpanded = false;
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 150),
     );
     _heightFactor = _controller.drive(_easeInTween);
-    searchWidgetHeight = 60;
-    hintText = "Select Item";
-    searchFocusNode.addListener(() {
-      if (!searchFocusNode.hasFocus &&
-          !textFieldFocusNode.hasFocus &&
-          isExpanded &&
+    _searchWidgetHeight = 60;
+    _hintText = "Select Item";
+    _searchFocusNode.addListener(() {
+      if (!_searchFocusNode.hasFocus &&
+          !_textFieldFocusNode.hasFocus &&
+          _isExpanded &&
           !widget.isMultiSelection) {
-        isExpanded = !isExpanded;
+        _isExpanded = !_isExpanded;
         hideOverlay();
       }
     });
-    textFieldFocusNode.addListener(() {
-      if (!searchFocusNode.hasFocus &&
-          !textFieldFocusNode.hasFocus &&
-          isExpanded) {
-        isExpanded = !isExpanded;
+    _textFieldFocusNode.addListener(() {
+      if (!_searchFocusNode.hasFocus &&
+          !_textFieldFocusNode.hasFocus &&
+          _isExpanded) {
+        _isExpanded = !_isExpanded;
         hideOverlay();
       }
     });
     for (int i = 0; i < widget.dropDownList.length; i++) {
-      multiSelectionValue.add(false);
+      _multiSelectionValue.add(false);
     }
 
     ///initial value load
     if (widget.initialValue != null) {
-      dropDownList = List.from(widget.dropDownList);
+      _dropDownList = List.from(widget.dropDownList);
       if (widget.isMultiSelection) {
         for (int i = 0; i < widget.initialValue.length; i++) {
-          var index = dropDownList.indexWhere((element) =>
+          var index = _dropDownList.indexWhere((element) =>
               element.name.trim() == widget.initialValue[i].trim());
           if (index != -1) {
-            multiSelectionValue[i] = true;
+            _multiSelectionValue[i] = true;
           }
         }
         int count =
-            multiSelectionValue.where((element) => element).toList().length;
+            _multiSelectionValue.where((element) => element).toList().length;
 
         _cnt.text = (count == 0
             ? ""
@@ -229,7 +240,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                 ? widget.initialValue.join(",")
                 : "$count item selected");
       } else {
-        var index = dropDownList.indexWhere(
+        var index = _dropDownList.indexWhere(
             (element) => element.name.trim() == widget.initialValue.trim());
 
         if (index != -1) {
@@ -243,22 +254,22 @@ class _DropDownTextFieldState extends State<DropDownTextField>
 
   updateFunction({DropDownTextField? oldWidget}) {
     Function eq = const DeepCollectionEquality().equals;
-    dropDownList = List.from(widget.dropDownList);
+    _dropDownList = List.from(widget.dropDownList);
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       if (widget.isMultiSelection) {
-        if (oldWidget != null && !eq(oldWidget.dropDownList, dropDownList)) {
-          multiSelectionValue = [];
+        if (oldWidget != null && !eq(oldWidget.dropDownList, _dropDownList)) {
+          _multiSelectionValue = [];
           _cnt.text = "";
-          for (int i = 0; i < dropDownList.length; i++) {
-            multiSelectionValue.add(false);
+          for (int i = 0; i < _dropDownList.length; i++) {
+            _multiSelectionValue.add(false);
           }
         }
         if (widget.isForceMultiSelectionClear &&
-            multiSelectionValue.isNotEmpty) {
-          multiSelectionValue = [];
+            _multiSelectionValue.isNotEmpty) {
+          _multiSelectionValue = [];
           _cnt.text = "";
-          for (int i = 0; i < dropDownList.length; i++) {
-            multiSelectionValue.add(false);
+          for (int i = 0; i < _dropDownList.length; i++) {
+            _multiSelectionValue.add(false);
           }
         }
 
@@ -277,31 +288,33 @@ class _DropDownTextFieldState extends State<DropDownTextField>
           if (oldWidget != null &&
               oldWidget.multiController!.dropDownValueList != null) {}
           if (widget.multiController!.dropDownValueList != null) {
-            multiSelectionValue = [];
-            for (int i = 0; i < dropDownList.length; i++) {
-              multiSelectionValue.add(false);
+            _multiSelectionValue = [];
+            for (int i = 0; i < _dropDownList.length; i++) {
+              _multiSelectionValue.add(false);
             }
             for (int i = 0;
                 i < widget.multiController!.dropDownValueList!.length;
                 i++) {
-              var index = dropDownList.indexWhere((element) =>
+              var index = _dropDownList.indexWhere((element) =>
                   element == widget.multiController!.dropDownValueList![i]);
               if (index != -1) {
-                multiSelectionValue[index] = true;
+                _multiSelectionValue[index] = true;
               }
             }
-            int count =
-                multiSelectionValue.where((element) => element).toList().length;
+            int count = _multiSelectionValue
+                .where((element) => element)
+                .toList()
+                .length;
             _cnt.text = (count == 0
                 ? ""
                 : widget.displayCompleteItem
                     ? widget.initialValue.join(",")
                     : "$count item selected");
           } else {
-            multiSelectionValue = [];
+            _multiSelectionValue = [];
             _cnt.text = "";
-            for (int i = 0; i < dropDownList.length; i++) {
-              multiSelectionValue.add(false);
+            for (int i = 0; i < _dropDownList.length; i++) {
+              _multiSelectionValue.add(false);
             }
           }
         }
@@ -315,14 +328,14 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         }
       }
     });
-    maxListItem = widget.dropDownItemCount;
-    height = !widget.isMultiSelection
-        ? dropDownList.length < maxListItem
-            ? dropDownList.length * widget.listTileHeight
-            : widget.listTileHeight * maxListItem.toDouble()
-        : dropDownList.length < maxListItem
-            ? dropDownList.length * widget.listTileHeight
-            : widget.listTileHeight * maxListItem.toDouble();
+    _maxListItem = widget.dropDownItemCount;
+    _height = !widget.isMultiSelection
+        ? _dropDownList.length < _maxListItem
+            ? _dropDownList.length * widget.listTileHeight
+            : widget.listTileHeight * _maxListItem.toDouble()
+        : _dropDownList.length < _maxListItem
+            ? _dropDownList.length * widget.listTileHeight
+            : widget.listTileHeight * _maxListItem.toDouble();
   }
 
   @override
@@ -333,15 +346,15 @@ class _DropDownTextFieldState extends State<DropDownTextField>
 
   @override
   void dispose() {
-    if (widget.searchFocusNode == null) searchFocusNode.dispose();
-    if (widget.textFieldFocusNode == null) textFieldFocusNode.dispose();
+    if (widget.searchFocusNode == null) _searchFocusNode.dispose();
+    if (widget.textFieldFocusNode == null) _textFieldFocusNode.dispose();
     _cnt.dispose();
     super.dispose();
   }
 
   clearFun() {
-    if (isExpanded) {
-      isExpanded = !isExpanded;
+    if (_isExpanded) {
+      _isExpanded = !_isExpanded;
       hideOverlay();
     }
     _cnt.clear();
@@ -353,9 +366,9 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         widget.onChanged!([]);
       }
 
-      multiSelectionValue = [];
-      for (int i = 0; i < dropDownList.length; i++) {
-        multiSelectionValue.add(false);
+      _multiSelectionValue = [];
+      for (int i = 0; i < _dropDownList.length; i++) {
+        _multiSelectionValue.add(false);
       }
     } else {
       if (widget.singleController != null) {
@@ -371,63 +384,62 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   @override
   Widget build(BuildContext context) {
     return CompositedTransformTarget(
-      link: layerLink,
-      child: TextFormField(
-        focusNode: textFieldFocusNode,
+      link: _layerLink,
+      child:TextFormField(
+        focusNode: _textFieldFocusNode,
         style: widget.textStyle,
         enabled: widget.isEnabled,
         readOnly: widget.readOnly,
         controller: _cnt,
         onTap: () {
           setState(() {
-            isExpanded = !isExpanded;
+            _isExpanded = !_isExpanded;
           });
-          if (isExpanded) {
+          if (_isExpanded) {
             _showOverlay();
           } else {
             hideOverlay();
           }
         },
         validator: (value) =>
-            widget.validator != null ? widget.validator!(value) : null,
+        widget.validator != null ? widget.validator!(value) : null,
         decoration: widget.textFieldDecoration != null
             ? widget.textFieldDecoration!.copyWith(
-                suffixIcon: (_cnt.text.isEmpty || !widget.clearOption)
-                    ? const Icon(
-                        Icons.arrow_drop_down_outlined,
-                      )
-                    : widget.clearOption
-                        ? InkWell(
-                            onTap: clearFun,
-                            child: const Icon(
-                              Icons.clear,
-                            ),
-                          )
-                        : null,
-              )
+          suffixIcon: (_cnt.text.isEmpty || !widget.clearOption)
+              ? const Icon(
+            Icons.arrow_drop_down_outlined,
+          )
+              : widget.clearOption
+              ? InkWell(
+            onTap: clearFun,
+            child: const Icon(
+              Icons.clear,
+            ),
+          )
+              : null,
+        )
             : InputDecoration(
-                floatingLabelBehavior: FloatingLabelBehavior.always,
-                hintText: hintText,
-                hintStyle: const TextStyle(fontWeight: FontWeight.normal),
-                suffixIcon: (_cnt.text.isEmpty || !widget.clearOption)
-                    ? const Icon(
-                        Icons.arrow_drop_down_outlined,
-                      )
-                    : widget.clearOption
-                        ? InkWell(
-                            onTap: clearFun,
-                            child: const Icon(
-                              Icons.clear,
-                            ),
-                          )
-                        : null,
-              ),
+          floatingLabelBehavior: FloatingLabelBehavior.always,
+          hintText: _hintText,
+          hintStyle: const TextStyle(fontWeight: FontWeight.normal),
+          suffixIcon: (_cnt.text.isEmpty || !widget.clearOption)
+              ? const Icon(
+            Icons.arrow_drop_down_outlined,
+          )
+              : widget.clearOption
+              ? InkWell(
+            onTap: clearFun,
+            child: const Icon(
+              Icons.clear,
+            ),
+          )
+              : null,
+        ),
       ),
     );
   }
 
   Future<void> _showOverlay() async {
-    // _insertOverlay(context);
     _controller.forward();
     final overlay = Overlay.of(context);
     final renderBox = context.findRenderObject() as RenderBox;
@@ -435,19 +447,24 @@ class _DropDownTextFieldState extends State<DropDownTextField>
     final offset = renderBox.localToGlobal(Offset.zero);
     double posFromTop = offset.dy;
     double posFromBot = MediaQuery.of(context).size.height - posFromTop;
-    double dropdownListHeight = height +
-        (widget.enableSearch ? searchWidgetHeight : 0) +
+    double dropdownListHeight = _height +
+        (widget.enableSearch ? _searchWidgetHeight : 0) +
         widget.listSpace;
     double ht = dropdownListHeight + 120;
-    final double topPaddingHeight = (widget.readOnly &&
-            dropdownListHeight >
-                (posFromTop - MediaQuery.of(context).padding.top - 15))
+    _isOutsideClickOverlay = (widget.readOnly &&
+        dropdownListHeight >
+            (posFromTop - MediaQuery.of(context).padding.top - 15) &&
+        posFromBot < ht);
+    final double topPaddingHeight = _isOutsideClickOverlay
         ? (dropdownListHeight -
             (posFromTop - MediaQuery.of(context).padding.top - 15))
         : 0;
     final double htPos =
         posFromBot < ht ? size.height - 100 + topPaddingHeight : size.height;
-    entry = OverlayEntry(
+    if (_isOutsideClickOverlay) {
+      _openOutSideClickOverlay(context);
+    }
+    _entry = OverlayEntry(
       builder: (context) => Positioned(
           width: size.width,
           child: CompositedTransformFollower(
@@ -457,7 +474,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
               followerAnchor: posFromBot < ht
                   ? Alignment.bottomCenter
                   : Alignment.topCenter,
-              link: layerLink,
+              link: _layerLink,
               showWhenUnlinked: false,
               offset: Offset(
                 0,
@@ -470,31 +487,37 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                 builder: buildOverlay,
               ))),
     );
-    overlay?.insert(entry!);
+    overlay?.insert(_entry!);
   }
 
-  _insertOverlay(BuildContext context) {
-    return Overlay.of(context)!.insert(
-      OverlayEntry(builder: (context) {
-        final size = MediaQuery.of(context).size;
-        return GestureDetector(
-          onTap: () {
-            hideOverlay();
-          },
-          child: Container(
-            width: size.width,
-            height: size.height,
-            color: Colors.transparent,
-          ),
-        );
-      }),
-    );
+  _openOutSideClickOverlay(BuildContext context) {
+    final overlay2 = Overlay.of(context);
+    _entry2 = OverlayEntry(builder: (context) {
+      final size = MediaQuery.of(context).size;
+      return GestureDetector(
+        onTap: () {
+          hideOverlay();
+        },
+        child: Container(
+          width: size.width,
+          height: size.height,
+          color: Colors.transparent,
+        ),
+      );
+    });
+    overlay2?.insert(_entry2!);
   }
 
   void hideOverlay() {
     _controller.reverse().then<void>((void value) {
-      entry?.remove();
-      entry = null;
+      _entry?.remove();
+      _entry = null;
+      if (_isOutsideClickOverlay) {
+        _entry2?.remove();
+        _entry2 = null;
+        _isOutsideClickOverlay = false;
+      }
+      _isExpanded = false;
     });
   }
 
@@ -522,16 +545,16 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                   ? SingleSelection(
                       mainController: _cnt,
                       autoSort: !widget.readOnly,
-                      mainFocusNode: textFieldFocusNode,
-                      searchFocusNode: searchFocusNode,
+                      mainFocusNode: _textFieldFocusNode,
+                      searchFocusNode: _searchFocusNode,
                       enableSearch: widget.enableSearch,
-                      height: height,
+                      height: _height,
                       listTileHeight: widget.listTileHeight,
-                      dropDownList: dropDownList,
+                      dropDownList: _dropDownList,
                       onChanged: (item) {
                         setState(() {
                           _cnt.text = item.name;
-                          isExpanded = !isExpanded;
+                          _isExpanded = !_isExpanded;
                         });
                         if (widget.singleController != null) {
                           widget.singleController!.setDropDown(item);
@@ -543,7 +566,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
 
                         hideOverlay();
                       },
-                      searchHeight: searchWidgetHeight,
+                      searchHeight: _searchWidgetHeight,
                       searchKeyboardType: widget.searchKeyboardType,
                       searchAutofocus: widget.searchAutofocus,
                       searchShowCursor: widget.searchShowCursor,
@@ -552,22 +575,22 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                       buttonTextStyle: widget.buttonTextStyle,
                       buttonText: widget.buttonText,
                       buttonColor: widget.buttonColor,
-                      height: height,
+                      height: _height,
                       listTileHeight: widget.listTileHeight,
-                      list: multiSelectionValue,
-                      dropDownList: dropDownList,
+                      list: _multiSelectionValue,
+                      dropDownList: _dropDownList,
                       onChanged: (val) {
-                        isExpanded = !isExpanded;
-                        multiSelectionValue = val;
+                        _isExpanded = !_isExpanded;
+                        _multiSelectionValue = val;
                         List<DropDownValueModel> result = [];
                         List completeList = [];
-                        for (int i = 0; i < multiSelectionValue.length; i++) {
-                          if (multiSelectionValue[i]) {
-                            result.add(dropDownList[i]);
-                            completeList.add(dropDownList[i].name);
+                        for (int i = 0; i < _multiSelectionValue.length; i++) {
+                          if (_multiSelectionValue[i]) {
+                            result.add(_dropDownList[i]);
+                            completeList.add(_dropDownList[i].name);
                           }
                         }
-                        int count = multiSelectionValue
+                        int count = _multiSelectionValue
                             .where((element) => element)
                             .toList()
                             .length;
