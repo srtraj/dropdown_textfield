@@ -2,7 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:dropdown_textfield/tooltip_widget.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 bool calledFromOutside = true;
 
@@ -29,7 +28,8 @@ class DropDownTextField extends StatefulWidget {
       this.searchKeyboardType,
       this.listSpace = 0,
       this.clearOption = true,
-      this.listTileHeight = 50})
+      this.listTileHeight = 50,
+      this.autoScrollPadding = false})
       : assert(!(initialValue != null && singleController != null),
             "you cannot add both initialValue and singleController,\nset initial value using controller \n\tEg: SingleValueDropDownController(data:initial value) "),
         isMultiSelection = false,
@@ -62,7 +62,8 @@ class DropDownTextField extends StatefulWidget {
       this.buttonColor,
       this.buttonText,
       this.buttonTextStyle,
-      this.listTileHeight = 50})
+      this.listTileHeight = 50,
+      this.autoScrollPadding = false})
       : assert(initialValue == null || multiController == null,
             "you cannot add both initialValue and multiController\nset initial value using controller\n\tMultiValueDropDownController(data:initial value)"),
         isMultiSelection = true,
@@ -149,8 +150,11 @@ class DropDownTextField extends StatefulWidget {
   ///submit button text style
   final TextStyle? buttonTextStyle;
 
-  ///List tile height
+  ///dropdown List tile height
   final double listTileHeight;
+
+  ///it will automatically add padding when search textfield on focus.
+  final bool autoScrollPadding;
 
   @override
   _DropDownTextFieldState createState() => _DropDownTextFieldState();
@@ -179,15 +183,12 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   late FocusNode _searchFocusNode;
   late FocusNode _textFieldFocusNode;
   late bool _isOutsideClickOverlay;
-  late ScrollController scrolCnt;
+  late bool _isScrollPadding;
 
   @override
   void initState() {
     _cnt = TextEditingController();
-    scrolCnt = ScrollController();
-    scrolCnt.addListener(() {
-      print(scrolCnt.position);
-    });
+    _isScrollPadding = false;
     _isOutsideClickOverlay = false;
     _searchFocusNode = widget.searchFocusNode ?? FocusNode();
     _textFieldFocusNode = widget.textFieldFocusNode ?? FocusNode();
@@ -206,6 +207,11 @@ class _DropDownTextFieldState extends State<DropDownTextField>
           !widget.isMultiSelection) {
         _isExpanded = !_isExpanded;
         hideOverlay();
+      }
+      if (_searchFocusNode.hasFocus) {
+        _isScrollPadding = true;
+      } else {
+        _isScrollPadding = false;
       }
     });
     _textFieldFocusNode.addListener(() {

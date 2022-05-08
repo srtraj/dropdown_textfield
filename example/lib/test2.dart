@@ -76,6 +76,9 @@ class _TestPage2State extends State<TestPage2> {
                   ],
                   onChanged: (val) {},
                 ),
+                const SizedBox(
+                  height: 600,
+                )
               ],
             ),
           ),
