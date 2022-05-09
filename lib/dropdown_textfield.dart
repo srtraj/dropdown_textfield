@@ -1,9 +1,10 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:dropdown_textfield/tooltip_widget.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-
-bool calledFromOutside = true;
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 class DropDownTextField extends StatefulWidget {
   const DropDownTextField(
@@ -171,6 +172,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   late bool _isExpanded;
   OverlayEntry? _entry;
   OverlayEntry? _entry2;
+  OverlayEntry? _barrierOverlay;
   final _layerLink = LayerLink();
   late AnimationController _controller;
   late Animation<double> _heightFactor;
@@ -184,10 +186,14 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   late FocusNode _textFieldFocusNode;
   late bool _isOutsideClickOverlay;
   late bool _isScrollPadding;
-
+  final int _duration = 150;
+  final int _keyboardHeight = 400;
+  late StreamSubscription<bool> keyboardSubscription;
+  late Offset _offset;
   @override
   void initState() {
     _cnt = TextEditingController();
+
     _isScrollPadding = false;
     _isOutsideClickOverlay = false;
     _searchFocusNode = widget.searchFocusNode ?? FocusNode();
@@ -195,7 +201,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
     _isExpanded = false;
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 150),
+      duration: Duration(milliseconds: _duration),
     );
     _heightFactor = _controller.drive(_easeInTween);
     _searchWidgetHeight = 60;
@@ -208,11 +214,6 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         _isExpanded = !_isExpanded;
         hideOverlay();
       }
-      if (_searchFocusNode.hasFocus) {
-        _isScrollPadding = true;
-      } else {
-        _isScrollPadding = false;
-      }
     });
     _textFieldFocusNode.addListener(() {
       if (!_searchFocusNode.hasFocus &&
@@ -222,6 +223,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         hideOverlay();
       }
     });
+
     for (int i = 0; i < widget.dropDownList.length; i++) {
       _multiSelectionValue.add(false);
     }
@@ -255,6 +257,22 @@ class _DropDownTextFieldState extends State<DropDownTextField>
       }
     }
     updateFunction();
+    var keyboardVisibilityController = KeyboardVisibilityController();
+    keyboardSubscription =
+        keyboardVisibilityController.onChange.listen((bool visible) {
+      if (visible &&
+          _isExpanded &&
+          _searchFocusNode.hasFocus &&
+          !_isScrollPadding &&
+          (MediaQuery.of(context).size.height - _offset.dy) < _keyboardHeight) {
+        shiftOverlayEntry1to2();
+      } else if (!visible &&
+          _isExpanded &&
+          _isScrollPadding &&
+          _searchFocusNode.hasFocus) {
+        shiftOverlayEntry2to1();
+      }
+    });
     super.initState();
   }
 
@@ -355,6 +373,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
     if (widget.searchFocusNode == null) _searchFocusNode.dispose();
     if (widget.textFieldFocusNode == null) _textFieldFocusNode.dispose();
     _cnt.dispose();
+
     super.dispose();
   }
 
@@ -398,10 +417,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         readOnly: widget.readOnly,
         controller: _cnt,
         onTap: () {
-          setState(() {
-            _isExpanded = !_isExpanded;
-          });
-          if (_isExpanded) {
+          if (!_isExpanded) {
             _showOverlay();
           } else {
             hideOverlay();
@@ -447,12 +463,14 @@ class _DropDownTextFieldState extends State<DropDownTextField>
 
   Future<void> _showOverlay() async {
     _controller.forward();
+    _isExpanded = true;
     final overlay = Overlay.of(context);
     final renderBox = context.findRenderObject() as RenderBox;
     final size = renderBox.size;
-    final offset = renderBox.localToGlobal(Offset.zero);
-    double posFromTop = offset.dy;
+    _offset = renderBox.localToGlobal(Offset.zero);
+    double posFromTop = _offset.dy;
     double posFromBot = MediaQuery.of(context).size.height - posFromTop;
+
     double dropdownListHeight = _height +
         (widget.enableSearch ? _searchWidgetHeight : 0) +
         widget.listSpace;
@@ -465,8 +483,11 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         ? (dropdownListHeight -
             (posFromTop - MediaQuery.of(context).padding.top - 15))
         : 0;
-    final double htPos =
-        posFromBot < ht ? size.height - 100 + topPaddingHeight : size.height;
+    final double htPos = _isScrollPadding
+        ? size.height - 200
+        : posFromBot < ht
+            ? size.height - 100 + topPaddingHeight
+            : size.height;
     if (_isOutsideClickOverlay) {
       _openOutSideClickOverlay(context);
     }
@@ -493,12 +514,30 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                 builder: buildOverlay,
               ))),
     );
-    overlay?.insert(_entry!);
+    _entry2 = OverlayEntry(
+      builder: (context) => Positioned(
+          width: size.width,
+          child: CompositedTransformFollower(
+              targetAnchor: Alignment.bottomCenter,
+              followerAnchor: Alignment.bottomCenter,
+              link: _layerLink,
+              showWhenUnlinked: false,
+              offset: Offset(
+                0,
+                htPos,
+              ),
+              child: AnimatedBuilder(
+                animation: _controller.view,
+                builder: buildOverlay,
+              ))),
+    );
+    overlay?.insert(_isScrollPadding ? _entry2! : _entry!);
+    print("overlay insertedddddddddddddddddddddddddddddddddddd");
   }
 
   _openOutSideClickOverlay(BuildContext context) {
     final overlay2 = Overlay.of(context);
-    _entry2 = OverlayEntry(builder: (context) {
+    _barrierOverlay = OverlayEntry(builder: (context) {
       final size = MediaQuery.of(context).size;
       return GestureDetector(
         onTap: () {
@@ -511,20 +550,54 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         ),
       );
     });
-    overlay2?.insert(_entry2!);
+    overlay2?.insert(_barrierOverlay!);
   }
 
   void hideOverlay() {
+    if (!_isScrollPadding) {}
     _controller.reverse().then<void>((void value) {
-      _entry?.remove();
-      _entry = null;
-      if (_isOutsideClickOverlay) {
+      if (_entry != null && _entry!.mounted) {
+        _entry?.remove();
+        _entry = null;
+      }
+      if (_entry2 != null && _entry2!.mounted) {
         _entry2?.remove();
         _entry2 = null;
+      }
+
+      if (_barrierOverlay != null && _barrierOverlay!.mounted) {
+        _barrierOverlay?.remove();
+        _barrierOverlay = null;
         _isOutsideClickOverlay = false;
       }
+      _isScrollPadding = false;
       _isExpanded = false;
     });
+  }
+
+  void shiftOverlayEntry1to2() {
+    print("callllllllllllllllllllllllled22");
+    _entry?.remove();
+    _entry = null;
+    // _isOutsideClickOverlay = true;
+    _controller.reset();
+    _isScrollPadding = true;
+    _showOverlay();
+    _textFieldFocusNode.requestFocus();
+    print("overlay shifted");
+    Future.delayed(const Duration(milliseconds: 50), () {
+      _searchFocusNode.requestFocus();
+    });
+  }
+
+  void shiftOverlayEntry2to1() {
+    _entry2?.remove();
+    _entry2 = null;
+    // _isOutsideClickOverlay = true;
+    _controller.reset();
+    _isScrollPadding = false;
+    _showOverlay();
+    _textFieldFocusNode.requestFocus();
   }
 
   Widget buildOverlay(context, child) {
@@ -576,7 +649,14 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                       searchKeyboardType: widget.searchKeyboardType,
                       searchAutofocus: widget.searchAutofocus,
                       searchShowCursor: widget.searchShowCursor,
-                    )
+                      onSearchTap: () {
+                        // if (!_isScrollPadding) {
+                        //   shiftOverlayEntry1to2();
+                        // }
+                      },
+                      onSearchSubmit: () {
+                        shiftOverlayEntry2to1();
+                      })
                   : MultiSelection(
                       buttonTextStyle: widget.buttonTextStyle,
                       buttonText: widget.buttonText,
@@ -642,7 +722,9 @@ class SingleSelection extends StatefulWidget {
       this.searchShowCursor,
       required this.mainController,
       required this.autoSort,
-      required this.listTileHeight})
+      required this.listTileHeight,
+      this.onSearchTap,
+      this.onSearchSubmit})
       : super(key: key);
   final List<DropDownValueModel> dropDownList;
   final ValueSetter onChanged;
@@ -657,6 +739,8 @@ class SingleSelection extends StatefulWidget {
   final bool? searchShowCursor;
   final TextEditingController mainController;
   final bool autoSort;
+  final Function? onSearchTap;
+  final Function? onSearchSubmit;
 
   @override
   State<SingleSelection> createState() => _SingleSelectionState();
@@ -665,7 +749,7 @@ class SingleSelection extends StatefulWidget {
 class _SingleSelectionState extends State<SingleSelection> {
   late List<DropDownValueModel> newDropDownList;
   late TextEditingController _searchCnt;
-
+  late FocusScopeNode _focusScopeNode;
   onItemChanged(String value) {
     setState(() {
       if (value.isEmpty) {
@@ -681,9 +765,11 @@ class _SingleSelectionState extends State<SingleSelection> {
 
   @override
   void initState() {
+    _focusScopeNode = FocusScopeNode();
     if (widget.searchAutofocus) {
       widget.searchFocusNode.requestFocus();
     }
+    _focusScopeNode.requestFocus();
     newDropDownList = List.from(widget.dropDownList);
     _searchCnt = TextEditingController();
     if (widget.autoSort) {
@@ -694,7 +780,6 @@ class _SingleSelectionState extends State<SingleSelection> {
         }
       });
     }
-
     super.initState();
   }
 
@@ -719,6 +804,11 @@ class _SingleSelectionState extends State<SingleSelection> {
                 showCursor: widget.searchShowCursor,
                 keyboardType: widget.searchKeyboardType,
                 controller: _searchCnt,
+                onTap: () {
+                  if (widget.onSearchTap != null) {
+                    widget.onSearchTap!();
+                  }
+                },
                 decoration: InputDecoration(
                   hintText: 'Search Here...',
                   suffixIcon: GestureDetector(
@@ -735,6 +825,12 @@ class _SingleSelectionState extends State<SingleSelection> {
                   ),
                 ),
                 onChanged: onItemChanged,
+                onSubmitted: (val) {
+                  widget.mainFocusNode.requestFocus();
+                  if (widget.onSearchSubmit != null) {
+                    widget.onSearchSubmit!();
+                  }
+                },
               ),
             ),
           ),

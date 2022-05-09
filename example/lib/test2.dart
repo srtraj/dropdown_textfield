@@ -14,9 +14,11 @@ class _TestPage2State extends State<TestPage2> {
   FocusNode textFieldFocusNode = FocusNode();
   late SingleValueDropDownController _cnt;
   late MultiValueDropDownController _cntMulti;
+  late FocusNode _fn;
 
   @override
   void initState() {
+    _fn = FocusNode();
     _cnt = SingleValueDropDownController();
     _cntMulti = MultiValueDropDownController();
     super.initState();
@@ -25,7 +27,6 @@ class _TestPage2State extends State<TestPage2> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -39,7 +40,10 @@ class _TestPage2State extends State<TestPage2> {
                 ),
                 DropDownTextField(
                   // initialValue: "name4",
+                  clearOption: true,
+                  // searchAutofocus: true,
                   enableSearch: true,
+                  searchFocusNode: _fn,
                   validator: (value) {
                     if (value == null) {
                       return "Required field";
@@ -86,7 +90,7 @@ class _TestPage2State extends State<TestPage2> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          if (!_formKey.currentState!.validate()) {}
+          _fn.requestFocus();
         },
         label: const Text("Submit"),
       ),
