@@ -15,12 +15,14 @@ class _TestPage2State extends State<TestPage2> {
   late SingleValueDropDownController _cnt;
   late MultiValueDropDownController _cntMulti;
   late FocusNode _fn;
+  late ScrollController _scrollCnt;
 
   @override
   void initState() {
     _fn = FocusNode();
     _cnt = SingleValueDropDownController();
     _cntMulti = MultiValueDropDownController();
+    _scrollCnt = ScrollController();
     super.initState();
   }
 
@@ -28,6 +30,7 @@ class _TestPage2State extends State<TestPage2> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
+        controller: _scrollCnt,
         child: Form(
           key: _formKey,
           child: Padding(
@@ -36,12 +39,12 @@ class _TestPage2State extends State<TestPage2> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(
-                  height: 900,
+                  height: 450,
                 ),
                 DropDownTextField(
                   // initialValue: "name4",
                   clearOption: true,
-                  // searchAutofocus: true,
+                  searchAutofocus: true,
                   enableSearch: true,
                   searchFocusNode: _fn,
                   validator: (value) {
@@ -80,9 +83,6 @@ class _TestPage2State extends State<TestPage2> {
                   ],
                   onChanged: (val) {},
                 ),
-                const SizedBox(
-                  height: 600,
-                )
               ],
             ),
           ),
@@ -90,7 +90,8 @@ class _TestPage2State extends State<TestPage2> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          _fn.requestFocus();
+          _scrollCnt.animateTo(MediaQuery.of(context).size.height,
+              duration: const Duration(milliseconds: 100), curve: Curves.ease);
         },
         label: const Text("Submit"),
       ),

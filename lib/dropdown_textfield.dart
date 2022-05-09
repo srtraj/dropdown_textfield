@@ -7,31 +7,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 class DropDownTextField extends StatefulWidget {
-  const DropDownTextField(
-      {Key? key,
-      this.singleController,
-      this.initialValue,
-      required this.dropDownList,
-      this.padding,
-      this.textStyle,
-      this.onChanged,
-      this.validator,
-      this.isEnabled = true,
-      this.enableSearch = false,
-      this.readOnly = true,
-      this.dropdownRadius = 12,
-      this.textFieldDecoration,
-      this.dropDownItemCount = 6,
-      this.searchFocusNode,
-      this.textFieldFocusNode,
-      this.searchAutofocus = false,
-      this.searchShowCursor,
-      this.searchKeyboardType,
-      this.listSpace = 0,
-      this.clearOption = true,
-      this.listTileHeight = 50,
-      this.autoScrollPadding = false})
-      : assert(!(initialValue != null && singleController != null),
+  const DropDownTextField({
+    Key? key,
+    this.singleController,
+    this.initialValue,
+    required this.dropDownList,
+    this.padding,
+    this.textStyle,
+    this.onChanged,
+    this.validator,
+    this.isEnabled = true,
+    this.enableSearch = false,
+    this.readOnly = true,
+    this.dropdownRadius = 12,
+    this.textFieldDecoration,
+    this.dropDownItemCount = 6,
+    this.searchFocusNode,
+    this.textFieldFocusNode,
+    this.searchAutofocus = false,
+    this.searchShowCursor,
+    this.searchKeyboardType,
+    this.listSpace = 0,
+    this.clearOption = true,
+    this.listTileHeight = 50,
+    this.autoScrollPadding = false,
+  })  : assert(!(initialValue != null && singleController != null),
             "you cannot add both initialValue and singleController,\nset initial value using controller \n\tEg: SingleValueDropDownController(data:initial value) "),
         isMultiSelection = false,
         isForceMultiSelectionClear = false,
@@ -41,31 +41,31 @@ class DropDownTextField extends StatefulWidget {
         buttonText = null,
         buttonTextStyle = null,
         super(key: key);
-  const DropDownTextField.multiSelection(
-      {Key? key,
-      this.multiController,
-      this.displayCompleteItem = false,
-      this.initialValue,
-      required this.dropDownList,
-      this.padding,
-      this.textStyle,
-      this.isForceMultiSelectionClear = false,
-      this.onChanged,
-      this.validator,
-      this.isEnabled = true,
-      this.dropdownRadius = 12,
-      this.textFieldDecoration,
-      this.dropDownItemCount = 6,
-      this.searchFocusNode,
-      this.textFieldFocusNode,
-      this.listSpace = 0,
-      this.clearOption = true,
-      this.buttonColor,
-      this.buttonText,
-      this.buttonTextStyle,
-      this.listTileHeight = 50,
-      this.autoScrollPadding = false})
-      : assert(initialValue == null || multiController == null,
+  const DropDownTextField.multiSelection({
+    Key? key,
+    this.multiController,
+    this.displayCompleteItem = false,
+    this.initialValue,
+    required this.dropDownList,
+    this.padding,
+    this.textStyle,
+    this.isForceMultiSelectionClear = false,
+    this.onChanged,
+    this.validator,
+    this.isEnabled = true,
+    this.dropdownRadius = 12,
+    this.textFieldDecoration,
+    this.dropDownItemCount = 6,
+    this.searchFocusNode,
+    this.textFieldFocusNode,
+    this.listSpace = 0,
+    this.clearOption = true,
+    this.buttonColor,
+    this.buttonText,
+    this.buttonTextStyle,
+    this.listTileHeight = 50,
+    this.autoScrollPadding = false,
+  })  : assert(initialValue == null || multiController == null,
             "you cannot add both initialValue and multiController\nset initial value using controller\n\tMultiValueDropDownController(data:initial value)"),
         isMultiSelection = true,
         enableSearch = false,
@@ -157,6 +157,8 @@ class DropDownTextField extends StatefulWidget {
   ///it will automatically add padding when search textfield on focus.
   final bool autoScrollPadding;
 
+  // final ScrollController? scrollController;
+
   @override
   _DropDownTextFieldState createState() => _DropDownTextFieldState();
 }
@@ -187,13 +189,14 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   late bool _isOutsideClickOverlay;
   late bool _isScrollPadding;
   final int _duration = 150;
-  final int _keyboardHeight = 400;
+  final double _keyboardHeight = 400;
   late StreamSubscription<bool> keyboardSubscription;
   late Offset _offset;
+  late bool _searchAutofocus;
   @override
   void initState() {
     _cnt = TextEditingController();
-
+    _searchAutofocus = false;
     _isScrollPadding = false;
     _isOutsideClickOverlay = false;
     _searchFocusNode = widget.searchFocusNode ?? FocusNode();
@@ -260,16 +263,8 @@ class _DropDownTextFieldState extends State<DropDownTextField>
     var keyboardVisibilityController = KeyboardVisibilityController();
     keyboardSubscription =
         keyboardVisibilityController.onChange.listen((bool visible) {
-      if (visible &&
-          _isExpanded &&
-          _searchFocusNode.hasFocus &&
-          !_isScrollPadding &&
-          (MediaQuery.of(context).size.height - _offset.dy) < _keyboardHeight) {
-        shiftOverlayEntry1to2();
-      } else if (!visible &&
-          _isExpanded &&
-          _isScrollPadding &&
-          _searchFocusNode.hasFocus) {
+      if (!visible && _isExpanded && _isScrollPadding) {
+        print("frommmmmmmmmmmmmmmmmmmmmmmmmmmmmm init");
         shiftOverlayEntry2to1();
       }
     });
@@ -417,6 +412,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         readOnly: widget.readOnly,
         controller: _cnt,
         onTap: () {
+          _searchAutofocus = widget.searchAutofocus;
           if (!_isExpanded) {
             _showOverlay();
           } else {
@@ -483,8 +479,11 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         ? (dropdownListHeight -
             (posFromTop - MediaQuery.of(context).padding.top - 15))
         : 0;
+    if (_searchAutofocus && posFromBot < _keyboardHeight && !_isScrollPadding) {
+      _isScrollPadding = true;
+    }
     final double htPos = _isScrollPadding
-        ? size.height - 200
+        ? size.height - (_keyboardHeight - posFromBot)
         : posFromBot < ht
             ? size.height - 100 + topPaddingHeight
             : size.height;
@@ -532,7 +531,6 @@ class _DropDownTextFieldState extends State<DropDownTextField>
               ))),
     );
     overlay?.insert(_isScrollPadding ? _entry2! : _entry!);
-    print("overlay insertedddddddddddddddddddddddddddddddddddd");
   }
 
   _openOutSideClickOverlay(BuildContext context) {
@@ -576,21 +574,19 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   }
 
   void shiftOverlayEntry1to2() {
-    print("callllllllllllllllllllllllled22");
     _entry?.remove();
     _entry = null;
     // _isOutsideClickOverlay = true;
-    _controller.reset();
     _isScrollPadding = true;
     _showOverlay();
     _textFieldFocusNode.requestFocus();
-    print("overlay shifted");
-    Future.delayed(const Duration(milliseconds: 50), () {
+    Future.delayed(Duration(milliseconds: _duration), () {
       _searchFocusNode.requestFocus();
     });
   }
 
   void shiftOverlayEntry2to1() {
+    _searchAutofocus = false;
     _entry2?.remove();
     _entry2 = null;
     // _isOutsideClickOverlay = true;
@@ -647,15 +643,19 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                       },
                       searchHeight: _searchWidgetHeight,
                       searchKeyboardType: widget.searchKeyboardType,
-                      searchAutofocus: widget.searchAutofocus,
+                      searchAutofocus: _searchAutofocus,
                       searchShowCursor: widget.searchShowCursor,
                       onSearchTap: () {
-                        // if (!_isScrollPadding) {
-                        //   shiftOverlayEntry1to2();
-                        // }
+                        double posFromBot =
+                            MediaQuery.of(context).size.height - _offset.dy;
+                        if (posFromBot < _keyboardHeight && !_isScrollPadding) {
+                          shiftOverlayEntry1to2();
+                        }
                       },
                       onSearchSubmit: () {
-                        shiftOverlayEntry2to1();
+                        if (_isScrollPadding) {
+                          shiftOverlayEntry2to1();
+                        }
                       })
                   : MultiSelection(
                       buttonTextStyle: widget.buttonTextStyle,
