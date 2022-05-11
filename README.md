@@ -12,179 +12,75 @@ A DropdownTextfield is a material design TextField. The DropDownButton is a widg
 6. ToolTip dialogue for multi selection dropdown item.
 
 
-## Single selection argument
-```dart
-singleController
-initialValue
-dropDownList
-padding
-textStyle
-onChanged
-validator
-isEnabled
-enableSearch
-dropdownRadius
-textFieldDecoration
-maxItemCount
-searchFocusNode
-textFieldFocusNode
-searchAutofocus
-searchShowCursor
-searchKeyboardType
-clearOption
-```
+### singleController
+single dropdown controller,
 
-## Multi selection argument
+### multiController
+multi dropdown controller
 
-```dart
-multiController
-displayCompleteItem 
-initialValue
-dropDownList
-padding
-textStyle
-isForceMultiSelectionClear
-onChanged
-validator
-isEnabled 
-dropdownRadius 
-textFieldDecoration
-maxItemCount
-searchFocusNode
-textFieldFocusNode
-clearOption 
-```
-
-
+### dropdownRadius
+define the radius of dropdown List ,default value is 12
 
 ### initialValue
-initial value ,if it is null or not exist in dropDownList then it will not display value
+initial value ,if it is null or not exist in dropDownList then it will not display value.
 
 ### dropDownList
-List<DropDownValueModel>,List of dropdown values
+dropDownList,List of dropdown values
+List<DropDownValueModel>
 
 ### onChanged
-it is a function,called when value selected from dropdown.
+it will listen and return value when item selected from dropdown list
 for single Selection Dropdown it will return single DropDownValueModel object,
 and for multi Selection Dropdown ,it will return list of DropDownValueModel object,
 
-### isForceMultiSelectionClear
-by setting isForceMultiSelectionClear=true to deselect selected item,only applicable for multi selection dropdown
-
 ### textFieldDecoration
-to override default textfield decoration
+override default textfield decoration
 
 ### isEnabled
-by setting isEnabled=false to disable textfield,default value true
+isEnabled=false to disable textfield,default value true
 
 
 ### enableSearch
-by setting enableSearch=true enable search option in dropdown,as of now this feature enabled only for single selection dropdown
+enableSearch=true to enable search option in dropdown,as of now this feature enabled only for single selection dropdown
+
 
 ### displayCompleteItem
-set displayCompleteItem=true, if you want display complete list of selected item in textfield else it will display in shorten form.
+set displayCompleteItem=true, if you want show complete list of selected item in textfield else it will display like "number_of_item item selected"
 
-### maxItemCount
-you can define maximum number of dropdown item length,default value is 6
 
-### dropdownRadius
-define the radius of dropdown List widget ,default value is 12
-
+### dropDownItemCount
+Maximum number of dropdown item to display,default value is 6
 
 ### searchKeyboardType
-override default search keyboard type
+override default search keyboard type,only applicable if enableSearch=true,
 
 ### searchAutofocus
-by setting searchAutofocus=true to autofocus search textfield,default value is false
-
+searchAutofocus=true to autofocus search textfield,only applicable if enableSearch=true,
+default value is false
 
 ### searchShowCursor
-by setting searchShowCursor=false to hide cursor from search textfield
+searchShowCursor=false to hide cursor from search textfield,only applicable if enableSearch=true,
 
 ### clearOption
-by set clearOption=false to hide clear suffix icon button from textfield
+clearOption=false to hide clear suffix icon button from textfield.
 
+### listSpace
+space between textfield and list ,default value is 0
 
+### listPadding
+dropdown List item padding
 
+### submitButtonText
+multi dropdown submit button text
 
+### submitButtonColor
+multi dropdown submit button color
 
-## Example
+### submitButtonTextStyle
+multi dropdown submit button text style
 
-### Single Selection dropdown
-
-```dart
-DropDownTextField(
-                  // initialValue: "name4",
-                  validator: (value) {
-                    if (value == null) {
-                      return "Required field";
-                    } else {
-                      return null;
-                    }
-                  },
-                  dropDownList: [
-                    DropDownValueModel(name: 'name1', value: "value1"),
-                    DropDownValueModel(name: 'name2', value: "value2"),
-                    DropDownValueModel(name: 'name3', value: "value3"),
-                    DropDownValueModel(name: 'name4', value: "value4"),
-                    DropDownValueModel(name: 'name5', value: "value5"),
-                    DropDownValueModel(name: 'name6', value: "value6"),
-                    DropDownValueModel(name: 'name7', value: "value7"),
-                    DropDownValueModel(name: 'name8', value: "value8"),
-                  ],
-                  maxItemCount: 6,
-                  onChanged: (val) {
-                    print(val);
-                  },
-                )
-```
-
-
-
-
-
-### Single Selection dropdown with search option
-```dart
-   DropDownTextField(
-                  dropDownList: [
-                    DropDownValueModel(name: 'aaa', value: "aaa"),
-                    DropDownValueModel(name: 'bbb', value: "bbb"),
-                    DropDownValueModel(name: 'acc', value: "acc"),
-                    DropDownValueModel(name: 'dbb', value: "dbb"),
-                  ],
-                  enableSearch: true,
-                  onChanged: (val) {},
-                ),
-```
-
-
-### Multi Selection dropdown with search option
-```dart
-         DropDownTextField.multiSelection(
-                  displayCompleteItem: true,#if true ,it will display complete list of selected item or else it will display in shorten form
-                  dropDownList: [
-                    DropDownValueModel(name: 'name1', value: "value1"),
-                    DropDownValueModel(
-                        name: 'name2',
-                        value: "value2",
-                        toolTipMsg:
-                            "DropDownButton is a widget that we can use to select one unique value from a set of values"),
-                    DropDownValueModel(name: 'name3', value: "value3"),
-                    DropDownValueModel(
-                        name: 'name4',
-                        value: "value4",
-                        toolTipMsg:
-                            "DropDownButton is a widget that we can use to select one unique value from a set of values"),
-                    DropDownValueModel(name: 'name5', value: "value5"),
-                    DropDownValueModel(name: 'name6', value: "value6"),
-                    DropDownValueModel(name: 'name7', value: "value7"),
-                    DropDownValueModel(name: 'name8', value: "value8"),
-                  ],
-                  onChanged: (val) {
-                  },
-                )
-```
-
+### listTextStyle
+dropdown list item text style
 
 
 
