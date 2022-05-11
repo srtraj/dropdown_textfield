@@ -5,7 +5,6 @@ import 'package:dropdown_textfield/tooltip_widget.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:never_behind_keyboard/never_behind_keyboard.dart';
 
 class DropDownTextField extends StatefulWidget {
   const DropDownTextField(
@@ -373,13 +372,15 @@ class _DropDownTextFieldState extends State<DropDownTextField>
               _listPadding.top +
               _listPadding.bottom;
       _maxListItem = widget.dropDownItemCount;
-      _height = !widget.isMultiSelection
-          ? _dropDownList.length < _maxListItem
-              ? _dropDownList.length * _listTileHeight
-              : _listTileHeight * _maxListItem.toDouble()
-          : _dropDownList.length < _maxListItem
-              ? _dropDownList.length * _listTileHeight
-              : _listTileHeight * _maxListItem.toDouble();
+
+      _height = (!widget.isMultiSelection
+              ? (_dropDownList.length < _maxListItem
+                  ? _dropDownList.length * _listTileHeight
+                  : _listTileHeight * _maxListItem.toDouble())
+              : _dropDownList.length < _maxListItem
+                  ? _dropDownList.length * _listTileHeight
+                  : _listTileHeight * _maxListItem.toDouble()) +
+          10;
     });
   }
 
@@ -514,7 +515,6 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         ? (dropdownListHeight -
             (posFromTop - MediaQuery.of(context).padding.top - 15))
         : 0;
-    print("-----------------------------$_isOutsideClickOverlay");
 
     final double htPos = posFromBot < ht
         ? size.height - 100 + topPaddingHeight
@@ -637,7 +637,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         child: Material(
           color: Colors.transparent,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -692,8 +692,6 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                       },
                       onSearchSubmit: () {
                         if (_isScrollPadding) {
-                          print(
-                              "++++++++++++++++++++++++++++++++++++++++++++++++");
                           shiftOverlayEntry2to1();
                         }
                       })
@@ -841,44 +839,42 @@ class _SingleSelectionState extends State<SingleSelection> {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (widget.enableSearch)
-          NeverBehindFocusSource(
-            child: SizedBox(
-              height: widget.searchHeight,
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: TextField(
-                  focusNode: widget.searchFocusNode,
-                  showCursor: widget.searchShowCursor,
-                  keyboardType: widget.searchKeyboardType,
-                  controller: _searchCnt,
-                  onTap: () {
-                    if (widget.onSearchTap != null) {
-                      widget.onSearchTap!();
-                    }
-                  },
-                  decoration: InputDecoration(
-                    hintText: 'Search Here...',
-                    suffixIcon: GestureDetector(
-                      onTap: () {
-                        widget.mainFocusNode.requestFocus();
-                        _searchCnt.clear();
-                        onItemChanged("");
-                      },
-                      child: widget.searchFocusNode.hasFocus
-                          ? const InkWell(
-                              child: Icon(Icons.close),
-                            )
-                          : const SizedBox.shrink(),
-                    ),
+          SizedBox(
+            height: widget.searchHeight,
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: TextField(
+                focusNode: widget.searchFocusNode,
+                showCursor: widget.searchShowCursor,
+                keyboardType: widget.searchKeyboardType,
+                controller: _searchCnt,
+                onTap: () {
+                  if (widget.onSearchTap != null) {
+                    widget.onSearchTap!();
+                  }
+                },
+                decoration: InputDecoration(
+                  hintText: 'Search Here...',
+                  suffixIcon: GestureDetector(
+                    onTap: () {
+                      widget.mainFocusNode.requestFocus();
+                      _searchCnt.clear();
+                      onItemChanged("");
+                    },
+                    child: widget.searchFocusNode.hasFocus
+                        ? const InkWell(
+                            child: Icon(Icons.close),
+                          )
+                        : const SizedBox.shrink(),
                   ),
-                  onChanged: onItemChanged,
-                  onSubmitted: (val) {
-                    widget.mainFocusNode.requestFocus();
-                    if (widget.onSearchSubmit != null) {
-                      widget.onSearchSubmit!();
-                    }
-                  },
                 ),
+                onChanged: onItemChanged,
+                onSubmitted: (val) {
+                  widget.mainFocusNode.requestFocus();
+                  if (widget.onSearchSubmit != null) {
+                    widget.onSearchSubmit!();
+                  }
+                },
               ),
             ),
           ),
@@ -1124,5 +1120,5 @@ class MultiValueDropDownController extends ChangeNotifier {
 class ListPadding {
   double top;
   double bottom;
-  ListPadding({this.top = 10, this.bottom = 10});
+  ListPadding({this.top = 15, this.bottom = 15});
 }

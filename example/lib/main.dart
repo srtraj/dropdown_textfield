@@ -11,6 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -110,6 +111,7 @@ class _TestPageState extends State<TestPage> {
                   textFieldFocusNode: textFieldFocusNode,
                   searchFocusNode: searchFocusNode,
                   // searchAutofocus: true,
+                  dropDownItemCount: 2,
                   searchShowCursor: false,
                   enableSearch: true,
                   searchKeyboardType: TextInputType.number,
@@ -134,7 +136,7 @@ class _TestPageState extends State<TestPage> {
                   onChanged: (val) {},
                 ),
                 const SizedBox(
-                  height: 30,
+                  height: 500,
                 ),
                 const Text(
                   "multi selection dropdown",
@@ -163,15 +165,12 @@ class _TestPageState extends State<TestPage> {
                     DropDownValueModel(name: 'name7', value: "value7"),
                     DropDownValueModel(name: 'name8', value: "value8"),
                   ],
-                  submitButtonColor: Colors.yellow,
-                  submitButtonText: "submit",
-                  listTextStyle: const TextStyle(color: Colors.red),
                   onChanged: (val) {
                     setState(() {});
                   },
                 ),
                 const SizedBox(
-                  height: 30,
+                  height: 500,
                 ),
                 const Text(
                   "Single selection dropdown",
