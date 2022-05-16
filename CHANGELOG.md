@@ -1,3 +1,9 @@
+## 0.0.9
+- added option to customize multiple dropdown okay button 
+    color
+    Text and textStyle
+- added option to customize padding and text style of dropdown list tile. 
+
 ## 0.0.8
 
 Single dropdown controller text clear function fix
