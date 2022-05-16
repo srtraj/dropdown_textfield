@@ -84,14 +84,12 @@ dropdown list item text style
 
 
 
-<img src="https://github.com/srtraj/imagefiles/blob/main/single%20dropdown.gif" align="left" height="600" width="350" >
+<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/assets/single%20dropdown.gif" align="left" height="600" width="350" >
 
 
-<img src="https://github.com/srtraj/imagefiles/blob/main/single_search.gif" align="left" height="600" width="350" >
+<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/assets/single%20dropdown%20with%20search.gif" align="left" height="600" width="350" >
 
-<img src="https://github.com/srtraj/imagefiles/blob/main/multiselection%20dropdown.gif" align="left" height="600" width="350" >
-
-<img src="https://github.com/srtraj/imagefiles/blob/main/multiSelectionDropdown2.gif" align="left" height="600" width="350" >
+<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/assets/multiple%20dropdown.gif" align="left" height="600" width="350" >
 
 
 
