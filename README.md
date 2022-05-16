@@ -81,7 +81,8 @@ multi dropdown submit button text style
 
 ### listTextStyle
 dropdown list item text style
-
+<br/>
+### Example:
 ### Single dropdown
 <img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/assets/single%20dropdown.gif" align="bottom" height="600" width="350"></img>
 ### Single dropdown with search option
