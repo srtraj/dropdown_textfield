@@ -82,13 +82,12 @@ multi dropdown submit button text style
 ### listTextStyle
 dropdown list item text style
 
-<br/>
 ### Single dropdown
-<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/assets/single%20dropdown.gif" align="bottom" height="600" width="350" >
+<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/assets/single%20dropdown.gif" align="bottom" height="600" width="350"></img>
 ### Single dropdown with search option
-<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/assets/single%20dropdown%20with%20search.gif" align="bottom" height="600" width="350" >
+<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/assets/single%20dropdown%20with%20search.gif" align="bottom" height="600" width="350"></img>
 ### Multiple dropdown
-<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/assets/multiple%20dropdown.gif" align="bottom" height="600" width="350" >
+<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/assets/multiple%20dropdown.gif" align="bottom" height="600" width="350" ></img>
 
 
 
