@@ -83,6 +83,10 @@ multi dropdown submit button text style
 dropdown list item text style
 <br/>
 
-Full example is here https://github.com/srtraj/dropdown_textfield
-
-Note: This plugin is under active development, if you have a feature to implement or find bugs, please, add them here: [issue](https://github.com/srtraj/dropdown_textfield/issues)
+### Example:
+### Single dropdown
+<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/assets/single%20dropdown.gif" align="bottom" height="600" width="350"></img>
+### Single dropdown with search option
+<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/assets/single%20dropdown%20with%20search.gif" align="bottom" height="600" width="350"></img>
+### Multiple dropdown
+<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/assets/multiple%20dropdown.gif" align="bottom" height="600" width="350" ></img>
