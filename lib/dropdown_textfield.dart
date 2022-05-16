@@ -4,7 +4,6 @@ import 'package:collection/collection.dart';
 import 'package:dropdown_textfield/tooltip_widget.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 class DropDownTextField extends StatefulWidget {
   const DropDownTextField(
@@ -268,14 +267,6 @@ class _DropDownTextFieldState extends State<DropDownTextField>
       }
     }
     updateFunction();
-    var keyboardVisibilityController = KeyboardVisibilityController();
-    keyboardSubscription =
-        keyboardVisibilityController.onChange.listen((bool visible) {
-      if (!visible && _isExpanded && _isScrollPadding) {
-        shiftOverlayEntry2to1();
-      }
-    });
-
     super.initState();
   }
 
@@ -431,57 +422,66 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   @override
   Widget build(BuildContext context) {
     _isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
-    return CompositedTransformTarget(
-      link: _layerLink,
-      child: TextFormField(
-        focusNode: _textFieldFocusNode,
-        style: widget.textStyle,
-        enabled: widget.isEnabled,
-        readOnly: widget.readOnly,
-        controller: _cnt,
-        onTap: () {
-          _searchAutofocus = widget.searchAutofocus;
-          if (!_isExpanded) {
-            _showOverlay();
-          } else {
-            hideOverlay();
-          }
-        },
-        validator: (value) =>
-            widget.validator != null ? widget.validator!(value) : null,
-        decoration: widget.textFieldDecoration != null
-            ? widget.textFieldDecoration!.copyWith(
-                suffixIcon: (_cnt.text.isEmpty || !widget.clearOption)
-                    ? const Icon(
-                        Icons.arrow_drop_down_outlined,
-                      )
-                    : widget.clearOption
-                        ? InkWell(
-                            onTap: clearFun,
-                            child: const Icon(
-                              Icons.clear,
-                            ),
+    return KeyboardVisibilityBuilder(
+      builder: (context, isKeyboardVisible) {
+        if (!isKeyboardVisible && _isExpanded && _isScrollPadding) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            shiftOverlayEntry2to1();
+          });
+        }
+        return CompositedTransformTarget(
+          link: _layerLink,
+          child: TextFormField(
+            focusNode: _textFieldFocusNode,
+            style: widget.textStyle,
+            enabled: widget.isEnabled,
+            readOnly: widget.readOnly,
+            controller: _cnt,
+            onTap: () {
+              _searchAutofocus = widget.searchAutofocus;
+              if (!_isExpanded) {
+                _showOverlay();
+              } else {
+                hideOverlay();
+              }
+            },
+            validator: (value) =>
+                widget.validator != null ? widget.validator!(value) : null,
+            decoration: widget.textFieldDecoration != null
+                ? widget.textFieldDecoration!.copyWith(
+                    suffixIcon: (_cnt.text.isEmpty || !widget.clearOption)
+                        ? const Icon(
+                            Icons.arrow_drop_down_outlined,
                           )
-                        : null,
-              )
-            : InputDecoration(
-                floatingLabelBehavior: FloatingLabelBehavior.always,
-                hintText: _hintText,
-                hintStyle: const TextStyle(fontWeight: FontWeight.normal),
-                suffixIcon: (_cnt.text.isEmpty || !widget.clearOption)
-                    ? const Icon(
-                        Icons.arrow_drop_down_outlined,
-                      )
-                    : widget.clearOption
-                        ? InkWell(
-                            onTap: clearFun,
-                            child: const Icon(
-                              Icons.clear,
-                            ),
+                        : widget.clearOption
+                            ? InkWell(
+                                onTap: clearFun,
+                                child: const Icon(
+                                  Icons.clear,
+                                ),
+                              )
+                            : null,
+                  )
+                : InputDecoration(
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    hintText: _hintText,
+                    hintStyle: const TextStyle(fontWeight: FontWeight.normal),
+                    suffixIcon: (_cnt.text.isEmpty || !widget.clearOption)
+                        ? const Icon(
+                            Icons.arrow_drop_down_outlined,
                           )
-                        : null,
-              ),
-      ),
+                        : widget.clearOption
+                            ? InkWell(
+                                onTap: clearFun,
+                                child: const Icon(
+                                  Icons.clear,
+                                ),
+                              )
+                            : null,
+                  ),
+          ),
+        );
+      },
     );
   }
 
@@ -610,10 +610,15 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   void shiftOverlayEntry1to2() {
     _entry?.remove();
     _entry = null;
-    // _isOutsideClickOverlay = true;
+    if (_barrierOverlay != null && _barrierOverlay!.mounted) {
+      _barrierOverlay?.remove();
+      _barrierOverlay = null;
+      _isOutsideClickOverlay = false;
+    }
     _isScrollPadding = true;
     _showOverlay();
     _textFieldFocusNode.requestFocus();
+
     Future.delayed(Duration(milliseconds: _duration), () {
       _searchFocusNode.requestFocus();
     });
@@ -623,7 +628,11 @@ class _DropDownTextFieldState extends State<DropDownTextField>
     _searchAutofocus = false;
     _entry2?.remove();
     _entry2 = null;
-    // _isOutsideClickOverlay = true;
+    if (_barrierOverlay != null && _barrierOverlay!.mounted) {
+      _barrierOverlay?.remove();
+      _barrierOverlay = null;
+      _isOutsideClickOverlay = false;
+    }
     _controller.reset();
     _isScrollPadding = false;
     _showOverlay();
@@ -1121,4 +1130,51 @@ class ListPadding {
   double top;
   double bottom;
   ListPadding({this.top = 15, this.bottom = 15});
+}
+
+class KeyboardVisibilityBuilder extends StatefulWidget {
+  final Widget Function(
+    BuildContext context,
+    bool isKeyboardVisible,
+  ) builder;
+  const KeyboardVisibilityBuilder({
+    Key? key,
+    required this.builder,
+  }) : super(key: key);
+  @override
+  _KeyboardVisibilityBuilderState createState() =>
+      _KeyboardVisibilityBuilderState();
+}
+
+class _KeyboardVisibilityBuilderState extends State<KeyboardVisibilityBuilder>
+    with WidgetsBindingObserver {
+  var _isKeyboardVisible = false;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
+    final newValue = bottomInset > 0.0;
+    if (newValue != _isKeyboardVisible) {
+      setState(() {
+        _isKeyboardVisible = newValue;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.builder(
+        context,
+        _isKeyboardVisible,
+      );
 }

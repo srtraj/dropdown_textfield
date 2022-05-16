@@ -3,7 +3,8 @@
   color
   Text and textStyle
 - added option to customize padding and text style of dropdown list tile.
-- Fixed setState bug on onChange function,
+- Fixed setState bug on onChange function.
+- added outside click to hide dropdown if textfield is hidden.
 - new version of flutter (Flutter 3.0.0)
 
 ## 0.0.8

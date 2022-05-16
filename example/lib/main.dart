@@ -97,7 +97,7 @@ class _TestPageState extends State<TestPage> {
                   onChanged: (val) {},
                 ),
                 const SizedBox(
-                  height: 50,
+                  height: 500,
                 ),
                 const Text(
                   "Single selection dropdown with search option",
@@ -111,7 +111,7 @@ class _TestPageState extends State<TestPage> {
                   textFieldFocusNode: textFieldFocusNode,
                   searchFocusNode: searchFocusNode,
                   // searchAutofocus: true,
-                  dropDownItemCount: 2,
+                  dropDownItemCount: 8,
                   searchShowCursor: false,
                   enableSearch: true,
                   searchKeyboardType: TextInputType.number,
@@ -136,7 +136,7 @@ class _TestPageState extends State<TestPage> {
                   onChanged: (val) {},
                 ),
                 const SizedBox(
-                  height: 50,
+                  height: 500,
                 ),
                 const Text(
                   "multi selection dropdown",
