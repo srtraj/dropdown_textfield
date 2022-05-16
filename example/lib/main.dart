@@ -166,6 +166,7 @@ class _TestPageState extends State<TestPage> {
                     DropDownValueModel(name: 'name8', value: "value8"),
                   ],
                   onChanged: (val) {
+                    print(val);
                     setState(() {});
                   },
                 ),

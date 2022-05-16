@@ -3,6 +3,7 @@
     color
     Text and textStyle
 - added option to customize padding and text style of dropdown list tile. 
+- Fixed setState bug on onChange function,
 
 ## 0.0.8
 
