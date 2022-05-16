@@ -54,10 +54,10 @@ class _TestPageState extends State<TestPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(
-                  height: 600,
+                  height: 50,
                 ),
                 const Text(
-                  "Single selection dropdown",
+                  "Single selection dropdown with search option",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(
@@ -67,7 +67,7 @@ class _TestPageState extends State<TestPage> {
                   // initialValue: "name4",
                   singleController: _cnt,
                   clearOption: false,
-
+                  enableSearch: true,
                   validator: (value) {
                     if (value == null) {
                       return "Required field";
@@ -97,7 +97,7 @@ class _TestPageState extends State<TestPage> {
                   onChanged: (val) {},
                 ),
                 const SizedBox(
-                  height: 500,
+                  height: 50,
                 ),
                 const Text(
                   "Single selection dropdown with search option",
@@ -136,7 +136,7 @@ class _TestPageState extends State<TestPage> {
                   onChanged: (val) {},
                 ),
                 const SizedBox(
-                  height: 500,
+                  height: 50,
                 ),
                 const Text(
                   "multi selection dropdown",
@@ -170,7 +170,7 @@ class _TestPageState extends State<TestPage> {
                   },
                 ),
                 const SizedBox(
-                  height: 500,
+                  height: 50,
                 ),
                 const Text(
                   "Single selection dropdown",
@@ -207,7 +207,7 @@ class _TestPageState extends State<TestPage> {
                   onChanged: (val) {},
                 ),
                 const SizedBox(
-                  height: 500,
+                  height: 50,
                 )
               ],
             ),
