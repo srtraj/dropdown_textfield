@@ -1,9 +1,10 @@
-## 0.0.9
-- added option to customize multiple dropdown okay button 
-    color
-    Text and textStyle
-- added option to customize padding and text style of dropdown list tile. 
+## 1.0.0
+- added option to customize multiple dropdown okay button
+  color
+  Text and textStyle
+- added option to customize padding and text style of dropdown list tile.
 - Fixed setState bug on onChange function,
+- new version of flutter (Flutter 3.0.0)
 
 ## 0.0.8
 

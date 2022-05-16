@@ -292,7 +292,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
     Function eq = const DeepCollectionEquality().equals;
     _dropDownList = List.from(widget.dropDownList);
     _listPadding = widget.listPadding ?? ListPadding();
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.isMultiSelection) {
         if (oldWidget != null && !eq(oldWidget.dropDownList, _dropDownList)) {
           _multiSelectionValue = [];
@@ -395,7 +395,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
     if (widget.searchFocusNode == null) _searchFocusNode.dispose();
     if (widget.textFieldFocusNode == null) _textFieldFocusNode.dispose();
     _cnt.dispose();
-
+    keyboardSubscription.cancel();
     super.dispose();
   }
 
