@@ -1,3 +1,6 @@
+## 1.0.1
+- keyboardSubscription bug fixed
+
 ## 1.0.0
 - added option to customize multiple dropdown okay button
   color

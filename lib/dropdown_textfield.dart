@@ -191,7 +191,6 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   late bool _isOutsideClickOverlay;
   late bool _isScrollPadding;
   final int _duration = 150;
-  late StreamSubscription<bool> keyboardSubscription;
   late Offset _offset;
   late bool _searchAutofocus;
   late bool _isPortrait;
@@ -386,7 +385,6 @@ class _DropDownTextFieldState extends State<DropDownTextField>
     if (widget.searchFocusNode == null) _searchFocusNode.dispose();
     if (widget.textFieldFocusNode == null) _textFieldFocusNode.dispose();
     _cnt.dispose();
-    keyboardSubscription.cancel();
     super.dispose();
   }
 
@@ -440,7 +438,9 @@ class _DropDownTextFieldState extends State<DropDownTextField>
             onTap: () {
               _searchAutofocus = widget.searchAutofocus;
               if (!_isExpanded) {
-                _showOverlay();
+                if (_dropDownList.isNotEmpty) {
+                  _showOverlay();
+                }
               } else {
                 hideOverlay();
               }
