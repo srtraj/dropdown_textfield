@@ -21,10 +21,10 @@ A DropdownTextfield is a material design TextField. The DropDownButton is a widg
      <td><b>Single dropdown with clear option</b></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/single-dropdown.gif" align="bottom" height="500" width="260"></img></td>
-    <td><img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/single-dropdown-with-search-option.gif" align="bottom" height="500" width="260"></img></td>
+    <td><img src="https://github.com/srtraj/dropdown_textfield/raw/development/example/examples/single-dropdown.gif" align="bottom" height="500" width="260"></img></td>
+    <td><img src="https://github.com/srtraj/dropdown_textfield/raw/development/example/examples/single-dropdown-with-search-option.gif" align="bottom" height="500" width="260"></img></td>
     <td>
-<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/single-dropdown-with-clearOption.gif" align="bottom" height="500" width="260"></img></td>
+<img src="https://github.com/srtraj/dropdown_textfield/raw/development/example/examples/single-dropdown-with-clearOption.gif" align="bottom" height="500" width="260"></img></td>
   </tr>
  </table>
 
@@ -35,8 +35,8 @@ A DropdownTextfield is a material design TextField. The DropDownButton is a widg
 
   </tr>
   <tr>
-    <td><img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/multiselection-dropdown.gif" align="bottom" height="500" width="260"></img></td>
-    <td><img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/multiselection-with-all-selected-items.gif" align="bottom" height="500" width="260"></img></td>
+    <td><img src="https://github.com/srtraj/dropdown_textfield/raw/development/example/examples/multiselection-dropdown.gif" align="bottom" height="500" width="260"></img></td>
+    <td><img src="https://github.com/srtraj/dropdown_textfield/raw/development/example/examples/multiselection-with-all-selected-items.gif" align="bottom" height="500" width="260"></img></td>
   </tr>
  </table>
 
