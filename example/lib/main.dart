@@ -54,75 +54,84 @@ class _TestPageState extends State<TestPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(
-                  height: 50,
+                  height: 700,
                 ),
+                // const Text(
+                //   "Single selection dropdown",
+                //   style: TextStyle(fontWeight: FontWeight.bold),
+                // ),
+                // const SizedBox(
+                //   height: 20,
+                // ),
+                // DropDownTextField(
+                //   // initialValue: "name4",
+                //   singleController: _cnt,
+                //   clearOption: false,
+                //   enableSearch: true,
+                //   validator: (value) {
+                //     if (value == null) {
+                //       return "Required field";
+                //     } else {
+                //       return null;
+                //     }
+                //   },
+                //   dropDownItemCount: 6,
+                //   dropDownList: const [
+                //     DropDownValueModel(name: 'name1', value: "value1"),
+                //     DropDownValueModel(name: 'name2', value: "value2"),
+                //     DropDownValueModel(name: 'name3', value: "value3"),
+                //     DropDownValueModel(name: 'name4', value: "value4"),
+                //     DropDownValueModel(name: 'name5', value: "value5"),
+                //     DropDownValueModel(name: 'name6', value: "value6"),
+                //     DropDownValueModel(name: 'name7', value: "value7"),
+                //     DropDownValueModel(name: 'name8', value: "value8"),
+                //   ],
+                //   onChanged: (val) {},
+                // ),
+                // const SizedBox(
+                //   height: 500,
+                // ),
+                // const Text(
+                //   "Single selection dropdown with search option",
+                //   style: TextStyle(fontWeight: FontWeight.bold),
+                // ),
+                // const SizedBox(
+                //   height: 20,
+                // ),
+                // DropDownTextField(
+                //   clearOption: false,
+                //   textFieldFocusNode: textFieldFocusNode,
+                //   searchFocusNode: searchFocusNode,
+                //   // searchAutofocus: true,
+                //   dropDownItemCount: 8,
+                //   searchShowCursor: false,
+                //   enableSearch: true,
+                //   searchKeyboardType: TextInputType.number,
+                //   dropDownList: const [
+                //     DropDownValueModel(name: 'name1', value: "value1"),
+                //     DropDownValueModel(
+                //         name: 'name2',
+                //         value: "value2",
+                //         toolTipMsg:
+                //             "DropDownButton is a widget that we can use to select one unique value from a set of values"),
+                //     DropDownValueModel(name: 'name3', value: "value3"),
+                //     DropDownValueModel(
+                //         name: 'name4',
+                //         value: "value4",
+                //         toolTipMsg:
+                //             "DropDownButton is a widget that we can use to select one unique value from a set of values"),
+                //     DropDownValueModel(name: 'name5', value: "value5"),
+                //     DropDownValueModel(name: 'name6', value: "value6"),
+                //     DropDownValueModel(name: 'name7', value: "value7"),
+                //     DropDownValueModel(name: 'name8', value: "value8"),
+                //   ],
+                //   onChanged: (val) {},
+                // ),
+                // const SizedBox(
+                //   height: 500,
+                // ),
                 const Text(
-                  "Single selection dropdown with search option",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                DropDownTextField(
-                  // initialValue: "name4",
-                  singleController: _cnt,
-                  clearOption: false,
-                  enableSearch: true,
-                  validator: (value) {
-                    if (value == null) {
-                      return "Required field";
-                    } else {
-                      return null;
-                    }
-                  },
-                  dropDownItemCount: 6,
-                  dropDownList: const [],
-                  onChanged: (val) {},
-                ),
-                const SizedBox(
-                  height: 500,
-                ),
-                const Text(
-                  "Single selection dropdown with search option",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                DropDownTextField(
-                  clearOption: false,
-                  textFieldFocusNode: textFieldFocusNode,
-                  searchFocusNode: searchFocusNode,
-                  // searchAutofocus: true,
-                  dropDownItemCount: 8,
-                  searchShowCursor: false,
-                  enableSearch: true,
-                  searchKeyboardType: TextInputType.number,
-                  dropDownList: const [
-                    DropDownValueModel(name: 'name1', value: "value1"),
-                    DropDownValueModel(
-                        name: 'name2',
-                        value: "value2",
-                        toolTipMsg:
-                            "DropDownButton is a widget that we can use to select one unique value from a set of values"),
-                    DropDownValueModel(name: 'name3', value: "value3"),
-                    DropDownValueModel(
-                        name: 'name4',
-                        value: "value4",
-                        toolTipMsg:
-                            "DropDownButton is a widget that we can use to select one unique value from a set of values"),
-                    DropDownValueModel(name: 'name5', value: "value5"),
-                    DropDownValueModel(name: 'name6', value: "value6"),
-                    DropDownValueModel(name: 'name7', value: "value7"),
-                    DropDownValueModel(name: 'name8', value: "value8"),
-                  ],
-                  onChanged: (val) {},
-                ),
-                const SizedBox(
-                  height: 500,
-                ),
-                const Text(
-                  "multi selection dropdown",
+                  "multi selection dropdown with all selected item",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(
@@ -130,6 +139,8 @@ class _TestPageState extends State<TestPage> {
                 ),
                 DropDownTextField.multiSelection(
                   multiController: _cntMulti,
+                  clearOption: false,
+                  displayCompleteItem: true,
                   dropDownList: const [
                     DropDownValueModel(name: 'name1', value: "value1"),
                     DropDownValueModel(
@@ -152,45 +163,45 @@ class _TestPageState extends State<TestPage> {
                     setState(() {});
                   },
                 ),
+                // const SizedBox(
+                //   height: 50,
+                // ),
+                // const Text(
+                //   "Single selection dropdown",
+                //   style: TextStyle(fontWeight: FontWeight.bold),
+                // ),
+                // const SizedBox(
+                //   height: 20,
+                // ),
+                // DropDownTextField(
+                //   // initialValue: "name4",
+                //   listSpace: 20,
+                //   listPadding: ListPadding(top: 20),
+                //   enableSearch: true,
+                //   validator: (value) {
+                //     if (value == null) {
+                //       return "Required field";
+                //     } else {
+                //       return null;
+                //     }
+                //   },
+                //   dropDownList: const [
+                //     DropDownValueModel(name: 'name1', value: "value1"),
+                //     DropDownValueModel(name: 'name2', value: "value2"),
+                //     DropDownValueModel(name: 'name3', value: "value3"),
+                //     DropDownValueModel(name: 'name4', value: "value4"),
+                //     DropDownValueModel(name: 'name5', value: "value5"),
+                //     DropDownValueModel(name: 'name6', value: "value6"),
+                //     DropDownValueModel(name: 'name7', value: "value7"),
+                //     DropDownValueModel(name: 'name8', value: "value8"),
+                //   ],
+                //   listTextStyle: const TextStyle(color: Colors.red),
+                //   dropDownItemCount: 8,
+                //
+                //   onChanged: (val) {},
+                // ),
                 const SizedBox(
-                  height: 50,
-                ),
-                const Text(
-                  "Single selection dropdown",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                DropDownTextField(
-                  // initialValue: "name4",
-                  listSpace: 20,
-                  listPadding: ListPadding(top: 20),
-                  enableSearch: true,
-                  validator: (value) {
-                    if (value == null) {
-                      return "Required field";
-                    } else {
-                      return null;
-                    }
-                  },
-                  dropDownList: const [
-                    DropDownValueModel(name: 'name1', value: "value1"),
-                    DropDownValueModel(name: 'name2', value: "value2"),
-                    DropDownValueModel(name: 'name3', value: "value3"),
-                    DropDownValueModel(name: 'name4', value: "value4"),
-                    DropDownValueModel(name: 'name5', value: "value5"),
-                    DropDownValueModel(name: 'name6', value: "value6"),
-                    DropDownValueModel(name: 'name7', value: "value7"),
-                    DropDownValueModel(name: 'name8', value: "value8"),
-                  ],
-                  listTextStyle: const TextStyle(color: Colors.red),
-                  dropDownItemCount: 8,
-
-                  onChanged: (val) {},
-                ),
-                const SizedBox(
-                  height: 50,
+                  height: 800,
                 )
               ],
             ),
