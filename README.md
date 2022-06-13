@@ -12,17 +12,33 @@ A DropdownTextfield is a material design TextField. The DropDownButton is a widg
 6. ToolTip dialogue for multi selection dropdown item.
 
 ### Example:
-### Single dropdown
-<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/single-dropdown.gif" align="bottom" height="500" width="260"></img>
-### Single dropdown with search option
-<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/single-dropdown-with-search-option.gif" align="bottom" height="600" width="350"></img>
-### Single dropdown with clear option
-<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/single-dropdown-with-clearOption.gif" align="bottom" height="600" width="350"></img>
 
-### Multiple dropdown
-<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/multiselection-dropdown.gif" align="bottom" height="600" width="350" ></img>
-### Multiple dropdown with all selected item
-<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/multiselection-with-all-selected-items.gif" align="bottom" height="600" width="350" ></img>
+
+<table>
+  <tr>
+    <td><b>Single dropdown</b></td>
+     <td><b>Single dropdown with search option</b></td>
+     <td><b>Single dropdown with clear option</b></td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/single-dropdown.gif" align="bottom" height="500" width="260"></img></td>
+    <td><img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/single-dropdown-with-search-option.gif" align="bottom" height="500" width="260"></img></td>
+    <td>
+<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/single-dropdown-with-clearOption.gif" align="bottom" height="500" width="260"></img></td>
+  </tr>
+ </table>
+
+<table>
+  <tr>
+    <td><b>Multiple dropdown</b></td>
+     <td><b>Multiple dropdown with all selected item</b></td>
+
+  </tr>
+  <tr>
+    <td><img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/multiselection-dropdown.gif" align="bottom" height="500" width="260"></img></td>
+    <td><img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/multiselection-with-all-selected-items.gif" align="bottom" height="500" width="260"></img></td>
+  </tr>
+ </table>
 
 
 
