@@ -1,3 +1,7 @@
+## 1.0.2
+
+Animated GIF not displaying in pub page -fixed
+
 ## 1.0.1
 - keyboardSubscription bug fixed
 
