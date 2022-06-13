@@ -13,16 +13,16 @@ A DropdownTextfield is a material design TextField. The DropDownButton is a widg
 
 ### Example:
 ### Single dropdown
-<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/single%20dropdown.mp4" align="bottom" height="600" width="350"></img>
+<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/single-dropdown.gif" align="bottom" height="600" width="350"></img>
 ### Single dropdown with search option
-<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/single%20dropdown%20with%20search%20option.mp4" align="bottom" height="600" width="350"></img>
+<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/single-dropdown-with-search-option.gif" align="bottom" height="600" width="350"></img>
 ### Single dropdown with clear option
-<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/single%20dropdown%20with%20clearOption.mp4" align="bottom" height="600" width="350"></img>
+<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/single-dropdown-with-clearOption.gif" align="bottom" height="600" width="350"></img>
 
 ### Multiple dropdown
-<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/multiselection%20dropdown.mp4" align="bottom" height="600" width="350" ></img>
+<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/multiselection-dropdown.gif" align="bottom" height="600" width="350" ></img>
 ### Multiple dropdown with all selected item
-<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/multiselection%20with%20all%20selected%20items.mp4" align="bottom" height="600" width="350" ></img>
+<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/multiselection-with-all-selected-items.gif" align="bottom" height="600" width="350" ></img>
 
 
 
