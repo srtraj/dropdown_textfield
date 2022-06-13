@@ -13,7 +13,7 @@ A DropdownTextfield is a material design TextField. The DropDownButton is a widg
 
 ### Example:
 ### Single dropdown
-<img src="https://github.com/srtraj/dropdown_textfield/raw/development/example/assets/single%20dropdown.gif" align="bottom" height="600" width="350"></img>
+<img src="https://github.com/srtraj/dropdown_textfield/raw/master/example/examples/single%20dropdown.mp4" align="bottom" height="600" width="350"></img>
 ### Single dropdown with search option
 <img src="https://github.com/srtraj/dropdown_textfield/raw/development/example/assets/single%20dropdown%20with%20search.gif" align="bottom" height="600" width="350"></img>
 ### Multiple dropdown
