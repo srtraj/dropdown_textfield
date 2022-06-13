@@ -12,8 +12,8 @@ A DropdownTextfield is a material design TextField. The DropDownButton is a widg
 6. ToolTip dialogue for multi selection dropdown item.
 
 ### Example:
-Solarized dark             |  Solarized Ocean
-:-------------------------:|:-------------------------:
+Solarized dark   |  Solarized Ocean
+:-------------------------------------:|:-------------------------:
 <img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/examples/single-dropdown.gif" align="bottom" height="400" width="220"></img>  |  ![](https://...Ocean.png)
 ### Single dropdown
 
