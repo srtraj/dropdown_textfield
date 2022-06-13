@@ -11,15 +11,6 @@ A DropdownTextfield is a material design TextField. The DropDownButton is a widg
 5. Easy implementation into statelessWidget
 6. ToolTip dialogue for multi selection dropdown item.
 
-### Example:
-### Single dropdown
-<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/assets/single%20dropdown.gif" align="bottom" height="600" width="350"></img>
-### Single dropdown with search option
-<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/assets/single%20dropdown%20with%20search.gif" align="bottom" height="600" width="350"></img>
-### Multiple dropdown
-<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/assets/multiple%20dropdown.gif" align="bottom" height="600" width="350" ></img>
-
-
 
 ### singleController
 single dropdown controller,
@@ -92,4 +83,14 @@ multi dropdown submit button text style
 dropdown list item text style
 <br/>
 
+### Example:
+### Single dropdown
+<https://raw.githubusercontent.com/srtraj/dropdown_textfield/development/example/assets/single%20dropdown.gif" align="bottom" height="600" width="350"></img>
 
+[comment]: <> (### Single dropdown with search option)
+
+[comment]: <> (<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/assets/single%20dropdown%20with%20search.gif" align="bottom" height="600" width="350"></img>)
+
+[comment]: <> (### Multiple dropdown)
+
+[comment]: <> (<img src="https://github.com/srtraj/dropdown_textfield/blob/development/example/assets/multiple%20dropdown.gif" align="bottom" height="600" width="350" ></img>)
