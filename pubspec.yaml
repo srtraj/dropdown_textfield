@@ -1,6 +1,6 @@
 name: dropdown_textfield
 description: A DropdownTextfield is a material design TextField. The DropDownButton is a widget that we can use to select one unique value or multivalue from a set of values.
-version: 1.0.1
+version: 1.0.2
 homepage: https://github.com/srtraj/dropdown_textfield
 
 environment:
@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  collection: ^1.15.0
+  collection: ^1.16.0
   equatable: ^2.0.3
 
 dev_dependencies:
