@@ -42,11 +42,8 @@ A DropdownTextfield is a material design TextField. The DropDownButton is a widg
 
 
 
-### singleController
-single dropdown controller,
-
-### multiController
-multi dropdown controller
+### controller
+dropdown controller,
 
 ### dropdownRadius
 define the radius of dropdown List ,default value is 12
