@@ -1,9 +1,9 @@
-## 1.0.3
+## 1.0.4
 Input decoration added for search textfield 
 singleController and multiController renamed to controller
 
 
-## 1.0.2
+## 1.0.3
 
 Animated GIF not displaying in pub page -fixed
 
