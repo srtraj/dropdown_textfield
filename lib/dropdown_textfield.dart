@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 class DropDownTextField extends StatefulWidget {
   const DropDownTextField(
       {Key? key,
-      this.singleController,
+      this.controller,
       this.initialValue,
       required this.dropDownList,
       this.padding,
@@ -32,18 +32,26 @@ class DropDownTextField extends StatefulWidget {
       // this.keyboardHeight = 450,
       this.listPadding,
       this.listTextStyle})
-      : assert(!(initialValue != null && singleController != null),
-            "you cannot add both initialValue and singleController,\nset initial value using controller \n\tEg: SingleValueDropDownController(data:initial value) "),
+      : assert(
+          !(initialValue != null && controller != null),
+          "you cannot add both initialValue and singleController,\nset initial value using controller \n\tEg: SingleValueDropDownController(data:initial value) ",
+        ),
+        assert(
+          !(controller != null &&
+              !(controller is SingleValueDropDownController)),
+          "controller must be type of SingleValueDropDownController",
+        ),
         isMultiSelection = false,
-        displayCompleteItem = false,
+        singleController = controller,
         multiController = null,
+        displayCompleteItem = false,
         submitButtonColor = null,
         submitButtonText = null,
         submitButtonTextStyle = null,
         super(key: key);
   const DropDownTextField.multiSelection(
       {Key? key,
-      this.multiController,
+      this.controller,
       this.displayCompleteItem = false,
       this.initialValue,
       required this.dropDownList,
@@ -64,8 +72,14 @@ class DropDownTextField extends StatefulWidget {
       this.submitButtonTextStyle,
       this.listPadding,
       this.listTextStyle})
-      : assert(initialValue == null || multiController == null,
+      : assert(initialValue == null || controller == null,
             "you cannot add both initialValue and multiController\nset initial value using controller\n\tMultiValueDropDownController(data:initial value)"),
+        assert(
+          !(controller != null &&
+              !(controller is MultiValueDropDownController)),
+          "controller must be type of MultiValueDropDownController",
+        ),
+        multiController = controller,
         isMultiSelection = true,
         enableSearch = false,
         readOnly = true,
@@ -76,6 +90,8 @@ class DropDownTextField extends StatefulWidget {
         searchDecoration = null,
         // keyboardHeight = 0,
         super(key: key);
+
+  final dynamic controller;
 
   ///single dropdown controller,
   final SingleValueDropDownController? singleController;

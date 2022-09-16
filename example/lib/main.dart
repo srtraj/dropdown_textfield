@@ -72,7 +72,7 @@ class _TestPageState extends State<TestPage> {
                 ),
                 DropDownTextField(
                   // initialValue: "name4",
-                  singleController: _cnt,
+                  controller: _cnt,
                   clearOption: false,
                   enableSearch: true,
                   searchDecoration: const InputDecoration(
@@ -155,7 +155,7 @@ class _TestPageState extends State<TestPage> {
                   height: 20,
                 ),
                 DropDownTextField.multiSelection(
-                  multiController: _cntMulti,
+                  controller: _cntMulti,
                   dropDownList: const [
                     DropDownValueModel(name: 'name1', value: "value1"),
                     DropDownValueModel(
@@ -225,7 +225,7 @@ class _TestPageState extends State<TestPage> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          setState(() {});
+          print(_cnt.dropDownValue);
         },
         label: const Text("Submit"),
       ),
