@@ -225,7 +225,7 @@ class _TestPageState extends State<TestPage> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          print(_cnt.dropDownValue);
+          setState(() {});
         },
         label: const Text("Submit"),
       ),
