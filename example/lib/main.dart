@@ -41,7 +41,8 @@ class _TestPageState extends State<TestPage> {
     _cntMulti = MultiValueDropDownController();
     super.initState();
   }
-    @override
+
+  @override
   void dispose() {
     _cnt.dispose();
     _cntMulti.dispose();
@@ -74,6 +75,8 @@ class _TestPageState extends State<TestPage> {
                   singleController: _cnt,
                   clearOption: false,
                   enableSearch: true,
+                  searchDecoration: const InputDecoration(
+                      hintText: "enter your custom hint text here"),
                   validator: (value) {
                     if (value == null) {
                       return "Required field";

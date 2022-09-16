@@ -24,6 +24,7 @@ class DropDownTextField extends StatefulWidget {
       this.searchFocusNode,
       this.textFieldFocusNode,
       this.searchAutofocus = false,
+      this.searchDecoration,
       this.searchShowCursor,
       this.searchKeyboardType,
       this.listSpace = 0,
@@ -34,7 +35,6 @@ class DropDownTextField extends StatefulWidget {
       : assert(!(initialValue != null && singleController != null),
             "you cannot add both initialValue and singleController,\nset initial value using controller \n\tEg: SingleValueDropDownController(data:initial value) "),
         isMultiSelection = false,
-        isForceMultiSelectionClear = false,
         displayCompleteItem = false,
         multiController = null,
         submitButtonColor = null,
@@ -49,8 +49,6 @@ class DropDownTextField extends StatefulWidget {
       required this.dropDownList,
       this.padding,
       this.textStyle,
-      @Deprecated('Use multiController instead. Will be removed in next version')
-          this.isForceMultiSelectionClear = false,
       this.onChanged,
       this.validator,
       this.isEnabled = true,
@@ -75,6 +73,7 @@ class DropDownTextField extends StatefulWidget {
         searchKeyboardType = null,
         searchShowCursor = null,
         singleController = null,
+        searchDecoration = null,
         // keyboardHeight = 0,
         super(key: key);
 
@@ -105,9 +104,6 @@ class DropDownTextField extends StatefulWidget {
 
   final EdgeInsets? padding;
 
-  ///by setting isForceMultiSelectionClear=true to deselect selected item,only applicable for multi selection dropdown
-  final bool isForceMultiSelectionClear;
-
   ///override default textfield decoration
   final InputDecoration? textFieldDecoration;
 
@@ -129,6 +125,9 @@ class DropDownTextField extends StatefulWidget {
 
   final FocusNode? searchFocusNode;
   final FocusNode? textFieldFocusNode;
+
+  ///override default search decoration
+  final InputDecoration? searchDecoration;
 
   ///override default search keyboard type,only applicable if enableSearch=true,
   final TextInputType? searchKeyboardType;
@@ -291,14 +290,14 @@ class _DropDownTextFieldState extends State<DropDownTextField>
             _multiSelectionValue.add(false);
           }
         }
-        if (widget.isForceMultiSelectionClear &&
-            _multiSelectionValue.isNotEmpty) {
-          _multiSelectionValue = [];
-          _cnt.text = "";
-          for (int i = 0; i < _dropDownList.length; i++) {
-            _multiSelectionValue.add(false);
-          }
-        }
+        // if (widget.isForceMultiSelectionClear &&
+        //     _multiSelectionValue.isNotEmpty) {
+        //   _multiSelectionValue = [];
+        //   _cnt.text = "";
+        //   for (int i = 0; i < _dropDownList.length; i++) {
+        //     _multiSelectionValue.add(false);
+        //   }
+        // }
 
         // if (widget.multiController != null) {
         //   List<DropDownValueModel> multiCnt = [];
@@ -688,6 +687,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                       searchHeight: _searchWidgetHeight,
                       searchKeyboardType: widget.searchKeyboardType,
                       searchAutofocus: _searchAutofocus,
+                      searchDecoration: widget.searchDecoration,
                       searchShowCursor: widget.searchShowCursor,
                       listPadding: _listPadding,
                       onSearchTap: () {
@@ -775,6 +775,7 @@ class SingleSelection extends StatefulWidget {
       this.onSearchTap,
       this.onSearchSubmit,
       this.listTextStyle,
+      this.searchDecoration,
       required this.listPadding})
       : super(key: key);
   final List<DropDownValueModel> dropDownList;
@@ -794,6 +795,7 @@ class SingleSelection extends StatefulWidget {
   final Function? onSearchSubmit;
   final TextStyle? listTextStyle;
   final ListPadding listPadding;
+  final InputDecoration? searchDecoration;
 
   @override
   State<SingleSelection> createState() => _SingleSelectionState();
@@ -803,6 +805,7 @@ class _SingleSelectionState extends State<SingleSelection> {
   late List<DropDownValueModel> newDropDownList;
   late TextEditingController _searchCnt;
   late FocusScopeNode _focusScopeNode;
+  late InputDecoration _inpDec;
   onItemChanged(String value) {
     setState(() {
       if (value.isEmpty) {
@@ -819,6 +822,7 @@ class _SingleSelectionState extends State<SingleSelection> {
   @override
   void initState() {
     _focusScopeNode = FocusScopeNode();
+    _inpDec = widget.searchDecoration ?? InputDecoration();
     if (widget.searchAutofocus) {
       widget.searchFocusNode.requestFocus();
     }
@@ -862,8 +866,8 @@ class _SingleSelectionState extends State<SingleSelection> {
                     widget.onSearchTap!();
                   }
                 },
-                decoration: InputDecoration(
-                  hintText: 'Search Here...',
+                decoration: _inpDec.copyWith(
+                  hintText: _inpDec.hintText ?? 'Search Here...',
                   suffixIcon: GestureDetector(
                     onTap: () {
                       widget.mainFocusNode.requestFocus();
