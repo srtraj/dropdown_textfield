@@ -73,8 +73,9 @@ class _TestPageState extends State<TestPage> {
                 DropDownTextField(
                   // initialValue: "name4",
                   controller: _cnt,
-                  clearOption: false,
+                  clearOption: true,
                   enableSearch: true,
+                  clearIconProperty: IconProperty(color: Colors.green),
                   searchDecoration: const InputDecoration(
                       hintText: "enter your custom hint text here"),
                   validator: (value) {
@@ -85,6 +86,7 @@ class _TestPageState extends State<TestPage> {
                     }
                   },
                   dropDownItemCount: 6,
+
                   dropDownList: const [
                     DropDownValueModel(name: 'name1', value: "value1"),
                     DropDownValueModel(
@@ -155,7 +157,8 @@ class _TestPageState extends State<TestPage> {
                   height: 20,
                 ),
                 DropDownTextField.multiSelection(
-                  controller: _cntMulti,
+                  // controller: _cntMulti,
+                  initialValue: const ["name1", "name2", "name8", "name3"],
                   dropDownList: const [
                     DropDownValueModel(name: 'name1', value: "value1"),
                     DropDownValueModel(

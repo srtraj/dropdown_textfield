@@ -5,6 +5,49 @@ import 'package:dropdown_textfield/tooltip_widget.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
+class IconProperty {
+  final IconData? icon;
+  final Color? color;
+  final double? size;
+  IconProperty({this.icon, this.color, this.size});
+}
+
+class CheckBoxProperty {
+  final MouseCursor? mouseCursor;
+  final Color? activeColor;
+  final MaterialStateProperty<Color?>? fillColor;
+  final Color? checkColor;
+  final bool tristate;
+  final MaterialTapTargetSize? materialTapTargetSize;
+  final VisualDensity? visualDensity;
+  final Color? focusColor;
+  final Color? hoverColor;
+  final MaterialStateProperty<Color?>? overlayColor;
+  final double? splashRadius;
+  final FocusNode? focusNode;
+  final bool autofocus;
+  final OutlinedBorder? shape;
+  final BorderSide? side;
+  static const double width = 18.0;
+  CheckBoxProperty({
+    this.tristate = false,
+    this.mouseCursor,
+    this.activeColor,
+    this.fillColor,
+    this.checkColor,
+    this.focusColor,
+    this.hoverColor,
+    this.overlayColor,
+    this.splashRadius,
+    this.materialTapTargetSize,
+    this.visualDensity,
+    this.focusNode,
+    this.autofocus = false,
+    this.shape,
+    this.side,
+  });
+}
+
 class DropDownTextField extends StatefulWidget {
   const DropDownTextField(
       {Key? key,
@@ -20,6 +63,7 @@ class DropDownTextField extends StatefulWidget {
       this.readOnly = true,
       this.dropdownRadius = 12,
       this.textFieldDecoration,
+      this.dropDownIconProperty,
       this.dropDownItemCount = 6,
       this.searchFocusNode,
       this.textFieldFocusNode,
@@ -29,6 +73,7 @@ class DropDownTextField extends StatefulWidget {
       this.searchKeyboardType,
       this.listSpace = 0,
       this.clearOption = true,
+      this.clearIconProperty,
       // this.keyboardHeight = 450,
       this.listPadding,
       this.listTextStyle})
@@ -41,6 +86,7 @@ class DropDownTextField extends StatefulWidget {
               !(controller is SingleValueDropDownController)),
           "controller must be type of SingleValueDropDownController",
         ),
+        checkBoxProperty = null,
         isMultiSelection = false,
         singleController = controller,
         multiController = null,
@@ -49,30 +95,33 @@ class DropDownTextField extends StatefulWidget {
         submitButtonText = null,
         submitButtonTextStyle = null,
         super(key: key);
-  const DropDownTextField.multiSelection(
-      {Key? key,
-      this.controller,
-      this.displayCompleteItem = false,
-      this.initialValue,
-      required this.dropDownList,
-      this.padding,
-      this.textStyle,
-      this.onChanged,
-      this.validator,
-      this.isEnabled = true,
-      this.dropdownRadius = 12,
-      this.textFieldDecoration,
-      this.dropDownItemCount = 6,
-      this.searchFocusNode,
-      this.textFieldFocusNode,
-      this.listSpace = 0,
-      this.clearOption = true,
-      this.submitButtonColor,
-      this.submitButtonText,
-      this.submitButtonTextStyle,
-      this.listPadding,
-      this.listTextStyle})
-      : assert(initialValue == null || controller == null,
+  const DropDownTextField.multiSelection({
+    Key? key,
+    this.controller,
+    this.displayCompleteItem = false,
+    this.initialValue,
+    required this.dropDownList,
+    this.padding,
+    this.textStyle,
+    this.onChanged,
+    this.validator,
+    this.isEnabled = true,
+    this.dropdownRadius = 12,
+    this.dropDownIconProperty,
+    this.textFieldDecoration,
+    this.dropDownItemCount = 6,
+    this.searchFocusNode,
+    this.textFieldFocusNode,
+    this.listSpace = 0,
+    this.clearOption = true,
+    this.clearIconProperty,
+    this.submitButtonColor,
+    this.submitButtonText,
+    this.submitButtonTextStyle,
+    this.listPadding,
+    this.listTextStyle,
+    this.checkBoxProperty,
+  })  : assert(initialValue == null || controller == null,
             "you cannot add both initialValue and multiController\nset initial value using controller\n\tMultiValueDropDownController(data:initial value)"),
         assert(
           !(controller != null &&
@@ -91,6 +140,8 @@ class DropDownTextField extends StatefulWidget {
         // keyboardHeight = 0,
         super(key: key);
 
+  ///single and multiple dropdown controller.
+  ///It must be type of SingleValueDropDownController or MultiValueDropDownController.
   final dynamic controller;
 
   ///single dropdown controller,
@@ -122,6 +173,9 @@ class DropDownTextField extends StatefulWidget {
 
   ///override default textfield decoration
   final InputDecoration? textFieldDecoration;
+
+  ///customize dropdown icon size and color
+  final IconProperty? dropDownIconProperty;
 
   ///by setting isEnabled=false to disable textfield,default value true
   final bool isEnabled;
@@ -158,6 +212,9 @@ class DropDownTextField extends StatefulWidget {
   ///by set clearOption=false to hide clear suffix icon button from textfield.
   final bool clearOption;
 
+  ///customize Clear icon size and color
+  final IconProperty? clearIconProperty;
+
   ///space between textfield and list ,default value is 0
   final double listSpace;
 
@@ -175,6 +232,9 @@ class DropDownTextField extends StatefulWidget {
 
   ///dropdown list item text style
   final TextStyle? listTextStyle;
+
+  ///customize checkbox property
+  final CheckBoxProperty? checkBoxProperty;
 
   @override
   _DropDownTextFieldState createState() => _DropDownTextFieldState();
@@ -260,7 +320,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
           var index = _dropDownList.indexWhere((element) =>
               element.name.trim() == widget.initialValue[i].trim());
           if (index != -1) {
-            _multiSelectionValue[i] = true;
+            _multiSelectionValue[index] = true;
           }
         }
         int count =
@@ -465,14 +525,19 @@ class _DropDownTextFieldState extends State<DropDownTextField>
             decoration: widget.textFieldDecoration != null
                 ? widget.textFieldDecoration!.copyWith(
                     suffixIcon: (_cnt.text.isEmpty || !widget.clearOption)
-                        ? const Icon(
-                            Icons.arrow_drop_down_outlined,
+                        ? Icon(
+                            widget.dropDownIconProperty?.icon ??
+                                Icons.arrow_drop_down_outlined,
+                            size: widget.dropDownIconProperty?.size,
+                            color: widget.dropDownIconProperty?.color,
                           )
                         : widget.clearOption
                             ? InkWell(
                                 onTap: clearFun,
-                                child: const Icon(
-                                  Icons.clear,
+                                child: Icon(
+                                  widget.clearIconProperty?.icon ?? Icons.clear,
+                                  size: widget.clearIconProperty?.size,
+                                  color: widget.clearIconProperty?.color,
                                 ),
                               )
                             : null,
@@ -482,14 +547,19 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                     hintText: _hintText,
                     hintStyle: const TextStyle(fontWeight: FontWeight.normal),
                     suffixIcon: (_cnt.text.isEmpty || !widget.clearOption)
-                        ? const Icon(
-                            Icons.arrow_drop_down_outlined,
+                        ? Icon(
+                            widget.dropDownIconProperty?.icon ??
+                                Icons.arrow_drop_down_outlined,
+                            size: widget.dropDownIconProperty?.size,
+                            color: widget.dropDownIconProperty?.color,
                           )
                         : widget.clearOption
                             ? InkWell(
                                 onTap: clearFun,
-                                child: const Icon(
-                                  Icons.clear,
+                                child: Icon(
+                                  widget.clearIconProperty?.icon ?? Icons.clear,
+                                  size: widget.clearIconProperty?.size,
+                                  color: widget.clearIconProperty?.color,
                                 ),
                               )
                             : null,
@@ -719,7 +789,9 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                         if (_isScrollPadding) {
                           shiftOverlayEntry2to1();
                         }
-                      })
+                      },
+                      clearIconProperty: widget.clearIconProperty,
+                    )
                   : MultiSelection(
                       buttonTextStyle: widget.submitButtonTextStyle,
                       buttonText: widget.submitButtonText,
@@ -763,6 +835,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
 
                         setState(() {});
                       },
+                      checkBoxProperty: widget.checkBoxProperty,
                     ),
             ),
           ),
@@ -792,7 +865,8 @@ class SingleSelection extends StatefulWidget {
       this.onSearchSubmit,
       this.listTextStyle,
       this.searchDecoration,
-      required this.listPadding})
+      required this.listPadding,
+      this.clearIconProperty})
       : super(key: key);
   final List<DropDownValueModel> dropDownList;
   final ValueSetter onChanged;
@@ -812,6 +886,7 @@ class SingleSelection extends StatefulWidget {
   final TextStyle? listTextStyle;
   final ListPadding listPadding;
   final InputDecoration? searchDecoration;
+  final IconProperty? clearIconProperty;
 
   @override
   State<SingleSelection> createState() => _SingleSelectionState();
@@ -891,8 +966,12 @@ class _SingleSelectionState extends State<SingleSelection> {
                       onItemChanged("");
                     },
                     child: widget.searchFocusNode.hasFocus
-                        ? const InkWell(
-                            child: Icon(Icons.close),
+                        ? InkWell(
+                            child: Icon(
+                              widget.clearIconProperty?.icon ?? Icons.close,
+                              size: widget.clearIconProperty?.size,
+                              color: widget.clearIconProperty?.color,
+                            ),
                           )
                         : const SizedBox.shrink(),
                   ),
@@ -956,7 +1035,8 @@ class MultiSelection extends StatefulWidget {
       this.buttonTextStyle,
       required this.listTileHeight,
       required this.listPadding,
-      this.listTextStyle})
+      this.listTextStyle,
+      this.checkBoxProperty})
       : super(key: key);
   final List<DropDownValueModel> dropDownList;
   final ValueSetter onChanged;
@@ -968,6 +1048,7 @@ class MultiSelection extends StatefulWidget {
   final double listTileHeight;
   final TextStyle? listTextStyle;
   final ListPadding listPadding;
+  final CheckBoxProperty? checkBoxProperty;
 
   @override
   _MultiSelectionState createState() => _MultiSelectionState();
@@ -1033,6 +1114,25 @@ class _MultiSelectionState extends State<MultiSelection> {
                                 });
                               }
                             },
+                            tristate:
+                                widget.checkBoxProperty?.tristate ?? false,
+                            mouseCursor: widget.checkBoxProperty?.mouseCursor,
+                            activeColor: widget.checkBoxProperty?.activeColor,
+                            fillColor: widget.checkBoxProperty?.fillColor,
+                            checkColor: widget.checkBoxProperty?.checkColor,
+                            focusColor: widget.checkBoxProperty?.focusColor,
+                            hoverColor: widget.checkBoxProperty?.hoverColor,
+                            overlayColor: widget.checkBoxProperty?.overlayColor,
+                            splashRadius: widget.checkBoxProperty?.splashRadius,
+                            materialTapTargetSize:
+                                widget.checkBoxProperty?.materialTapTargetSize,
+                            visualDensity:
+                                widget.checkBoxProperty?.visualDensity,
+                            focusNode: widget.checkBoxProperty?.focusNode,
+                            autofocus:
+                                widget.checkBoxProperty?.autofocus ?? false,
+                            shape: widget.checkBoxProperty?.shape,
+                            side: widget.checkBoxProperty?.side,
                           ),
                         ],
                       ),

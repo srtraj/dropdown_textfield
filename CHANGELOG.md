@@ -1,3 +1,9 @@
+## 1.0.5
+- Option added to customize clear and dropdown icon properties
+- checkBoxProperty added ,now you can customize default property of multiple checkbox style
+- "InitialValue in multiSelection #9" bug .
+
+
 ## 1.0.4
 Input decoration added for search textfield 
 singleController and multiController renamed to controller

@@ -42,8 +42,10 @@ A DropdownTextfield is a material design TextField. The DropDownButton is a widg
 
 
 
-### controller
-dropdown controller,
+
+### controller,
+single and multiple dropdown controller
+### It must be type of SingleValueDropDownController or MultiValueDropDownController.
 
 ### dropdownRadius
 define the radius of dropdown List ,default value is 12
@@ -62,6 +64,11 @@ and for multi Selection Dropdown ,it will return list of DropDownValueModel obje
 
 ### textFieldDecoration
 override default textfield decoration
+
+
+### dropDownIconProperty
+customize dropdown icon size and color
+
 
 ### isEnabled
 isEnabled=false to disable textfield,default value true
@@ -91,6 +98,9 @@ searchShowCursor=false to hide cursor from search textfield,only applicable if e
 ### clearOption
 clearOption=false to hide clear suffix icon button from textfield.
 
+###clearIconProperty
+customize Clear icon size and color
+
 ### listSpace
 space between textfield and list ,default value is 0
 
@@ -108,6 +118,12 @@ multi dropdown submit button text style
 
 ### listTextStyle
 dropdown list item text style
+
+
+### checkBoxProperty
+customize multiple checkbox property
+
+
 <br/>
 
 
