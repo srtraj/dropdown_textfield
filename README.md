@@ -124,6 +124,4 @@ dropdown list item text style
 customize multiple checkbox property
 
 
-<br/>
-
 
