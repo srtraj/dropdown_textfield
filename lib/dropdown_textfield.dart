@@ -776,20 +776,20 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                       searchDecoration: widget.searchDecoration,
                       searchShowCursor: widget.searchShowCursor,
                       listPadding: _listPadding,
-                      onSearchTap: () {
-                        double posFromBot =
-                            MediaQuery.of(context).size.height - _offset.dy;
-                        if (posFromBot < _keyboardHeight &&
-                            !_isScrollPadding &&
-                            _isPortrait) {
-                          shiftOverlayEntry1to2();
-                        }
-                      },
-                      onSearchSubmit: () {
-                        if (_isScrollPadding) {
-                          shiftOverlayEntry2to1();
-                        }
-                      },
+                      // onSearchTap: () {
+                      //   double posFromBot =
+                      //       MediaQuery.of(context).size.height - _offset.dy;
+                      //   if (posFromBot < _keyboardHeight &&
+                      //       !_isScrollPadding &&
+                      //       _isPortrait) {
+                      //     shiftOverlayEntry1to2();
+                      //   }
+                      // },
+                      // onSearchSubmit: () {
+                      //   if (_isScrollPadding) {
+                      //     shiftOverlayEntry2to1();
+                      //   }
+                      // },
                       clearIconProperty: widget.clearIconProperty,
                     )
                   : MultiSelection(
