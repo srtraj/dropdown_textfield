@@ -48,6 +48,13 @@ class _TestPageState extends State<TestPage> {
     super.dispose();
   }
   @override
+  void dispose() {
+    _cnt.dispose();
+    _cntMulti.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
@@ -70,9 +77,12 @@ class _TestPageState extends State<TestPage> {
                 ),
                 DropDownTextField(
                   // initialValue: "name4",
-                  singleController: _cnt,
-                  clearOption: false,
+                  controller: _cnt,
+                  clearOption: true,
                   enableSearch: true,
+                  clearIconProperty: IconProperty(color: Colors.green),
+                  searchDecoration: const InputDecoration(
+                      hintText: "enter your custom hint text here"),
                   validator: (value) {
                     if (value == null) {
                       return "Required field";
@@ -81,6 +91,7 @@ class _TestPageState extends State<TestPage> {
                     }
                   },
                   dropDownItemCount: 6,
+
                   dropDownList: const [
                     DropDownValueModel(name: 'name1', value: "value1"),
                     DropDownValueModel(
@@ -151,7 +162,8 @@ class _TestPageState extends State<TestPage> {
                   height: 20,
                 ),
                 DropDownTextField.multiSelection(
-                  multiController: _cntMulti,
+                  // controller: _cntMulti,
+                  initialValue: const ["name1", "name2", "name8", "name3"],
                   dropDownList: const [
                     DropDownValueModel(name: 'name1', value: "value1"),
                     DropDownValueModel(
