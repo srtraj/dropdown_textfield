@@ -41,12 +41,7 @@ class _TestPageState extends State<TestPage> {
     _cntMulti = MultiValueDropDownController();
     super.initState();
   }
-  @override
-  void dispose() {
-    _cnt.dispose();
-    _cntMulti.dispose();
-    super.dispose();
-  }
+
   @override
   void dispose() {
     _cnt.dispose();
