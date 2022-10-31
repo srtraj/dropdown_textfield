@@ -249,6 +249,7 @@ class _TestPage2State extends State<TestPage2> {
   FocusNode textFieldFocusNode = FocusNode();
   late SingleValueDropDownController _cnt;
   late MultiValueDropDownController _cntMulti;
+  final formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -285,42 +286,45 @@ class _TestPage2State extends State<TestPage2> {
                 const SizedBox(
                   height: 20,
                 ),
-                DropDownTextField(
-                  // initialValue: "name4",
-                  controller: _cnt,
-                  clearOption: true,
-                  enableSearch: true,
-                  clearIconProperty: IconProperty(color: Colors.green),
-                  searchDecoration: const InputDecoration(
-                      hintText: "enter your custom hint text here"),
-                  validator: (value) {
-                    if (value == null) {
-                      return "Required field";
-                    } else {
-                      return null;
-                    }
-                  },
-                  dropDownItemCount: 6,
+                Form(
+                  key: formKey,
+                  child: DropDownTextField(
+                    // initialValue: "name4",
+                    readOnly: false,
+                    controller: _cnt,
+                    clearOption: true,
+                    clearIconProperty: IconProperty(color: Colors.green),
+                    searchDecoration: const InputDecoration(
+                        hintText: "enter your custom hint text here"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Required field";
+                      } else {
+                        return null;
+                      }
+                    },
+                    dropDownItemCount: 6,
 
-                  dropDownList: const [
-                    DropDownValueModel(name: 'name1', value: "value1"),
-                    DropDownValueModel(
-                        name: 'name2',
-                        value: "value2",
-                        toolTipMsg:
-                            "DropDownButton is a widget that we can use to select one unique value from a set of values"),
-                    DropDownValueModel(name: 'name3', value: "value3"),
-                    DropDownValueModel(
-                        name: 'name4',
-                        value: "value4",
-                        toolTipMsg:
-                            "DropDownButton is a widget that we can use to select one unique value from a set of values"),
-                    DropDownValueModel(name: 'name5', value: "value5"),
-                    DropDownValueModel(name: 'name6', value: "value6"),
-                    DropDownValueModel(name: 'name7', value: "value7"),
-                    DropDownValueModel(name: 'name8', value: "value8"),
-                  ],
-                  onChanged: (val) {},
+                    dropDownList: const [
+                      DropDownValueModel(name: 'name1', value: "value1"),
+                      DropDownValueModel(
+                          name: 'name2',
+                          value: "value2",
+                          toolTipMsg:
+                              "DropDownButton is a widget that we can use to select one unique value from a set of values"),
+                      DropDownValueModel(name: 'name3', value: "value3"),
+                      DropDownValueModel(
+                          name: 'name4',
+                          value: "value4",
+                          toolTipMsg:
+                              "DropDownButton is a widget that we can use to select one unique value from a set of values"),
+                      DropDownValueModel(name: 'name5', value: "value5"),
+                      DropDownValueModel(name: 'name6', value: "value6"),
+                      DropDownValueModel(name: 'name7', value: "value7"),
+                      DropDownValueModel(name: 'name8', value: "value8"),
+                    ],
+                    onChanged: (val) {},
+                  ),
                 ),
               ],
             ),
@@ -329,7 +333,7 @@ class _TestPage2State extends State<TestPage2> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          setState(() {});
+          formKey.currentState!.validate();
         },
         label: const Text("Submit"),
       ),
