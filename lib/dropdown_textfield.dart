@@ -81,6 +81,8 @@ class DropDownTextField extends StatefulWidget {
           !(initialValue != null && controller != null),
           "you cannot add both initialValue and singleController,\nset initial value using controller \n\tEg: SingleValueDropDownController(data:initial value) ",
         ),
+        assert(!(!readOnly && enableSearch),
+            "readOnly!=true or enableSearch=true both condition does not work"),
         assert(
           !(controller != null &&
               !(controller is SingleValueDropDownController)),
@@ -305,6 +307,12 @@ class _DropDownTextFieldState extends State<DropDownTextField>
           _isExpanded) {
         _isExpanded = !_isExpanded;
         hideOverlay();
+        if (!widget.readOnly &&
+            widget.singleController?.dropDownValue?.name != _cnt.text) {
+          setState(() {
+            _cnt.clear();
+          });
+        }
       }
     });
 
@@ -517,7 +525,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                   _showOverlay();
                 }
               } else {
-                hideOverlay();
+                if (widget.readOnly) hideOverlay();
               }
             },
             validator: (value) =>
@@ -690,6 +698,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
       _isScrollPadding = false;
       _isExpanded = false;
     });
+    _textFieldFocusNode.unfocus();
   }
 
   void shiftOverlayEntry1to2() {
