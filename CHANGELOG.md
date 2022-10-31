@@ -1,3 +1,6 @@
+## 1.0.6
+-  keyboard failed to show #10 -fixed
+
 ## 1.0.5
 - Option added to customize clear and dropdown icon properties
 - checkBoxProperty added ,now you can customize default property of multiple checkbox style
