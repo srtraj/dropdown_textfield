@@ -43,7 +43,7 @@ A DropdownTextfield is a material design TextField. The DropDownButton is a widg
 
 
 
-### controller,
+### controller
 single and multiple dropdown controller
 It must be type of SingleValueDropDownController or MultiValueDropDownController.
 
@@ -98,7 +98,7 @@ searchShowCursor=false to hide cursor from search textfield,only applicable if e
 ### clearOption
 clearOption=false to hide clear suffix icon button from textfield.
 
-###clearIconProperty
+### clearIconProperty
 customize Clear icon size and color
 
 ### listSpace
