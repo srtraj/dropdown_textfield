@@ -74,9 +74,10 @@ class DropDownTextField extends StatefulWidget {
       this.listSpace = 0,
       this.clearOption = true,
       this.clearIconProperty,
-      // this.keyboardHeight = 450,
       this.listPadding,
-      this.listTextStyle})
+      this.listTextStyle,
+      this.keyboardType,
+      this.autovalidateMode})
       : assert(
           !(initialValue != null && controller != null),
           "you cannot add both initialValue and singleController,\nset initial value using controller \n\tEg: SingleValueDropDownController(data:initial value) ",
@@ -97,33 +98,34 @@ class DropDownTextField extends StatefulWidget {
         submitButtonText = null,
         submitButtonTextStyle = null,
         super(key: key);
-  const DropDownTextField.multiSelection({
-    Key? key,
-    this.controller,
-    this.displayCompleteItem = false,
-    this.initialValue,
-    required this.dropDownList,
-    this.padding,
-    this.textStyle,
-    this.onChanged,
-    this.validator,
-    this.isEnabled = true,
-    this.dropdownRadius = 12,
-    this.dropDownIconProperty,
-    this.textFieldDecoration,
-    this.dropDownItemCount = 6,
-    this.searchFocusNode,
-    this.textFieldFocusNode,
-    this.listSpace = 0,
-    this.clearOption = true,
-    this.clearIconProperty,
-    this.submitButtonColor,
-    this.submitButtonText,
-    this.submitButtonTextStyle,
-    this.listPadding,
-    this.listTextStyle,
-    this.checkBoxProperty,
-  })  : assert(initialValue == null || controller == null,
+  const DropDownTextField.multiSelection(
+      {Key? key,
+      this.controller,
+      this.displayCompleteItem = false,
+      this.initialValue,
+      required this.dropDownList,
+      this.padding,
+      this.textStyle,
+      this.onChanged,
+      this.validator,
+      this.isEnabled = true,
+      this.dropdownRadius = 12,
+      this.dropDownIconProperty,
+      this.textFieldDecoration,
+      this.dropDownItemCount = 6,
+      this.searchFocusNode,
+      this.textFieldFocusNode,
+      this.listSpace = 0,
+      this.clearOption = true,
+      this.clearIconProperty,
+      this.submitButtonColor,
+      this.submitButtonText,
+      this.submitButtonTextStyle,
+      this.listPadding,
+      this.listTextStyle,
+      this.checkBoxProperty,
+      this.autovalidateMode})
+      : assert(initialValue == null || controller == null,
             "you cannot add both initialValue and multiController\nset initial value using controller\n\tMultiValueDropDownController(data:initial value)"),
         assert(
           !(controller != null &&
@@ -139,6 +141,7 @@ class DropDownTextField extends StatefulWidget {
         searchShowCursor = null,
         singleController = null,
         searchDecoration = null,
+        keyboardType = null,
         // keyboardHeight = 0,
         super(key: key);
 
@@ -234,6 +237,9 @@ class DropDownTextField extends StatefulWidget {
 
   ///dropdown list item text style
   final TextStyle? listTextStyle;
+
+  final TextInputType? keyboardType;
+  final AutovalidateMode? autovalidateMode;
 
   ///customize checkbox property
   final CheckBoxProperty? checkBoxProperty;
@@ -513,11 +519,13 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         return CompositedTransformTarget(
           link: _layerLink,
           child: TextFormField(
+            controller: _cnt,
             focusNode: _textFieldFocusNode,
+            keyboardType: widget.keyboardType,
+            autovalidateMode: widget.autovalidateMode,
             style: widget.textStyle,
             enabled: widget.isEnabled,
             readOnly: widget.readOnly,
-            controller: _cnt,
             onTap: () {
               _searchAutofocus = widget.searchAutofocus;
               if (!_isExpanded) {

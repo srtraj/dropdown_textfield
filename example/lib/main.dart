@@ -293,6 +293,8 @@ class _TestPage2State extends State<TestPage2> {
                     readOnly: false,
                     controller: _cnt,
                     clearOption: true,
+                    keyboardType: TextInputType.number,
+                    autovalidateMode: AutovalidateMode.always,
                     clearIconProperty: IconProperty(color: Colors.green),
                     searchDecoration: const InputDecoration(
                         hintText: "enter your custom hint text here"),
