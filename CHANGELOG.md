@@ -1,3 +1,8 @@
+## 1.0.7
+- Clear validation error #14 -fixed
+  autovalidate option added
+
+
 ## 1.0.6
 -  keyboard failed to show #10 -fixed
 
