@@ -751,7 +751,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).backgroundColor,
                 borderRadius:
                     BorderRadius.all(Radius.circular(widget.dropdownRadius)),
                 boxShadow: const [
