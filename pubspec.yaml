@@ -1,6 +1,6 @@
 name: dropdown_textfield
 description: A DropdownTextfield is a material design TextField. The DropDownButton is a widget that we can use to select one unique value or multivalue from a set of values.
-version: 1.0.7
+version: 1.0.8
 homepage: https://github.com/srtraj/dropdown_textfield
 
 environment:

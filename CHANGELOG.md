@@ -1,3 +1,7 @@
+## 1.0.8
+- Hover effect in dropdownlist for web/desktop added [#16](https://github.com/srtraj/dropdown_textfield/issues/16)
+- ThemeData based dropdownlist color and by using **dropdownColor** to customize color of overlay.[#19](https://github.com/srtraj/dropdown_textfield/issues/19)
+
 ## 1.0.7
 - Clear validation error #14 -fixed
   autovalidate option added

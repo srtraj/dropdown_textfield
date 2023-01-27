@@ -1097,7 +1097,7 @@ class _MultiSelectionState extends State<MultiSelection> {
           height: widget.height,
           child: Scrollbar(
             child: ListView.builder(
-                padding: EdgeInsets.zero,
+                padding: EdgeInsets.only(right: 15),
                 itemCount: widget.dropDownList.length,
                 itemBuilder: (BuildContext context, int index) {
                   return InkWell(
