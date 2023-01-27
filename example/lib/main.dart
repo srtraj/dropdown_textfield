@@ -14,9 +14,15 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        brightness: Brightness.light,
+        /* light theme settings */
       ),
-      home: const TestPage2(),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        /* dark theme settings */
+      ),
+      themeMode: ThemeMode.light,
+      home: const TestPage(),
     );
   }
 }
@@ -74,8 +80,8 @@ class _TestPageState extends State<TestPage> {
                   // initialValue: "name4",
                   controller: _cnt,
                   clearOption: true,
-                  enableSearch: true,
-                  clearIconProperty: IconProperty(color: Colors.green),
+                  // enableSearch: true,
+                  dropdownColor: Colors.green,
                   searchDecoration: const InputDecoration(
                       hintText: "enter your custom hint text here"),
                   validator: (value) {
@@ -158,6 +164,7 @@ class _TestPageState extends State<TestPage> {
                 ),
                 DropDownTextField.multiSelection(
                   // controller: _cntMulti,
+                  displayCompleteItem: true,
                   initialValue: const ["name1", "name2", "name8", "name3"],
                   dropDownList: const [
                     DropDownValueModel(name: 'name1', value: "value1"),
@@ -290,9 +297,10 @@ class _TestPage2State extends State<TestPage2> {
                   key: formKey,
                   child: DropDownTextField(
                     // initialValue: "name4",
-                    readOnly: false,
+                    // readOnly: false,
                     controller: _cnt,
                     clearOption: true,
+
                     keyboardType: TextInputType.number,
                     autovalidateMode: AutovalidateMode.always,
                     clearIconProperty: IconProperty(color: Colors.green),
