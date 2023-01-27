@@ -457,14 +457,13 @@ class _DropDownTextFieldState extends State<DropDownTextField>
               _listPadding.bottom;
       _maxListItem = widget.dropDownItemCount;
 
-      _height = (!widget.isMultiSelection
-              ? (_dropDownList.length < _maxListItem
-                  ? _dropDownList.length * _listTileHeight
-                  : _listTileHeight * _maxListItem.toDouble())
-              : _dropDownList.length < _maxListItem
-                  ? _dropDownList.length * _listTileHeight
-                  : _listTileHeight * _maxListItem.toDouble()) +
-          10;
+      _height = !widget.isMultiSelection
+          ? (_dropDownList.length < _maxListItem
+              ? _dropDownList.length * _listTileHeight
+              : _listTileHeight * _maxListItem.toDouble())
+          : _dropDownList.length < _maxListItem
+              ? _dropDownList.length * _listTileHeight
+              : _listTileHeight * _maxListItem.toDouble();
     });
   }
 

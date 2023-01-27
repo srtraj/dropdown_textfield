@@ -81,7 +81,7 @@ class _TestPageState extends State<TestPage> {
                   controller: _cnt,
                   clearOption: true,
                   // enableSearch: true,
-                  dropdownColor: Colors.green,
+                  // dropdownColor: Colors.green,
                   searchDecoration: const InputDecoration(
                       hintText: "enter your custom hint text here"),
                   validator: (value) {
