@@ -913,7 +913,7 @@ class _SingleSelectionState extends State<SingleSelection> {
   late TextEditingController _searchCnt;
   late FocusScopeNode _focusScopeNode;
   late InputDecoration _inpDec;
-  int? hoverIndex;
+
   onItemChanged(String value) {
     setState(() {
       if (value.isEmpty) {
@@ -1011,18 +1011,10 @@ class _SingleSelectionState extends State<SingleSelection> {
               itemCount: newDropDownList.length,
               itemBuilder: (BuildContext context, int index) {
                 return InkWell(
-                  onHover: (val) {
-                    if (val) {
-                      setState(() {
-                        hoverIndex = index;
-                      });
-                    }
-                  },
                   onTap: () {
                     widget.onChanged(newDropDownList[index]);
                   },
                   child: Container(
-                    color: hoverIndex == index ? Colors.grey[100] : null,
                     width: double.infinity,
                     padding: EdgeInsets.only(
                         left: 10,
@@ -1081,7 +1073,6 @@ class MultiSelection extends StatefulWidget {
 
 class _MultiSelectionState extends State<MultiSelection> {
   List<bool> multiSelectionValue = [];
-  int? hoverIndex;
 
   @override
   void initState() {
@@ -1101,13 +1092,6 @@ class _MultiSelectionState extends State<MultiSelection> {
                 itemCount: widget.dropDownList.length,
                 itemBuilder: (BuildContext context, int index) {
                   return InkWell(
-                    onHover: (val) {
-                      if (val) {
-                        setState(() {
-                          hoverIndex = index;
-                        });
-                      }
-                    },
                     onTap: () {
                       setState(() {
                         multiSelectionValue[index] =
@@ -1115,7 +1099,6 @@ class _MultiSelectionState extends State<MultiSelection> {
                       });
                     },
                     child: Container(
-                      color: hoverIndex == index ? Colors.grey[100] : null,
                       height: widget.listTileHeight,
                       child: Padding(
                         padding: EdgeInsets.only(
