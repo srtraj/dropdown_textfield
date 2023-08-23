@@ -195,7 +195,7 @@ class DropDownTextField extends StatefulWidget {
   final bool enableSearch;
 
   ///by setting displayValue=true enable displaying the 'value' instead of 'name' and in list it will show 'name(value)'
-  final bool displayValue;
+  final bool? displayValue;
 
   final bool readOnly;
 
@@ -447,7 +447,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
       } else {
         if (widget.singleController != null) {
           if (widget.singleController!.dropDownValue != null) {
-            _cnt.text = widget.displayValue ? widget.singleController!.dropDownValue!.value : widget.singleController!.dropDownValue!.name;
+            _cnt.text = (widget.displayValue?? false) ? widget.singleController!.dropDownValue!.value : widget.singleController!.dropDownValue!.name;
           } else {
             _cnt.clear();
           }
@@ -779,7 +779,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                       listTextStyle: _listTileTextStyle,
                       onChanged: (item) {
                         setState(() {
-                          _cnt.text = widget.displayValue? item.value : item.name;
+                          _cnt.text = (widget.displayValue?? false) ? item.value : item.name;
                           _isExpanded = !_isExpanded;
                         });
                         if (widget.singleController != null) {
@@ -874,7 +874,7 @@ class SingleSelection extends StatefulWidget {
       required this.onChanged,
       required this.height,
       required this.enableSearch,
-      required this.displayValue,
+      this.displayValue,
       required this.searchHeight,
       required this.searchFocusNode,
       required this.mainFocusNode,
@@ -896,7 +896,7 @@ class SingleSelection extends StatefulWidget {
   final double height;
   final double listTileHeight;
   final bool enableSearch;
-  final bool displayValue;
+  final bool? displayValue;
   final double searchHeight;
   final FocusNode searchFocusNode;
   final FocusNode mainFocusNode;
@@ -1033,7 +1033,7 @@ class _SingleSelectionState extends State<SingleSelection> {
                       alignment: Alignment.centerLeft,
                       child: FittedBox(
                         fit: BoxFit.fitHeight,
-                        child: Text(widget.displayValue ? '${newDropDownList[index].name}(${newDropDownList[index].value})' : newDropDownList[index].name,
+                        child: Text((widget.displayValue?? false) ? '${newDropDownList[index].name}(${newDropDownList[index].value})' : newDropDownList[index].name,
                             style: widget.listTextStyle),
                       ),
                     ),
