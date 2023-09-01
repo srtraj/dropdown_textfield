@@ -60,6 +60,7 @@ class DropDownTextField extends StatefulWidget {
       this.validator,
       this.isEnabled = true,
       this.enableSearch = false,
+      this.displayValue = false,
       this.readOnly = true,
       this.dropdownRadius = 12,
       this.textFieldDecoration,
@@ -137,6 +138,7 @@ class DropDownTextField extends StatefulWidget {
         multiController = controller,
         isMultiSelection = true,
         enableSearch = false,
+        displayValue = false,
         readOnly = true,
         searchAutofocus = false,
         searchKeyboardType = null,
@@ -191,6 +193,9 @@ class DropDownTextField extends StatefulWidget {
 
   ///by setting enableSearch=true enable search option in dropdown,as of now this feature enabled only for single selection dropdown
   final bool enableSearch;
+
+  ///by setting displayValue=true enable displaying the 'value' instead of 'name' and in list it will show 'name(value)'
+  final bool? displayValue;
 
   final bool readOnly;
 
@@ -442,7 +447,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
       } else {
         if (widget.singleController != null) {
           if (widget.singleController!.dropDownValue != null) {
-            _cnt.text = widget.singleController!.dropDownValue!.name;
+            _cnt.text = (widget.displayValue?? false) ? widget.singleController!.dropDownValue!.value : widget.singleController!.dropDownValue!.name;
           } else {
             _cnt.clear();
           }
@@ -450,7 +455,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
       }
 
       _listTileTextStyle =
-          (widget.listTextStyle ?? Theme.of(context).textTheme.subtitle1)!;
+          (widget.listTextStyle ?? Theme.of(context).textTheme.titleMedium)!;
       _listTileHeight =
           _textWidgetSize("dummy Text", _listTileTextStyle).height +
               _listPadding.top +
@@ -669,7 +674,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                 builder: buildOverlay,
               ))),
     );
-    overlay?.insert(_isScrollPadding ? _entry2! : _entry!);
+    overlay.insert(_isScrollPadding ? _entry2! : _entry!);
   }
 
   _openOutSideClickOverlay(BuildContext context) {
@@ -687,7 +692,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         ),
       );
     });
-    overlay2?.insert(_barrierOverlay!);
+    overlay2.insert(_barrierOverlay!);
   }
 
   void hideOverlay() {
@@ -767,13 +772,14 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                       mainFocusNode: _textFieldFocusNode,
                       searchFocusNode: _searchFocusNode,
                       enableSearch: widget.enableSearch,
+                      displayValue: widget.displayValue,
                       height: _height,
                       listTileHeight: _listTileHeight,
                       dropDownList: _dropDownList,
                       listTextStyle: _listTileTextStyle,
                       onChanged: (item) {
                         setState(() {
-                          _cnt.text = item.name;
+                          _cnt.text = (widget.displayValue?? false) ? item.value : item.name;
                           _isExpanded = !_isExpanded;
                         });
                         if (widget.singleController != null) {
@@ -868,6 +874,7 @@ class SingleSelection extends StatefulWidget {
       required this.onChanged,
       required this.height,
       required this.enableSearch,
+      this.displayValue,
       required this.searchHeight,
       required this.searchFocusNode,
       required this.mainFocusNode,
@@ -889,6 +896,7 @@ class SingleSelection extends StatefulWidget {
   final double height;
   final double listTileHeight;
   final bool enableSearch;
+  final bool? displayValue;
   final double searchHeight;
   final FocusNode searchFocusNode;
   final FocusNode mainFocusNode;
@@ -1025,7 +1033,7 @@ class _SingleSelectionState extends State<SingleSelection> {
                       alignment: Alignment.centerLeft,
                       child: FittedBox(
                         fit: BoxFit.fitHeight,
-                        child: Text(newDropDownList[index].name,
+                        child: Text((widget.displayValue?? false) ? '${newDropDownList[index].name}(${newDropDownList[index].value})' : newDropDownList[index].name,
                             style: widget.listTextStyle),
                       ),
                     ),
@@ -1311,7 +1319,8 @@ class _KeyboardVisibilityBuilderState extends State<KeyboardVisibilityBuilder>
 
   @override
   void didChangeMetrics() {
-    final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
+    // final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
+    final bottomInset = WidgetsBinding.instance.platformDispatcher.views.first.viewInsets.bottom;
     final newValue = bottomInset > 0.0;
     if (newValue != _isKeyboardVisible) {
       setState(() {

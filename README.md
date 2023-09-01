@@ -77,6 +77,10 @@ isEnabled=false to disable textfield,default value true
 ### enableSearch
 enableSearch=true to enable search option in dropdown,as of now this feature enabled only for single selection dropdown
 
+### displayValue
+to display value in conjunction with name and display the value on selection.
+more specifically, country code in selection dropdown show 'Bangladesh(+880)' and display '+880' on selection - where name is 'Bangladesh' and value is '+880'.
+
 
 ### displayCompleteItem
 set displayCompleteItem=true, if you want show complete list of selected item in textfield else it will display like "number_of_item item selected"
