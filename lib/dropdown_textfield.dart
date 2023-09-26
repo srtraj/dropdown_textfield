@@ -77,7 +77,8 @@ class DropDownTextField extends StatefulWidget {
       this.listPadding,
       this.listTextStyle,
       this.keyboardType,
-      this.autovalidateMode})
+      this.autovalidateMode,
+      this.maxLine = 1})
       : assert(
           !(initialValue != null && controller != null),
           "you cannot add both initialValue and singleController,\nset initial value using controller \n\tEg: SingleValueDropDownController(data:initial value) ",
@@ -124,7 +125,7 @@ class DropDownTextField extends StatefulWidget {
       this.listPadding,
       this.listTextStyle,
       this.checkBoxProperty,
-      this.autovalidateMode})
+      this.autovalidateMode, this.maxLine = 1})
       : assert(initialValue == null || controller == null,
             "you cannot add both initialValue and multiController\nset initial value using controller\n\tMultiValueDropDownController(data:initial value)"),
         assert(
@@ -191,6 +192,8 @@ class DropDownTextField extends StatefulWidget {
   final bool enableSearch;
 
   final bool readOnly;
+
+  final int? maxLine;
 
   ///set displayCompleteItem=true, if you want show complete list of item in textfield else it will display like "number_of_item item selected"
   final bool displayCompleteItem;
@@ -772,6 +775,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                       listTileHeight: _listTileHeight,
                       dropDownList: _dropDownList,
                       listTextStyle: _listTileTextStyle,
+                      maxLine: widget.maxLine,
                       onChanged: (item) {
                         setState(() {
                           _cnt.text = item.name;
@@ -883,7 +887,8 @@ class SingleSelection extends StatefulWidget {
       this.listTextStyle,
       this.searchDecoration,
       required this.listPadding,
-      this.clearIconProperty})
+      this.clearIconProperty,
+      this.maxLine})
       : super(key: key);
   final List<DropDownValueModel> dropDownList;
   final ValueSetter onChanged;
@@ -901,6 +906,7 @@ class SingleSelection extends StatefulWidget {
   final Function? onSearchTap;
   final Function? onSearchSubmit;
   final TextStyle? listTextStyle;
+  final int? maxLine;
   final ListPadding listPadding;
   final InputDecoration? searchDecoration;
   final IconProperty? clearIconProperty;
@@ -1023,11 +1029,9 @@ class _SingleSelectionState extends State<SingleSelection> {
                         top: widget.listPadding.top),
                     child: Align(
                       alignment: Alignment.centerLeft,
-                      child: FittedBox(
-                        fit: BoxFit.fitHeight,
-                        child: Text(newDropDownList[index].name,
-                            style: widget.listTextStyle),
-                      ),
+                      child: Text(newDropDownList[index].name,
+                          maxLines: widget.maxLine,
+                          style: widget.listTextStyle),
                     ),
                   ),
                 );
