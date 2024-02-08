@@ -473,6 +473,10 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   void dispose() {
     if (widget.searchFocusNode == null) _searchFocusNode.dispose();
     if (widget.textFieldFocusNode == null) _textFieldFocusNode.dispose();
+    if (_controller.isAnimating) {
+      _controller.stop();
+    } 
+    _controller.dispose();
     _cnt.dispose();
     super.dispose();
   }
