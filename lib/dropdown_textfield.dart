@@ -445,7 +445,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
       }
 
       _listTileTextStyle =
-          (widget.listTextStyle ?? Theme.of(context).textTheme.subtitle1)!;
+          (widget.listTextStyle ?? Theme.of(context).textTheme.titleMedium)!;
       _listTileHeight =
           _textWidgetSize("dummy Text", _listTileTextStyle).height +
               _listPadding.top +
@@ -475,7 +475,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
     if (widget.textFieldFocusNode == null) _textFieldFocusNode.dispose();
     if (_controller.isAnimating) {
       _controller.stop();
-    } 
+    }
     _controller.dispose();
     _cnt.dispose();
     super.dispose();
