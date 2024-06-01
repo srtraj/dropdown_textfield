@@ -327,7 +327,16 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         }
       }
     });
-
+    widget.singleController?.addListener(() {
+      if (widget.singleController?.dropDownValue == null) {
+        clearFun();
+      }
+    });
+    widget.multiController?.addListener(() {
+      if (widget.multiController?.dropDownValueList == null) {
+        clearFun();
+      }
+    });
     for (int i = 0; i < widget.dropDownList.length; i++) {
       _multiSelectionValue.add(false);
     }
@@ -360,6 +369,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         }
       }
     }
+
     updateFunction();
     super.initState();
   }
@@ -503,7 +513,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
     _cnt.clear();
     if (widget.isMultiSelection) {
       if (widget.multiController != null) {
-        widget.multiController!.setDropDown(null);
+        widget.multiController!.clearDropDown();
       }
       if (widget.onChanged != null) {
         widget.onChanged!([]);
@@ -515,7 +525,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
       }
     } else {
       if (widget.singleController != null) {
-        widget.singleController!.setDropDown(null);
+        widget.singleController!.clearDropDown();
       }
       if (widget.onChanged != null) {
         widget.onChanged!("");
@@ -912,6 +922,17 @@ class DropDownValueModel extends Equatable {
       };
   @override
   List<Object> get props => [name, value];
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DropDownValueModel &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          value == other.value;
+
+  @override
+  int get hashCode => name.hashCode ^ value.hashCode;
 }
 
 class SingleValueDropDownController extends ChangeNotifier {
@@ -920,13 +941,17 @@ class SingleValueDropDownController extends ChangeNotifier {
     setDropDown(data);
   }
   setDropDown(DropDownValueModel? model) {
-    dropDownValue = model;
-    notifyListeners();
+    if (dropDownValue != model) {
+      dropDownValue = model;
+      notifyListeners();
+    }
   }
 
   clearDropDown() {
-    dropDownValue = null;
-    notifyListeners();
+    if (dropDownValue != null) {
+      dropDownValue = null;
+      notifyListeners();
+    }
   }
 }
 
@@ -936,6 +961,7 @@ class MultiValueDropDownController extends ChangeNotifier {
     setDropDown(data);
   }
   setDropDown(List<DropDownValueModel>? modelList) {
+    List<DropDownValueModel>? lst = null;
     if (modelList != null && modelList.isNotEmpty) {
       List<DropDownValueModel> list = [];
       for (DropDownValueModel item in modelList) {
@@ -943,16 +969,21 @@ class MultiValueDropDownController extends ChangeNotifier {
           list.add(item);
         }
       }
-      dropDownValueList = list;
-    } else {
-      dropDownValueList = null;
+      lst = list;
     }
-    notifyListeners();
+    Function unOrdDeepEq = const DeepCollectionEquality.unordered().equals;
+
+    if (!unOrdDeepEq(lst, dropDownValueList)) {
+      dropDownValueList = lst;
+      notifyListeners();
+    }
   }
 
   clearDropDown() {
-    dropDownValueList = null;
-    notifyListeners();
+    if (dropDownValueList != null) {
+      dropDownValueList = null;
+      notifyListeners();
+    }
   }
 }
 

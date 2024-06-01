@@ -242,8 +242,7 @@ class _TestPageState extends State<TestPage> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          // _cntMulti.clearDropDown();
-          print("callledddddddddd${_cnt.dropDownValue}");
+          _cntMulti.clearDropDown();
         },
         label: const Text("Submit"),
       ),
