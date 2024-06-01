@@ -349,7 +349,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         _cnt.text = (count == 0
             ? ""
             : widget.displayCompleteItem
-                ? widget.initialValue.join(",")
+                ? (widget.initialValue ?? []).join(",")
                 : "$count item selected");
       } else {
         var index = _dropDownList.indexWhere(
@@ -408,8 +408,8 @@ class _DropDownTextFieldState extends State<DropDownTextField>
 
         if (widget.multiController != null) {
           if (oldWidget != null &&
-              oldWidget.multiController!.dropDownValueList != null) {}
-          if (widget.multiController!.dropDownValueList != null) {
+              oldWidget.multiController?.dropDownValueList != null) {}
+          if (widget.multiController?.dropDownValueList != null) {
             _multiSelectionValue = [];
             for (int i = 0; i < _dropDownList.length; i++) {
               _multiSelectionValue.add(false);
@@ -423,15 +423,23 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                 _multiSelectionValue[index] = true;
               }
             }
-            int count = _multiSelectionValue
-                .where((element) => element)
-                .toList()
-                .length;
-            _cnt.text = (count == 0
-                ? ""
-                : widget.displayCompleteItem
-                    ? widget.initialValue.join(",")
-                    : "$count item selected");
+
+            if (oldWidget?.displayCompleteItem != widget.displayCompleteItem) {
+              List<String> names =
+                  (widget.multiController?.dropDownValueList ?? [])
+                      .map((dataModel) => dataModel.name)
+                      .toList();
+
+              int count = _multiSelectionValue
+                  .where((element) => element)
+                  .toList()
+                  .length;
+              _cnt.text = (count == 0
+                  ? ""
+                  : widget.displayCompleteItem
+                      ? names.join(",")
+                      : "$count item selected");
+            }
           } else {
             _multiSelectionValue = [];
             _cnt.text = "";
