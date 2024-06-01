@@ -65,6 +65,7 @@ class DropDownTextField extends StatefulWidget {
       this.textFieldDecoration,
       this.dropDownIconProperty,
       this.dropDownItemCount = 6,
+      this.searchTextStyle,
       this.searchFocusNode,
       this.textFieldFocusNode,
       this.searchAutofocus = false,
@@ -136,6 +137,7 @@ class DropDownTextField extends StatefulWidget {
         isMultiSelection = true,
         enableSearch = false,
         readOnly = true,
+        searchTextStyle = null,
         searchAutofocus = false,
         searchKeyboardType = null,
         searchShowCursor = null,
@@ -200,6 +202,7 @@ class DropDownTextField extends StatefulWidget {
 
   final FocusNode? searchFocusNode;
   final FocusNode? textFieldFocusNode;
+  final TextStyle? searchTextStyle;
 
   ///override default search decoration
   final InputDecoration? searchDecoration;
@@ -766,6 +769,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                       mainController: _cnt,
                       autoSort: !widget.readOnly,
                       mainFocusNode: _textFieldFocusNode,
+                      searchTextStyle: widget.searchTextStyle,
                       searchFocusNode: _searchFocusNode,
                       enableSearch: widget.enableSearch,
                       height: _height,
@@ -870,6 +874,7 @@ class SingleSelection extends StatefulWidget {
       required this.height,
       required this.enableSearch,
       required this.searchHeight,
+      this.searchTextStyle,
       required this.searchFocusNode,
       required this.mainFocusNode,
       this.searchKeyboardType,
@@ -891,6 +896,7 @@ class SingleSelection extends StatefulWidget {
   final double listTileHeight;
   final bool enableSearch;
   final double searchHeight;
+  final TextStyle? searchTextStyle;
   final FocusNode searchFocusNode;
   final FocusNode mainFocusNode;
   final TextInputType? searchKeyboardType;
@@ -965,6 +971,7 @@ class _SingleSelectionState extends State<SingleSelection> {
             child: Padding(
               padding: const EdgeInsets.all(12.0),
               child: TextField(
+                style: widget.searchTextStyle,
                 focusNode: widget.searchFocusNode,
                 showCursor: widget.searchShowCursor,
                 keyboardType: widget.searchKeyboardType,

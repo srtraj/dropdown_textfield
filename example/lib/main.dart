@@ -76,6 +76,7 @@ class _TestPageState extends State<TestPage> {
                   clearOption: true,
                   enableSearch: true,
                   clearIconProperty: IconProperty(color: Colors.green),
+                  searchTextStyle: const TextStyle(color: Colors.red),
                   searchDecoration: const InputDecoration(
                       hintText: "enter your custom hint text here"),
                   validator: (value) {
