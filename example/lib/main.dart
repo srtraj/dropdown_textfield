@@ -22,6 +22,20 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class NewPage extends StatelessWidget {
+  const NewPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(onPressed: () {
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => TestPage()));
+      }),
+    );
+  }
+}
+
 class TestPage extends StatefulWidget {
   const TestPage({Key? key}) : super(key: key);
 
