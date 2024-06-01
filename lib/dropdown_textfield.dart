@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:collection/collection.dart';
-import 'package:dropdown_textfield/tooltip_widget.dart';
+import 'package:dropdown_textfield/single_selction.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+
+import 'multi_selection.dart';
 
 class IconProperty {
   final IconData? icon;
@@ -65,6 +67,7 @@ class DropDownTextField extends StatefulWidget {
       this.textFieldDecoration,
       this.dropDownIconProperty,
       this.dropDownItemCount = 6,
+      this.searchTextStyle,
       this.searchFocusNode,
       this.textFieldFocusNode,
       this.searchAutofocus = false,
@@ -136,6 +139,7 @@ class DropDownTextField extends StatefulWidget {
         isMultiSelection = true,
         enableSearch = false,
         readOnly = true,
+        searchTextStyle = null,
         searchAutofocus = false,
         searchKeyboardType = null,
         searchShowCursor = null,
@@ -200,6 +204,7 @@ class DropDownTextField extends StatefulWidget {
 
   final FocusNode? searchFocusNode;
   final FocusNode? textFieldFocusNode;
+  final TextStyle? searchTextStyle;
 
   ///override default search decoration
   final InputDecoration? searchDecoration;
@@ -281,6 +286,8 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   late double _keyboardHeight;
   late TextStyle _listTileTextStyle;
   late ListPadding _listPadding;
+  late TextDirection _currentDirection;
+  GlobalKey overlayKey = GlobalKey();
   @override
   void initState() {
     _cnt = TextEditingController();
@@ -321,7 +328,16 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         }
       }
     });
-
+    widget.singleController?.addListener(() {
+      if (widget.singleController?.dropDownValue == null) {
+        clearFun();
+      }
+    });
+    widget.multiController?.addListener(() {
+      if (widget.multiController?.dropDownValueList == null) {
+        clearFun();
+      }
+    });
     for (int i = 0; i < widget.dropDownList.length; i++) {
       _multiSelectionValue.add(false);
     }
@@ -343,7 +359,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         _cnt.text = (count == 0
             ? ""
             : widget.displayCompleteItem
-                ? widget.initialValue.join(",")
+                ? (widget.initialValue ?? []).join(",")
                 : "$count item selected");
       } else {
         var index = _dropDownList.indexWhere(
@@ -354,6 +370,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         }
       }
     }
+
     updateFunction();
     super.initState();
   }
@@ -402,8 +419,8 @@ class _DropDownTextFieldState extends State<DropDownTextField>
 
         if (widget.multiController != null) {
           if (oldWidget != null &&
-              oldWidget.multiController!.dropDownValueList != null) {}
-          if (widget.multiController!.dropDownValueList != null) {
+              oldWidget.multiController?.dropDownValueList != null) {}
+          if (widget.multiController?.dropDownValueList != null) {
             _multiSelectionValue = [];
             for (int i = 0; i < _dropDownList.length; i++) {
               _multiSelectionValue.add(false);
@@ -417,15 +434,23 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                 _multiSelectionValue[index] = true;
               }
             }
-            int count = _multiSelectionValue
-                .where((element) => element)
-                .toList()
-                .length;
-            _cnt.text = (count == 0
-                ? ""
-                : widget.displayCompleteItem
-                    ? widget.initialValue.join(",")
-                    : "$count item selected");
+
+            if (oldWidget?.displayCompleteItem != widget.displayCompleteItem) {
+              List<String> names =
+                  (widget.multiController?.dropDownValueList ?? [])
+                      .map((dataModel) => dataModel.name)
+                      .toList();
+
+              int count = _multiSelectionValue
+                  .where((element) => element)
+                  .toList()
+                  .length;
+              _cnt.text = (count == 0
+                  ? ""
+                  : widget.displayCompleteItem
+                      ? names.join(",")
+                      : "$count item selected");
+            }
           } else {
             _multiSelectionValue = [];
             _cnt.text = "";
@@ -473,6 +498,10 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   void dispose() {
     if (widget.searchFocusNode == null) _searchFocusNode.dispose();
     if (widget.textFieldFocusNode == null) _textFieldFocusNode.dispose();
+    if (_controller.isAnimating) {
+      _controller.stop();
+    }
+    _controller.dispose();
     _cnt.dispose();
     super.dispose();
   }
@@ -485,7 +514,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
     _cnt.clear();
     if (widget.isMultiSelection) {
       if (widget.multiController != null) {
-        widget.multiController!.setDropDown(null);
+        widget.multiController!.clearDropDown();
       }
       if (widget.onChanged != null) {
         widget.onChanged!([]);
@@ -497,7 +526,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
       }
     } else {
       if (widget.singleController != null) {
-        widget.singleController!.setDropDown(null);
+        widget.singleController!.clearDropDown();
       }
       if (widget.onChanged != null) {
         widget.onChanged!("");
@@ -509,6 +538,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   @override
   Widget build(BuildContext context) {
     _isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    _currentDirection = Directionality.of(context);
     return KeyboardVisibilityBuilder(
       builder: (context, isKeyboardVisible) {
         if (!isKeyboardVisible && _isExpanded && _isScrollPadding) {
@@ -526,6 +556,22 @@ class _DropDownTextFieldState extends State<DropDownTextField>
             style: widget.textStyle,
             enabled: widget.isEnabled,
             readOnly: widget.readOnly,
+            onTapOutside: (event) {
+              final RenderBox renderBox =
+                  overlayKey.currentContext?.findRenderObject() as RenderBox;
+              final overlayPosition = renderBox.localToGlobal(Offset.zero);
+              final overlaySize = renderBox.size;
+              bool isOverlayTap = (overlayPosition.dx <= event.position.dx &&
+                      event.position.dx <=
+                          overlayPosition.dx + overlaySize.width) &&
+                  (overlayPosition.dy <= event.position.dy &&
+                      event.position.dy <=
+                          overlayPosition.dy + overlaySize.height);
+
+              if (!isOverlayTap) {
+                _textFieldFocusNode.unfocus();
+              }
+            },
             onTap: () {
               _searchAutofocus = widget.searchAutofocus;
               if (!_isExpanded) {
@@ -742,455 +788,130 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   }
 
   Widget buildOverlay(context, child) {
-    return ClipRect(
-      child: Align(
-        heightFactor: _heightFactor.value,
-        child: Material(
-          color: Colors.transparent,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius:
-                    BorderRadius.all(Radius.circular(widget.dropdownRadius)),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.grey,
-                    blurRadius: 5,
-                  ),
-                ],
-              ),
-              child: !widget.isMultiSelection
-                  ? SingleSelection(
-                      mainController: _cnt,
-                      autoSort: !widget.readOnly,
-                      mainFocusNode: _textFieldFocusNode,
-                      searchFocusNode: _searchFocusNode,
-                      enableSearch: widget.enableSearch,
-                      height: _height,
-                      listTileHeight: _listTileHeight,
-                      dropDownList: _dropDownList,
-                      listTextStyle: _listTileTextStyle,
-                      onChanged: (item) {
-                        setState(() {
-                          _cnt.text = item.name;
-                          _isExpanded = !_isExpanded;
-                        });
-                        if (widget.singleController != null) {
-                          widget.singleController!.setDropDown(item);
-                        }
-                        if (widget.onChanged != null) {
-                          widget.onChanged!(item);
-                        }
-                        // Navigator.pop(context, null);
-
-                        hideOverlay();
-                      },
-                      searchHeight: _searchWidgetHeight,
-                      searchKeyboardType: widget.searchKeyboardType,
-                      searchAutofocus: _searchAutofocus,
-                      searchDecoration: widget.searchDecoration,
-                      searchShowCursor: widget.searchShowCursor,
-                      listPadding: _listPadding,
-                      // onSearchTap: () {
-                      //   double posFromBot =
-                      //       MediaQuery.of(context).size.height - _offset.dy;
-                      //   if (posFromBot < _keyboardHeight &&
-                      //       !_isScrollPadding &&
-                      //       _isPortrait) {
-                      //     shiftOverlayEntry1to2();
-                      //   }
-                      // },
-                      // onSearchSubmit: () {
-                      //   if (_isScrollPadding) {
-                      //     shiftOverlayEntry2to1();
-                      //   }
-                      // },
-                      clearIconProperty: widget.clearIconProperty,
-                    )
-                  : MultiSelection(
-                      buttonTextStyle: widget.submitButtonTextStyle,
-                      buttonText: widget.submitButtonText,
-                      buttonColor: widget.submitButtonColor,
-                      height: _height,
-                      listTileHeight: _listTileHeight,
-                      list: _multiSelectionValue,
-                      dropDownList: _dropDownList,
-                      listTextStyle: _listTileTextStyle,
-                      listPadding: _listPadding,
-                      onChanged: (val) {
-                        _isExpanded = !_isExpanded;
-                        _multiSelectionValue = val;
-                        List<DropDownValueModel> result = [];
-                        List completeList = [];
-                        for (int i = 0; i < _multiSelectionValue.length; i++) {
-                          if (_multiSelectionValue[i]) {
-                            result.add(_dropDownList[i]);
-                            completeList.add(_dropDownList[i].name);
-                          }
-                        }
-                        int count = _multiSelectionValue
-                            .where((element) => element)
-                            .toList()
-                            .length;
-
-                        _cnt.text = (count == 0
-                            ? ""
-                            : widget.displayCompleteItem
-                                ? completeList.join(",")
-                                : "$count item selected");
-                        if (widget.multiController != null) {
-                          widget.multiController!
-                              .setDropDown(result.isNotEmpty ? result : null);
-                        }
-                        if (widget.onChanged != null) {
-                          widget.onChanged!(result);
-                        }
-
-                        hideOverlay();
-
-                        setState(() {});
-                      },
-                      checkBoxProperty: widget.checkBoxProperty,
+    // final bool isRTL = currentDirection == TextDirection.rtl;
+    return Directionality(
+      textDirection: _currentDirection,
+      child: ClipRect(
+        child: Align(
+          heightFactor: _heightFactor.value,
+          child: Material(
+            key: overlayKey,
+            color: Colors.transparent,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius:
+                      BorderRadius.all(Radius.circular(widget.dropdownRadius)),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.grey,
+                      blurRadius: 5,
                     ),
+                  ],
+                ),
+                child: !widget.isMultiSelection
+                    ? SingleSelection(
+                        mainController: _cnt,
+                        autoSort: !widget.readOnly,
+                        mainFocusNode: _textFieldFocusNode,
+                        searchTextStyle: widget.searchTextStyle,
+                        searchFocusNode: _searchFocusNode,
+                        enableSearch: widget.enableSearch,
+                        height: _height,
+                        listTileHeight: _listTileHeight,
+                        dropDownList: _dropDownList,
+                        listTextStyle: _listTileTextStyle,
+                        onChanged: (item) {
+                          setState(() {
+                            _cnt.text = item.name;
+                            _isExpanded = !_isExpanded;
+                          });
+                          if (widget.singleController != null) {
+                            widget.singleController!.setDropDown(item);
+                          }
+                          if (widget.onChanged != null) {
+                            widget.onChanged!(item);
+                          }
+                          // Navigator.pop(context, null);
+
+                          hideOverlay();
+                        },
+                        searchHeight: _searchWidgetHeight,
+                        searchKeyboardType: widget.searchKeyboardType,
+                        searchAutofocus: _searchAutofocus,
+                        searchDecoration: widget.searchDecoration,
+                        searchShowCursor: widget.searchShowCursor,
+                        listPadding: _listPadding,
+                        // onSearchTap: () {
+                        //   double posFromBot =
+                        //       MediaQuery.of(context).size.height - _offset.dy;
+                        //   if (posFromBot < _keyboardHeight &&
+                        //       !_isScrollPadding &&
+                        //       _isPortrait) {
+                        //     shiftOverlayEntry1to2();
+                        //   }
+                        // },
+                        // onSearchSubmit: () {
+                        //   if (_isScrollPadding) {
+                        //     shiftOverlayEntry2to1();
+                        //   }
+                        // },
+                        clearIconProperty: widget.clearIconProperty,
+                      )
+                    : MultiSelection(
+                        buttonTextStyle: widget.submitButtonTextStyle,
+                        buttonText: widget.submitButtonText,
+                        buttonColor: widget.submitButtonColor,
+                        height: _height,
+                        listTileHeight: _listTileHeight,
+                        list: _multiSelectionValue,
+                        dropDownList: _dropDownList,
+                        listTextStyle: _listTileTextStyle,
+                        listPadding: _listPadding,
+                        onChanged: (val) {
+                          _isExpanded = !_isExpanded;
+                          _multiSelectionValue = val;
+                          List<DropDownValueModel> result = [];
+                          List completeList = [];
+                          for (int i = 0;
+                              i < _multiSelectionValue.length;
+                              i++) {
+                            if (_multiSelectionValue[i]) {
+                              result.add(_dropDownList[i]);
+                              completeList.add(_dropDownList[i].name);
+                            }
+                          }
+                          int count = _multiSelectionValue
+                              .where((element) => element)
+                              .toList()
+                              .length;
+
+                          _cnt.text = (count == 0
+                              ? ""
+                              : widget.displayCompleteItem
+                                  ? completeList.join(",")
+                                  : "$count item selected");
+                          if (widget.multiController != null) {
+                            widget.multiController!
+                                .setDropDown(result.isNotEmpty ? result : null);
+                          }
+                          if (widget.onChanged != null) {
+                            widget.onChanged!(result);
+                          }
+
+                          hideOverlay();
+
+                          setState(() {});
+                        },
+                        checkBoxProperty: widget.checkBoxProperty,
+                      ),
+              ),
             ),
           ),
         ),
       ),
-    );
-  }
-}
-
-class SingleSelection extends StatefulWidget {
-  const SingleSelection(
-      {Key? key,
-      required this.dropDownList,
-      required this.onChanged,
-      required this.height,
-      required this.enableSearch,
-      required this.searchHeight,
-      required this.searchFocusNode,
-      required this.mainFocusNode,
-      this.searchKeyboardType,
-      required this.searchAutofocus,
-      this.searchShowCursor,
-      required this.mainController,
-      required this.autoSort,
-      required this.listTileHeight,
-      this.onSearchTap,
-      this.onSearchSubmit,
-      this.listTextStyle,
-      this.searchDecoration,
-      required this.listPadding,
-      this.clearIconProperty})
-      : super(key: key);
-  final List<DropDownValueModel> dropDownList;
-  final ValueSetter onChanged;
-  final double height;
-  final double listTileHeight;
-  final bool enableSearch;
-  final double searchHeight;
-  final FocusNode searchFocusNode;
-  final FocusNode mainFocusNode;
-  final TextInputType? searchKeyboardType;
-  final bool searchAutofocus;
-  final bool? searchShowCursor;
-  final TextEditingController mainController;
-  final bool autoSort;
-  final Function? onSearchTap;
-  final Function? onSearchSubmit;
-  final TextStyle? listTextStyle;
-  final ListPadding listPadding;
-  final InputDecoration? searchDecoration;
-  final IconProperty? clearIconProperty;
-
-  @override
-  State<SingleSelection> createState() => _SingleSelectionState();
-}
-
-class _SingleSelectionState extends State<SingleSelection> {
-  late List<DropDownValueModel> newDropDownList;
-  late TextEditingController _searchCnt;
-  late FocusScopeNode _focusScopeNode;
-  late InputDecoration _inpDec;
-  onItemChanged(String value) {
-    setState(() {
-      if (value.isEmpty) {
-        newDropDownList = List.from(widget.dropDownList);
-      } else {
-        newDropDownList = widget.dropDownList
-            .where(
-                (item) => item.name.toLowerCase().contains(value.toLowerCase()))
-            .toList();
-      }
-    });
-  }
-
-  @override
-  void initState() {
-    _focusScopeNode = FocusScopeNode();
-    _inpDec = widget.searchDecoration ?? InputDecoration();
-    if (widget.searchAutofocus) {
-      widget.searchFocusNode.requestFocus();
-    }
-    _focusScopeNode.requestFocus();
-    newDropDownList = List.from(widget.dropDownList);
-    _searchCnt = TextEditingController();
-    if (widget.autoSort) {
-      onItemChanged(widget.mainController.text);
-      widget.mainController.addListener(() {
-        if (mounted) {
-          onItemChanged(widget.mainController.text);
-        }
-      });
-    }
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _searchCnt.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (widget.enableSearch)
-          SizedBox(
-            height: widget.searchHeight,
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: TextField(
-                focusNode: widget.searchFocusNode,
-                showCursor: widget.searchShowCursor,
-                keyboardType: widget.searchKeyboardType,
-                controller: _searchCnt,
-                onTap: () {
-                  if (widget.onSearchTap != null) {
-                    widget.onSearchTap!();
-                  }
-                },
-                decoration: _inpDec.copyWith(
-                  hintText: _inpDec.hintText ?? 'Search Here...',
-                  suffixIcon: GestureDetector(
-                    onTap: () {
-                      widget.mainFocusNode.requestFocus();
-                      _searchCnt.clear();
-                      onItemChanged("");
-                    },
-                    child: widget.searchFocusNode.hasFocus
-                        ? InkWell(
-                            child: Icon(
-                              widget.clearIconProperty?.icon ?? Icons.close,
-                              size: widget.clearIconProperty?.size,
-                              color: widget.clearIconProperty?.color,
-                            ),
-                          )
-                        : const SizedBox.shrink(),
-                  ),
-                ),
-                onChanged: onItemChanged,
-                onSubmitted: (val) {
-                  widget.mainFocusNode.requestFocus();
-                  if (widget.onSearchSubmit != null) {
-                    widget.onSearchSubmit!();
-                  }
-                },
-              ),
-            ),
-          ),
-        SizedBox(
-          height: widget.height,
-          child: Scrollbar(
-            child: ListView.builder(
-              padding: EdgeInsets.zero,
-              itemCount: newDropDownList.length,
-              itemBuilder: (BuildContext context, int index) {
-                return InkWell(
-                  onTap: () {
-                    widget.onChanged(newDropDownList[index]);
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.only(
-                        left: 10,
-                        right: 10,
-                        bottom: widget.listPadding.bottom,
-                        top: widget.listPadding.top),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: FittedBox(
-                        fit: BoxFit.fitHeight,
-                        child: Text(newDropDownList[index].name,
-                            style: widget.listTextStyle),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class MultiSelection extends StatefulWidget {
-  const MultiSelection(
-      {Key? key,
-      required this.onChanged,
-      required this.dropDownList,
-      required this.list,
-      required this.height,
-      this.buttonColor,
-      this.buttonText,
-      this.buttonTextStyle,
-      required this.listTileHeight,
-      required this.listPadding,
-      this.listTextStyle,
-      this.checkBoxProperty})
-      : super(key: key);
-  final List<DropDownValueModel> dropDownList;
-  final ValueSetter onChanged;
-  final List<bool> list;
-  final double height;
-  final Color? buttonColor;
-  final String? buttonText;
-  final TextStyle? buttonTextStyle;
-  final double listTileHeight;
-  final TextStyle? listTextStyle;
-  final ListPadding listPadding;
-  final CheckBoxProperty? checkBoxProperty;
-
-  @override
-  _MultiSelectionState createState() => _MultiSelectionState();
-}
-
-class _MultiSelectionState extends State<MultiSelection> {
-  List<bool> multiSelectionValue = [];
-
-  @override
-  void initState() {
-    multiSelectionValue = List.from(widget.list);
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          height: widget.height,
-          child: Scrollbar(
-            child: ListView.builder(
-                padding: EdgeInsets.zero,
-                itemCount: widget.dropDownList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return SizedBox(
-                    height: widget.listTileHeight,
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                          bottom: widget.listPadding.bottom,
-                          top: widget.listPadding.top),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                          widget.dropDownList[index].name,
-                                          style: widget.listTextStyle),
-                                    ),
-                                    if (widget.dropDownList[index].toolTipMsg !=
-                                        null)
-                                      ToolTipWidget(
-                                          msg: widget
-                                              .dropDownList[index].toolTipMsg!)
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          Checkbox(
-                            value: multiSelectionValue[index],
-                            onChanged: (value) {
-                              if (value != null) {
-                                setState(() {
-                                  multiSelectionValue[index] = value;
-                                });
-                              }
-                            },
-                            tristate:
-                                widget.checkBoxProperty?.tristate ?? false,
-                            mouseCursor: widget.checkBoxProperty?.mouseCursor,
-                            activeColor: widget.checkBoxProperty?.activeColor,
-                            fillColor: widget.checkBoxProperty?.fillColor,
-                            checkColor: widget.checkBoxProperty?.checkColor,
-                            focusColor: widget.checkBoxProperty?.focusColor,
-                            hoverColor: widget.checkBoxProperty?.hoverColor,
-                            overlayColor: widget.checkBoxProperty?.overlayColor,
-                            splashRadius: widget.checkBoxProperty?.splashRadius,
-                            materialTapTargetSize:
-                                widget.checkBoxProperty?.materialTapTargetSize,
-                            visualDensity:
-                                widget.checkBoxProperty?.visualDensity,
-                            focusNode: widget.checkBoxProperty?.focusNode,
-                            autofocus:
-                                widget.checkBoxProperty?.autofocus ?? false,
-                            shape: widget.checkBoxProperty?.shape,
-                            side: widget.checkBoxProperty?.side,
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }),
-          ),
-        ),
-        Row(
-          children: [
-            const Expanded(
-              child: SizedBox.shrink(),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0, top: 15, bottom: 10),
-              child: InkWell(
-                onTap: () => widget.onChanged(multiSelectionValue),
-                child: Container(
-                  height: widget.listTileHeight * 0.9,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 5.0, horizontal: 12),
-                  decoration: BoxDecoration(
-                      color: widget.buttonColor ?? Colors.green,
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(12))),
-                  child: Align(
-                    child: FittedBox(
-                      fit: BoxFit.contain,
-                      child: Text(
-                        widget.buttonText ?? "Ok",
-                        style: widget.buttonTextStyle ??
-                            const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
     );
   }
 }
@@ -1219,6 +940,17 @@ class DropDownValueModel extends Equatable {
       };
   @override
   List<Object> get props => [name, value];
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DropDownValueModel &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          value == other.value;
+
+  @override
+  int get hashCode => name.hashCode ^ value.hashCode;
 }
 
 class SingleValueDropDownController extends ChangeNotifier {
@@ -1227,13 +959,17 @@ class SingleValueDropDownController extends ChangeNotifier {
     setDropDown(data);
   }
   setDropDown(DropDownValueModel? model) {
-    dropDownValue = model;
-    notifyListeners();
+    if (dropDownValue != model) {
+      dropDownValue = model;
+      notifyListeners();
+    }
   }
 
   clearDropDown() {
-    dropDownValue = null;
-    notifyListeners();
+    if (dropDownValue != null) {
+      dropDownValue = null;
+      notifyListeners();
+    }
   }
 }
 
@@ -1243,6 +979,7 @@ class MultiValueDropDownController extends ChangeNotifier {
     setDropDown(data);
   }
   setDropDown(List<DropDownValueModel>? modelList) {
+    List<DropDownValueModel>? lst = null;
     if (modelList != null && modelList.isNotEmpty) {
       List<DropDownValueModel> list = [];
       for (DropDownValueModel item in modelList) {
@@ -1250,16 +987,21 @@ class MultiValueDropDownController extends ChangeNotifier {
           list.add(item);
         }
       }
-      dropDownValueList = list;
-    } else {
-      dropDownValueList = null;
+      lst = list;
     }
-    notifyListeners();
+    Function unOrdDeepEq = const DeepCollectionEquality.unordered().equals;
+
+    if (!unOrdDeepEq(lst, dropDownValueList)) {
+      dropDownValueList = lst;
+      notifyListeners();
+    }
   }
 
   clearDropDown() {
-    dropDownValueList = null;
-    notifyListeners();
+    if (dropDownValueList != null) {
+      dropDownValueList = null;
+      notifyListeners();
+    }
   }
 }
 

@@ -16,7 +16,21 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const TestPage2(),
+      home: const TestPage(),
+    );
+  }
+}
+
+class NewPage extends StatelessWidget {
+  const NewPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(onPressed: () {
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => TestPage()));
+      }),
     );
   }
 }
@@ -34,7 +48,7 @@ class _TestPageState extends State<TestPage> {
   FocusNode textFieldFocusNode = FocusNode();
   late SingleValueDropDownController _cnt;
   late MultiValueDropDownController _cntMulti;
-
+  String initalValue = "abc";
   @override
   void initState() {
     _cnt = SingleValueDropDownController();
@@ -71,11 +85,11 @@ class _TestPageState extends State<TestPage> {
                   height: 20,
                 ),
                 DropDownTextField(
-                  // initialValue: "name4",
                   controller: _cnt,
                   clearOption: true,
                   enableSearch: true,
                   clearIconProperty: IconProperty(color: Colors.green),
+                  searchTextStyle: const TextStyle(color: Colors.red),
                   searchDecoration: const InputDecoration(
                       hintText: "enter your custom hint text here"),
                   validator: (value) {
@@ -86,7 +100,6 @@ class _TestPageState extends State<TestPage> {
                     }
                   },
                   dropDownItemCount: 6,
-
                   dropDownList: const [
                     DropDownValueModel(name: 'name1', value: "value1"),
                     DropDownValueModel(
@@ -157,8 +170,9 @@ class _TestPageState extends State<TestPage> {
                   height: 20,
                 ),
                 DropDownTextField.multiSelection(
-                  // controller: _cntMulti,
-                  initialValue: const ["name1", "name2", "name8", "name3"],
+                  controller: _cntMulti,
+                  // initialValue: const ["name1", "name2", "name8", "name3"],
+                  // displayCompleteItem: true,
                   dropDownList: const [
                     DropDownValueModel(name: 'name1', value: "value1"),
                     DropDownValueModel(
@@ -228,114 +242,7 @@ class _TestPageState extends State<TestPage> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          setState(() {});
-        },
-        label: const Text("Submit"),
-      ),
-    );
-  }
-}
-
-class TestPage2 extends StatefulWidget {
-  const TestPage2({Key? key}) : super(key: key);
-
-  @override
-  State<TestPage2> createState() => _TestPage2State();
-}
-
-class _TestPage2State extends State<TestPage2> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  FocusNode searchFocusNode = FocusNode();
-  FocusNode textFieldFocusNode = FocusNode();
-  late SingleValueDropDownController _cnt;
-  late MultiValueDropDownController _cntMulti;
-  final formKey = GlobalKey<FormState>();
-
-  @override
-  void initState() {
-    _cnt = SingleValueDropDownController();
-    _cntMulti = MultiValueDropDownController();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _cnt.dispose();
-    _cntMulti.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 50,
-                ),
-                const Text(
-                  "Single selection dropdown with search option",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Form(
-                  key: formKey,
-                  child: DropDownTextField(
-                    // initialValue: "name4",
-                    readOnly: false,
-                    controller: _cnt,
-                    clearOption: true,
-                    keyboardType: TextInputType.number,
-                    autovalidateMode: AutovalidateMode.always,
-                    clearIconProperty: IconProperty(color: Colors.green),
-                    searchDecoration: const InputDecoration(
-                        hintText: "enter your custom hint text here"),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Required field";
-                      } else {
-                        return null;
-                      }
-                    },
-                    dropDownItemCount: 6,
-
-                    dropDownList: const [
-                      DropDownValueModel(name: 'name1', value: "value1"),
-                      DropDownValueModel(
-                          name: 'name2',
-                          value: "value2",
-                          toolTipMsg:
-                              "DropDownButton is a widget that we can use to select one unique value from a set of values"),
-                      DropDownValueModel(name: 'name3', value: "value3"),
-                      DropDownValueModel(
-                          name: 'name4',
-                          value: "value4",
-                          toolTipMsg:
-                              "DropDownButton is a widget that we can use to select one unique value from a set of values"),
-                      DropDownValueModel(name: 'name5', value: "value5"),
-                      DropDownValueModel(name: 'name6', value: "value6"),
-                      DropDownValueModel(name: 'name7', value: "value7"),
-                      DropDownValueModel(name: 'name8', value: "value8"),
-                    ],
-                    onChanged: (val) {},
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          formKey.currentState!.validate();
+          _cntMulti.clearDropDown();
         },
         label: const Text("Submit"),
       ),
