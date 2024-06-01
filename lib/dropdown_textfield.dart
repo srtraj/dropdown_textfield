@@ -15,14 +15,14 @@ class IconProperty {
 class CheckBoxProperty {
   final MouseCursor? mouseCursor;
   final Color? activeColor;
-  final MaterialStateProperty<Color?>? fillColor;
+  final WidgetStateProperty<Color?>? fillColor;
   final Color? checkColor;
   final bool tristate;
   final MaterialTapTargetSize? materialTapTargetSize;
   final VisualDensity? visualDensity;
   final Color? focusColor;
   final Color? hoverColor;
-  final MaterialStateProperty<Color?>? overlayColor;
+  final WidgetStateProperty<Color?>? overlayColor;
   final double? splashRadius;
   final FocusNode? focusNode;
   final bool autofocus;
@@ -445,7 +445,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
       }
 
       _listTileTextStyle =
-          (widget.listTextStyle ?? Theme.of(context).textTheme.subtitle1)!;
+          (widget.listTextStyle ?? Theme.of(context).textTheme.titleMedium)!;
       _listTileHeight =
           _textWidgetSize("dummy Text", _listTileTextStyle).height +
               _listPadding.top +
@@ -665,7 +665,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                 builder: buildOverlay,
               ))),
     );
-    overlay?.insert(_isScrollPadding ? _entry2! : _entry!);
+    overlay.insert(_isScrollPadding ? _entry2! : _entry!);
   }
 
   _openOutSideClickOverlay(BuildContext context) {
@@ -683,7 +683,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         ),
       );
     });
-    overlay2?.insert(_barrierOverlay!);
+    overlay2.insert(_barrierOverlay!);
   }
 
   void hideOverlay() {
@@ -1300,7 +1300,7 @@ class _KeyboardVisibilityBuilderState extends State<KeyboardVisibilityBuilder>
 
   @override
   void didChangeMetrics() {
-    final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     final newValue = bottomInset > 0.0;
     if (newValue != _isKeyboardVisible) {
       setState(() {
