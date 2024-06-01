@@ -16,7 +16,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const TestPage(),
+      home: Directionality(
+          textDirection: TextDirection.rtl, child: const TestPage()),
     );
   }
 }
@@ -34,7 +35,7 @@ class _TestPageState extends State<TestPage> {
   FocusNode textFieldFocusNode = FocusNode();
   late SingleValueDropDownController _cnt;
   late MultiValueDropDownController _cntMulti;
-
+  String initalValue = "abc";
   @override
   void initState() {
     _cnt = SingleValueDropDownController();
@@ -71,7 +72,6 @@ class _TestPageState extends State<TestPage> {
                   height: 20,
                 ),
                 DropDownTextField(
-                  // initialValue: "name4",
                   controller: _cnt,
                   clearOption: true,
                   enableSearch: true,
@@ -87,7 +87,6 @@ class _TestPageState extends State<TestPage> {
                     }
                   },
                   dropDownItemCount: 6,
-
                   dropDownList: const [
                     DropDownValueModel(name: 'name1', value: "value1"),
                     DropDownValueModel(
@@ -159,7 +158,8 @@ class _TestPageState extends State<TestPage> {
                 ),
                 DropDownTextField.multiSelection(
                   // controller: _cntMulti,
-                  initialValue: const ["name1", "name2", "name8", "name3"],
+                  // initialValue: const ["name1", "name2", "name8", "name3"],
+                  displayCompleteItem: true,
                   dropDownList: const [
                     DropDownValueModel(name: 'name1', value: "value1"),
                     DropDownValueModel(

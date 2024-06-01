@@ -55,6 +55,7 @@ You need to use `SingleValueDropDownController` for single dropdown and `MultiVa
 - **displayCompleteItem**: Set to `true` to display the complete list of selected items in the text field. Otherwise, it will display as "number_of_items selected".
 - **dropDownItemCount**: Maximum number of dropdown items to display. Default value is 6.
 - **searchKeyboardType**: Overrides the default search keyboard type. Applicable only if `enableSearch=true`.
+- **searchTextStyle**: Text style for the search text field.
 - **searchAutofocus**: Set to `true` to autofocus the search text field. Applicable only if `enableSearch=true`. Default value is `false`.
 - **searchShowCursor**: Set to `false` to hide the cursor from the search text field. Applicable only if `enableSearch=true`.
 - **clearOption**: Set to `false` to hide the clear suffix icon button from the text field.
