@@ -65,6 +65,7 @@ class DropDownTextField extends StatefulWidget {
       this.textFieldDecoration,
       this.dropDownIconProperty,
       this.dropDownItemCount = 6,
+      this.dropDownItemTextAlignment = Alignment.centerLeft,
       this.searchFocusNode,
       this.textFieldFocusNode,
       this.searchAutofocus = false,
@@ -113,6 +114,7 @@ class DropDownTextField extends StatefulWidget {
       this.dropDownIconProperty,
       this.textFieldDecoration,
       this.dropDownItemCount = 6,
+      this.dropDownItemTextAlignment = Alignment.centerLeft,
       this.searchFocusNode,
       this.textFieldFocusNode,
       this.listSpace = 0,
@@ -243,6 +245,9 @@ class DropDownTextField extends StatefulWidget {
 
   ///customize checkbox property
   final CheckBoxProperty? checkBoxProperty;
+
+  ///dropdown list text alignment
+  final Alignment? dropDownItemTextAlignment;
 
   @override
   _DropDownTextFieldState createState() => _DropDownTextFieldState();
@@ -770,6 +775,8 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                       enableSearch: widget.enableSearch,
                       height: _height,
                       listTileHeight: _listTileHeight,
+                      listTileTextAlignment: widget.dropDownItemTextAlignment ??
+                          Alignment.centerLeft,
                       dropDownList: _dropDownList,
                       listTextStyle: _listTileTextStyle,
                       onChanged: (item) {
@@ -815,6 +822,8 @@ class _DropDownTextFieldState extends State<DropDownTextField>
                       buttonColor: widget.submitButtonColor,
                       height: _height,
                       listTileHeight: _listTileHeight,
+                      listTileTextAlignment: widget.dropDownItemTextAlignment ??
+                          Alignment.centerLeft,
                       list: _multiSelectionValue,
                       dropDownList: _dropDownList,
                       listTextStyle: _listTileTextStyle,
@@ -878,6 +887,7 @@ class SingleSelection extends StatefulWidget {
       required this.mainController,
       required this.autoSort,
       required this.listTileHeight,
+      this.listTileTextAlignment = Alignment.centerLeft,
       this.onSearchTap,
       this.onSearchSubmit,
       this.listTextStyle,
@@ -889,6 +899,7 @@ class SingleSelection extends StatefulWidget {
   final ValueSetter onChanged;
   final double height;
   final double listTileHeight;
+  final Alignment listTileTextAlignment;
   final bool enableSearch;
   final double searchHeight;
   final FocusNode searchFocusNode;
@@ -1022,7 +1033,7 @@ class _SingleSelectionState extends State<SingleSelection> {
                         bottom: widget.listPadding.bottom,
                         top: widget.listPadding.top),
                     child: Align(
-                      alignment: Alignment.centerLeft,
+                      alignment: widget.listTileTextAlignment,
                       child: FittedBox(
                         fit: BoxFit.fitHeight,
                         child: Text(newDropDownList[index].name,
@@ -1052,6 +1063,7 @@ class MultiSelection extends StatefulWidget {
       this.buttonTextStyle,
       required this.listTileHeight,
       required this.listPadding,
+      this.listTileTextAlignment = Alignment.centerLeft,
       this.listTextStyle,
       this.checkBoxProperty})
       : super(key: key);
@@ -1063,6 +1075,7 @@ class MultiSelection extends StatefulWidget {
   final String? buttonText;
   final TextStyle? buttonTextStyle;
   final double listTileHeight;
+  final Alignment listTileTextAlignment;
   final TextStyle? listTextStyle;
   final ListPadding listPadding;
   final CheckBoxProperty? checkBoxProperty;
@@ -1104,7 +1117,7 @@ class _MultiSelectionState extends State<MultiSelection> {
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 10),
                               child: Align(
-                                alignment: Alignment.centerLeft,
+                                alignment: widget.listTileTextAlignment,
                                 child: Row(
                                   children: [
                                     Expanded(

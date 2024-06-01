@@ -73,6 +73,7 @@ class _TestPageState extends State<TestPage> {
                 DropDownTextField(
                   // initialValue: "name4",
                   controller: _cnt,
+
                   clearOption: true,
                   enableSearch: true,
                   clearIconProperty: IconProperty(color: Colors.green),
@@ -86,7 +87,7 @@ class _TestPageState extends State<TestPage> {
                     }
                   },
                   dropDownItemCount: 6,
-
+                  dropDownItemTextAlignment: Alignment.centerLeft,
                   dropDownList: const [
                     DropDownValueModel(name: 'name1', value: "value1"),
                     DropDownValueModel(
