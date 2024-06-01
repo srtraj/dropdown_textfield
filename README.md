@@ -66,3 +66,8 @@ You need to use `SingleValueDropDownController` for single dropdown and `MultiVa
 - **submitButtonTextStyle**: Text style for the multi-dropdown submit button.
 - **listTextStyle**: Text style for dropdown list items.
 - **checkBoxProperty**: Customizes the properties of multiple checkboxes.
+
+
+## Contributing
+
+We are seeking contributions to improve the `DropdownTextfield`! If you have ideas for new features, optimizations, or bug fixes, please feel free to open a pull request or issue on our [GitHub repository](https://github.com/srtraj/dropdown_textfield). Your contributions are greatly appreciated and will help make this project even better.
