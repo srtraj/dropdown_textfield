@@ -287,6 +287,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   late TextStyle _listTileTextStyle;
   late ListPadding _listPadding;
   late TextDirection _currentDirection;
+  GlobalKey overlayKey = GlobalKey();
   @override
   void initState() {
     _cnt = TextEditingController();
@@ -555,6 +556,22 @@ class _DropDownTextFieldState extends State<DropDownTextField>
             style: widget.textStyle,
             enabled: widget.isEnabled,
             readOnly: widget.readOnly,
+            onTapOutside: (event) {
+              final RenderBox renderBox =
+                  overlayKey.currentContext?.findRenderObject() as RenderBox;
+              final overlayPosition = renderBox.localToGlobal(Offset.zero);
+              final overlaySize = renderBox.size;
+              bool isOverlayTap = (overlayPosition.dx <= event.position.dx &&
+                      event.position.dx <=
+                          overlayPosition.dx + overlaySize.width) &&
+                  (overlayPosition.dy <= event.position.dy &&
+                      event.position.dy <=
+                          overlayPosition.dy + overlaySize.height);
+
+              if (!isOverlayTap) {
+                _textFieldFocusNode.unfocus();
+              }
+            },
             onTap: () {
               _searchAutofocus = widget.searchAutofocus;
               if (!_isExpanded) {
@@ -778,6 +795,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         child: Align(
           heightFactor: _heightFactor.value,
           child: Material(
+            key: overlayKey,
             color: Colors.transparent,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
