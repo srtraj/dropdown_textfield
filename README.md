@@ -1,127 +1,74 @@
 # Flutter DropdownTextfield
 
-A DropdownTextfield is a material design TextField. The DropDownButton is a widget that we can use to select one unique value or multivalue from a set of values.
+A `DropdownTextfield` is a Material Design `TextField`. The `DropDownButton` is a widget that can be used to select one unique value or multiple values from a set of options.
 
 ## Key Features
 
 1. Searchable dropdown
-2. Single & multi selection
+2. Single & multi-selection
 3. Material dropdown
-4. Easy customizable UI
-5. Easy implementation into statelessWidget
-6. ToolTip dialogue for multi selection dropdown item.
+4. Easily customizable UI
+5. Easy implementation into `StatelessWidget`
+6. ToolTip dialogue for multi-selection dropdown items
 
-### Example:
-
-
-<table>
-  <tr>
-    <td><b>Single dropdown</b></td>
-     <td><b>Single dropdown with search option</b></td>
-     <td><b>Single dropdown with clear option</b></td>
-  </tr>
-  <tr>
-    <td><img src="https://github.com/srtraj/dropdown_textfield/raw/development/example/examples/single-dropdown.gif" align="bottom" height="500" width="260"></img></td>
-    <td><img src="https://github.com/srtraj/dropdown_textfield/raw/development/example/examples/single-dropdown-with-search-option.gif" align="bottom" height="500" width="260"></img></td>
-    <td>
-<img src="https://github.com/srtraj/dropdown_textfield/raw/development/example/examples/single-dropdown-with-clearOption.gif" align="bottom" height="500" width="260"></img></td>
-  </tr>
- </table>
+## Examples
 
 <table>
   <tr>
-    <td><b>Multiple dropdown</b></td>
-     <td><b>Multiple dropdown with all selected item</b></td>
-
+    <th>Single Dropdown</th>
+    <th>Single Dropdown with Search Option</th>
+    <th>Single Dropdown with Clear Option</th>
   </tr>
   <tr>
-    <td><img src="https://github.com/srtraj/dropdown_textfield/raw/development/example/examples/multiselection-dropdown.gif" align="bottom" height="500" width="260"></img></td>
-    <td><img src="https://github.com/srtraj/dropdown_textfield/raw/development/example/examples/multiselection-with-all-selected-items.gif" align="bottom" height="500" width="260"></img></td>
+    <td><img src="https://github.com/srtraj/dropdown_textfield/raw/development/example/examples/single-dropdown.gif" alt="Single Dropdown" height="500" width="260"></td>
+    <td><img src="https://github.com/srtraj/dropdown_textfield/raw/development/example/examples/single-dropdown-with-search-option.gif" alt="Single Dropdown with Search Option" height="500" width="260"></td>
+    <td><img src="https://github.com/srtraj/dropdown_textfield/raw/development/example/examples/single-dropdown-with-clearOption.gif" alt="Single Dropdown with Clear Option" height="500" width="260"></td>
   </tr>
- </table>
+</table>
+
+<table>
+  <tr>
+    <th>Multiple Dropdown</th>
+    <th>Multiple Dropdown with All Selected Items</th>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/srtraj/dropdown_textfield/raw/development/example/examples/multiselection-dropdown.gif" alt="Multiple Dropdown" height="500" width="260"></td>
+    <td><img src="https://github.com/srtraj/dropdown_textfield/raw/development/example/examples/multiselection-with-all-selected-items.gif" alt="Multiple Dropdown with All Selected Items" height="500" width="260"></td>
+  </tr>
+</table>
+
+## Usage
+
+### Controllers
+You need to use `SingleValueDropDownController` for single dropdown and `MultiValueDropDownController` for multiple dropdown.
+
+### Properties
+
+- **dropdownRadius**: Defines the radius of the dropdown list. Default value is 12.
+- **initialValue**: Sets the initial value. If null or not in the `dropDownList`, it will not display any value.
+- **dropDownList**: A list of dropdown values of type `<DropDownValueModel>`.
+- **onChanged**: Listens for item selection changes. Returns a single `DropDownValueModel` object for single selection dropdown, and a list of `DropDownValueModel` objects for multi-selection dropdown.
+- **textFieldDecoration**: Overrides the default text field decoration.
+- **dropDownIconProperty**: Customizes the dropdown icon size and color.
+- **isEnabled**: Set to `false` to disable the text field. Default value is `true`.
+- **enableSearch**: Set to `true` to enable the search option in the dropdown. Currently available only for single selection dropdown.
+- **displayCompleteItem**: Set to `true` to display the complete list of selected items in the text field. Otherwise, it will display as "number_of_items selected".
+- **dropDownItemCount**: Maximum number of dropdown items to display. Default value is 6.
+- **searchKeyboardType**: Overrides the default search keyboard type. Applicable only if `enableSearch=true`.
+- **searchTextStyle**: Text style for the search text field.
+- **searchAutofocus**: Set to `true` to autofocus the search text field. Applicable only if `enableSearch=true`. Default value is `false`.
+- **searchShowCursor**: Set to `false` to hide the cursor from the search text field. Applicable only if `enableSearch=true`.
+- **clearOption**: Set to `false` to hide the clear suffix icon button from the text field.
+- **clearIconProperty**: Customizes the clear icon size and color.
+- **listSpace**: Space between the text field and the list. Default value is 0.
+- **listPadding**: Padding for dropdown list items.
+- **submitButtonText**: Text for the multi-dropdown submit button.
+- **submitButtonColor**: Color of the multi-dropdown submit button.
+- **submitButtonTextStyle**: Text style for the multi-dropdown submit button.
+- **listTextStyle**: Text style for dropdown list items.
+- **checkBoxProperty**: Customizes the properties of multiple checkboxes.
 
 
+## Contributing
 
-
-### controller
-single and multiple dropdown controller
-It must be type of SingleValueDropDownController or MultiValueDropDownController.
-
-### dropdownRadius
-define the radius of dropdown List ,default value is 12
-
-### initialValue
-initial value ,if it is null or not exist in dropDownList then it will not display value.
-
-### dropDownList
-dropDownList,List of dropdown values
-List<DropDownValueModel>
-
-### onChanged
-it will listen and return value when item selected from dropdown list
-for single Selection Dropdown it will return single DropDownValueModel object,
-and for multi Selection Dropdown ,it will return list of DropDownValueModel object,
-
-### textFieldDecoration
-override default textfield decoration
-
-
-### dropDownIconProperty
-customize dropdown icon size and color
-
-
-### isEnabled
-isEnabled=false to disable textfield,default value true
-
-
-### enableSearch
-enableSearch=true to enable search option in dropdown,as of now this feature enabled only for single selection dropdown
-
-
-### displayCompleteItem
-set displayCompleteItem=true, if you want show complete list of selected item in textfield else it will display like "number_of_item item selected"
-
-
-### dropDownItemCount
-Maximum number of dropdown item to display,default value is 6
-
-### searchKeyboardType
-override default search keyboard type,only applicable if enableSearch=true,
-
-### searchAutofocus
-searchAutofocus=true to autofocus search textfield,only applicable if enableSearch=true,
-default value is false
-
-### searchShowCursor
-searchShowCursor=false to hide cursor from search textfield,only applicable if enableSearch=true,
-
-### clearOption
-clearOption=false to hide clear suffix icon button from textfield.
-
-### clearIconProperty
-customize Clear icon size and color
-
-### listSpace
-space between textfield and list ,default value is 0
-
-### listPadding
-dropdown List item padding
-
-### submitButtonText
-multi dropdown submit button text
-
-### submitButtonColor
-multi dropdown submit button color
-
-### submitButtonTextStyle
-multi dropdown submit button text style
-
-### listTextStyle
-dropdown list item text style
-
-
-### checkBoxProperty
-customize multiple checkbox property
-
-
-
+Seeking contributions to improve the `DropdownTextfield`! If you have ideas for new features, optimizations, or bug fixes, please feel free to open a pull request or issue on our [GitHub repository](https://github.com/srtraj/dropdown_textfield). Your contributions are greatly appreciated and will help make this package even better.
