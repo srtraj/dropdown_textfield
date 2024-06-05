@@ -17,14 +17,14 @@ class IconProperty {
 class CheckBoxProperty {
   final MouseCursor? mouseCursor;
   final Color? activeColor;
-  final WidgetStateProperty<Color?>? fillColor;
+  final MaterialStateProperty<Color?>? fillColor;
   final Color? checkColor;
   final bool tristate;
   final MaterialTapTargetSize? materialTapTargetSize;
   final VisualDensity? visualDensity;
   final Color? focusColor;
   final Color? hoverColor;
-  final WidgetStateProperty<Color?>? overlayColor;
+  final MaterialStateProperty<Color?>? overlayColor;
   final double? splashRadius;
   final FocusNode? focusNode;
   final bool autofocus;
