@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2.0
+- 'WidgetStateProperty' not found - fixed
+
 ## 1.1.0
 - Deprecated bug fixes
 - README updated
