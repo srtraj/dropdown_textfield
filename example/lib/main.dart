@@ -173,6 +173,8 @@ class _TestPageState extends State<TestPage> {
                   controller: _cntMulti,
                   // initialValue: const ["name1", "name2", "name8", "name3"],
                   // displayCompleteItem: true,
+                  checkBoxProperty: CheckBoxProperty(
+                      fillColor: MaterialStateProperty.all<Color>(Colors.red)),
                   dropDownList: const [
                     DropDownValueModel(name: 'name1', value: "value1"),
                     DropDownValueModel(
