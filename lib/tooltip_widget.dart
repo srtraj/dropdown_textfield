@@ -117,12 +117,12 @@ class _ToolTipWidgetState extends State<ToolTipWidget> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                 width: MediaQuery.of(context).size.width * 0.85,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).dialogBackgroundColor,
                   borderRadius: BorderRadius.all(Radius.circular(20)),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.white,
+                      color: Theme.of(context).dialogBackgroundColor,
                     ),
                   ],
                 ),
