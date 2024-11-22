@@ -17,14 +17,14 @@ class IconProperty {
 class CheckBoxProperty {
   final MouseCursor? mouseCursor;
   final Color? activeColor;
-  final MaterialStateProperty<Color?>? fillColor;
+  final WidgetStateProperty<Color?>? fillColor;
   final Color? checkColor;
   final bool tristate;
   final MaterialTapTargetSize? materialTapTargetSize;
   final VisualDensity? visualDensity;
   final Color? focusColor;
   final Color? hoverColor;
-  final MaterialStateProperty<Color?>? overlayColor;
+  final WidgetStateProperty<Color?>? overlayColor;
   final double? splashRadius;
   final FocusNode? focusNode;
   final bool autofocus;
@@ -557,19 +557,21 @@ class _DropDownTextFieldState extends State<DropDownTextField>
             enabled: widget.isEnabled,
             readOnly: widget.readOnly,
             onTapOutside: (event) {
-              final RenderBox renderBox =
-                  overlayKey.currentContext?.findRenderObject() as RenderBox;
-              final overlayPosition = renderBox.localToGlobal(Offset.zero);
-              final overlaySize = renderBox.size;
-              bool isOverlayTap = (overlayPosition.dx <= event.position.dx &&
-                      event.position.dx <=
-                          overlayPosition.dx + overlaySize.width) &&
-                  (overlayPosition.dy <= event.position.dy &&
-                      event.position.dy <=
-                          overlayPosition.dy + overlaySize.height);
+              if (overlayKey.currentContext != null) {
+                final RenderBox renderBox =
+                    overlayKey.currentContext?.findRenderObject() as RenderBox;
+                final overlayPosition = renderBox.localToGlobal(Offset.zero);
+                final overlaySize = renderBox.size;
+                bool isOverlayTap = (overlayPosition.dx <= event.position.dx &&
+                        event.position.dx <=
+                            overlayPosition.dx + overlaySize.width) &&
+                    (overlayPosition.dy <= event.position.dy &&
+                        event.position.dy <=
+                            overlayPosition.dy + overlaySize.height);
 
-              if (!isOverlayTap) {
-                _textFieldFocusNode.unfocus();
+                if (!isOverlayTap) {
+                  _textFieldFocusNode.unfocus();
+                }
               }
             },
             onTap: () {
