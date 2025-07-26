@@ -80,7 +80,9 @@ class DropDownTextField extends StatefulWidget {
       this.listPadding,
       this.listTextStyle,
       this.keyboardType,
-      this.autovalidateMode})
+      this.autovalidateMode,
+      this.boxDecoration,
+      this.boxMargin})
       : assert(
           !(initialValue != null && controller != null),
           "you cannot add both initialValue and singleController,\nset initial value using controller \n\tEg: SingleValueDropDownController(data:initial value) ",
@@ -101,34 +103,36 @@ class DropDownTextField extends StatefulWidget {
         submitButtonText = null,
         submitButtonTextStyle = null,
         super(key: key);
-  const DropDownTextField.multiSelection(
-      {Key? key,
-      this.controller,
-      this.displayCompleteItem = false,
-      this.initialValue,
-      required this.dropDownList,
-      this.padding,
-      this.textStyle,
-      this.onChanged,
-      this.validator,
-      this.isEnabled = true,
-      this.dropdownRadius = 12,
-      this.dropDownIconProperty,
-      this.textFieldDecoration,
-      this.dropDownItemCount = 6,
-      this.searchFocusNode,
-      this.textFieldFocusNode,
-      this.listSpace = 0,
-      this.clearOption = true,
-      this.clearIconProperty,
-      this.submitButtonColor,
-      this.submitButtonText,
-      this.submitButtonTextStyle,
-      this.listPadding,
-      this.listTextStyle,
-      this.checkBoxProperty,
-      this.autovalidateMode})
-      : assert(initialValue == null || controller == null,
+  const DropDownTextField.multiSelection({
+    Key? key,
+    this.controller,
+    this.displayCompleteItem = false,
+    this.initialValue,
+    required this.dropDownList,
+    this.padding,
+    this.textStyle,
+    this.onChanged,
+    this.validator,
+    this.isEnabled = true,
+    this.dropdownRadius = 12,
+    this.dropDownIconProperty,
+    this.textFieldDecoration,
+    this.dropDownItemCount = 6,
+    this.searchFocusNode,
+    this.textFieldFocusNode,
+    this.listSpace = 0,
+    this.clearOption = true,
+    this.clearIconProperty,
+    this.submitButtonColor,
+    this.submitButtonText,
+    this.submitButtonTextStyle,
+    this.listPadding,
+    this.listTextStyle,
+    this.checkBoxProperty,
+    this.autovalidateMode,
+    this.boxDecoration,
+    this.boxMargin,
+  })  : assert(initialValue == null || controller == null,
             "you cannot add both initialValue and multiController\nset initial value using controller\n\tMultiValueDropDownController(data:initial value)"),
         assert(
           !(controller != null &&
@@ -246,6 +250,10 @@ class DropDownTextField extends StatefulWidget {
   final TextInputType? keyboardType;
   final AutovalidateMode? autovalidateMode;
 
+  final BoxDecoration? boxDecoration;
+
+  final EdgeInsets? boxMargin;
+
   ///customize checkbox property
   final CheckBoxProperty? checkBoxProperty;
 
@@ -287,6 +295,8 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   late TextStyle _listTileTextStyle;
   late ListPadding _listPadding;
   late TextDirection _currentDirection;
+  late BoxDecoration? _boxDecoration;
+  late EdgeInsets? _boxMargin;
   GlobalKey overlayKey = GlobalKey();
   @override
   void initState() {
@@ -297,6 +307,8 @@ class _DropDownTextFieldState extends State<DropDownTextField>
     _isOutsideClickOverlay = false;
     _searchFocusNode = widget.searchFocusNode ?? FocusNode();
     _textFieldFocusNode = widget.textFieldFocusNode ?? FocusNode();
+    _boxDecoration = widget.boxDecoration;
+    _boxMargin = widget.boxMargin;
     _isExpanded = false;
     _controller = AnimationController(
       vsync: this,
@@ -797,117 +809,115 @@ class _DropDownTextFieldState extends State<DropDownTextField>
           child: Material(
             key: overlayKey,
             color: Colors.transparent,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius:
-                      BorderRadius.all(Radius.circular(widget.dropdownRadius)),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.grey,
-                      blurRadius: 5,
-                    ),
-                  ],
-                ),
-                child: !widget.isMultiSelection
-                    ? SingleSelection(
-                        mainController: _cnt,
-                        autoSort: !widget.readOnly,
-                        mainFocusNode: _textFieldFocusNode,
-                        searchTextStyle: widget.searchTextStyle,
-                        searchFocusNode: _searchFocusNode,
-                        enableSearch: widget.enableSearch,
-                        height: _height,
-                        listTileHeight: _listTileHeight,
-                        dropDownList: _dropDownList,
-                        listTextStyle: _listTileTextStyle,
-                        onChanged: (item) {
-                          setState(() {
-                            _cnt.text = item.name;
-                            _isExpanded = !_isExpanded;
-                          });
-                          if (widget.singleController != null) {
-                            widget.singleController!.setDropDown(item);
-                          }
-                          if (widget.onChanged != null) {
-                            widget.onChanged!(item);
-                          }
-                          // Navigator.pop(context, null);
-
-                          hideOverlay();
-                        },
-                        searchHeight: _searchWidgetHeight,
-                        searchKeyboardType: widget.searchKeyboardType,
-                        searchAutofocus: _searchAutofocus,
-                        searchDecoration: widget.searchDecoration,
-                        searchShowCursor: widget.searchShowCursor,
-                        listPadding: _listPadding,
-                        // onSearchTap: () {
-                        //   double posFromBot =
-                        //       MediaQuery.of(context).size.height - _offset.dy;
-                        //   if (posFromBot < _keyboardHeight &&
-                        //       !_isScrollPadding &&
-                        //       _isPortrait) {
-                        //     shiftOverlayEntry1to2();
-                        //   }
-                        // },
-                        // onSearchSubmit: () {
-                        //   if (_isScrollPadding) {
-                        //     shiftOverlayEntry2to1();
-                        //   }
-                        // },
-                        clearIconProperty: widget.clearIconProperty,
-                      )
-                    : MultiSelection(
-                        buttonTextStyle: widget.submitButtonTextStyle,
-                        buttonText: widget.submitButtonText,
-                        buttonColor: widget.submitButtonColor,
-                        height: _height,
-                        listTileHeight: _listTileHeight,
-                        list: _multiSelectionValue,
-                        dropDownList: _dropDownList,
-                        listTextStyle: _listTileTextStyle,
-                        listPadding: _listPadding,
-                        onChanged: (val) {
-                          _isExpanded = !_isExpanded;
-                          _multiSelectionValue = val;
-                          List<DropDownValueModel> result = [];
-                          List completeList = [];
-                          for (int i = 0;
-                              i < _multiSelectionValue.length;
-                              i++) {
-                            if (_multiSelectionValue[i]) {
-                              result.add(_dropDownList[i]);
-                              completeList.add(_dropDownList[i].name);
-                            }
-                          }
-                          int count = _multiSelectionValue
-                              .where((element) => element)
-                              .toList()
-                              .length;
-
-                          _cnt.text = (count == 0
-                              ? ""
-                              : widget.displayCompleteItem
-                                  ? completeList.join(",")
-                                  : "$count item selected");
-                          if (widget.multiController != null) {
-                            widget.multiController!
-                                .setDropDown(result.isNotEmpty ? result : null);
-                          }
-                          if (widget.onChanged != null) {
-                            widget.onChanged!(result);
-                          }
-
-                          hideOverlay();
-
-                          setState(() {});
-                        },
-                        checkBoxProperty: widget.checkBoxProperty,
+            child: Container(
+              margin: _boxMargin ??
+                  EdgeInsets.symmetric(horizontal: 4, vertical: 5),
+              decoration: _boxDecoration ??
+                  BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(
+                        Radius.circular(widget.dropdownRadius)),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.grey,
+                        blurRadius: 5,
                       ),
-              ),
+                    ],
+                  ),
+              child: !widget.isMultiSelection
+                  ? SingleSelection(
+                      mainController: _cnt,
+                      autoSort: !widget.readOnly,
+                      mainFocusNode: _textFieldFocusNode,
+                      searchTextStyle: widget.searchTextStyle,
+                      searchFocusNode: _searchFocusNode,
+                      enableSearch: widget.enableSearch,
+                      height: _height,
+                      listTileHeight: _listTileHeight,
+                      dropDownList: _dropDownList,
+                      listTextStyle: _listTileTextStyle,
+                      onChanged: (item) {
+                        setState(() {
+                          _cnt.text = item.name;
+                          _isExpanded = !_isExpanded;
+                        });
+                        if (widget.singleController != null) {
+                          widget.singleController!.setDropDown(item);
+                        }
+                        if (widget.onChanged != null) {
+                          widget.onChanged!(item);
+                        }
+                        // Navigator.pop(context, null);
+
+                        hideOverlay();
+                      },
+                      searchHeight: _searchWidgetHeight,
+                      searchKeyboardType: widget.searchKeyboardType,
+                      searchAutofocus: _searchAutofocus,
+                      searchDecoration: widget.searchDecoration,
+                      searchShowCursor: widget.searchShowCursor,
+                      listPadding: _listPadding,
+                      // onSearchTap: () {
+                      //   double posFromBot =
+                      //       MediaQuery.of(context).size.height - _offset.dy;
+                      //   if (posFromBot < _keyboardHeight &&
+                      //       !_isScrollPadding &&
+                      //       _isPortrait) {
+                      //     shiftOverlayEntry1to2();
+                      //   }
+                      // },
+                      // onSearchSubmit: () {
+                      //   if (_isScrollPadding) {
+                      //     shiftOverlayEntry2to1();
+                      //   }
+                      // },
+                      clearIconProperty: widget.clearIconProperty,
+                    )
+                  : MultiSelection(
+                      buttonTextStyle: widget.submitButtonTextStyle,
+                      buttonText: widget.submitButtonText,
+                      buttonColor: widget.submitButtonColor,
+                      height: _height,
+                      listTileHeight: _listTileHeight,
+                      list: _multiSelectionValue,
+                      dropDownList: _dropDownList,
+                      listTextStyle: _listTileTextStyle,
+                      listPadding: _listPadding,
+                      onChanged: (val) {
+                        _isExpanded = !_isExpanded;
+                        _multiSelectionValue = val;
+                        List<DropDownValueModel> result = [];
+                        List completeList = [];
+                        for (int i = 0; i < _multiSelectionValue.length; i++) {
+                          if (_multiSelectionValue[i]) {
+                            result.add(_dropDownList[i]);
+                            completeList.add(_dropDownList[i].name);
+                          }
+                        }
+                        int count = _multiSelectionValue
+                            .where((element) => element)
+                            .toList()
+                            .length;
+
+                        _cnt.text = (count == 0
+                            ? ""
+                            : widget.displayCompleteItem
+                                ? completeList.join(",")
+                                : "$count item selected");
+                        if (widget.multiController != null) {
+                          widget.multiController!
+                              .setDropDown(result.isNotEmpty ? result : null);
+                        }
+                        if (widget.onChanged != null) {
+                          widget.onChanged!(result);
+                        }
+
+                        hideOverlay();
+
+                        setState(() {});
+                      },
+                      checkBoxProperty: widget.checkBoxProperty,
+                    ),
             ),
           ),
         ),
