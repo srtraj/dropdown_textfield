@@ -55,7 +55,9 @@ class _MultiSelectionState extends State<MultiSelection> {
                 itemCount: widget.dropDownList.length,
                 itemBuilder: (BuildContext context, int index) {
                   return SizedBox(
-                    height: widget.listTileHeight,
+                    height: widget.listTileHeight +
+                        widget.listPadding.top +
+                        widget.listPadding.bottom,
                     child: Padding(
                       padding: EdgeInsets.only(
                           bottom: widget.listPadding.bottom,
@@ -69,8 +71,17 @@ class _MultiSelectionState extends State<MultiSelection> {
                               child: Row(
                                 children: [
                                   Expanded(
-                                    child: Text(widget.dropDownList[index].name,
-                                        style: widget.listTextStyle),
+                                    child: Row(
+                                      children: [
+                                        widget.dropDownList[index]
+                                                .prefixWidget ??
+                                            const SizedBox.shrink(),
+                                        Text(
+                                          widget.dropDownList[index].name,
+                                          style: widget.listTextStyle,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                   if (widget.dropDownList[index].toolTipMsg !=
                                       null)

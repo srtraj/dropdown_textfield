@@ -930,27 +930,33 @@ class _DropDownTextFieldState extends State<DropDownTextField>
 class DropDownValueModel extends Equatable {
   final String name;
   final dynamic value;
+  final Widget? prefixWidget;
 
   ///as of now only added for multiselection dropdown
   final String? toolTipMsg;
 
   const DropDownValueModel(
-      {required this.name, required this.value, this.toolTipMsg});
+      {required this.name,
+      required this.value,
+      this.prefixWidget,
+      this.toolTipMsg});
 
   factory DropDownValueModel.fromJson(Map<String, dynamic> json) =>
       DropDownValueModel(
         name: json["name"],
         value: json["value"],
+        prefixWidget: json["prefixWidget"],
         toolTipMsg: json["toolTipMsg"],
       );
 
   Map<String, dynamic> toJson() => {
         "name": name,
         "value": value,
+        "prefixWidget": prefixWidget,
         "toolTipMsg": toolTipMsg,
       };
   @override
-  List<Object> get props => [name, value];
+  List<Object?> get props => [name, value, prefixWidget];
 
   @override
   bool operator ==(Object other) =>
@@ -958,10 +964,11 @@ class DropDownValueModel extends Equatable {
       other is DropDownValueModel &&
           runtimeType == other.runtimeType &&
           name == other.name &&
-          value == other.value;
+          value == other.value &&
+          prefixWidget == other.prefixWidget;
 
   @override
-  int get hashCode => name.hashCode ^ value.hashCode;
+  int get hashCode => name.hashCode ^ value.hashCode ^ prefixWidget.hashCode;
 }
 
 class SingleValueDropDownController extends ChangeNotifier {
