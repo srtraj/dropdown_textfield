@@ -6,7 +6,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,14 +29,14 @@ class NewPage extends StatelessWidget {
     return Scaffold(
       floatingActionButton: FloatingActionButton(onPressed: () {
         Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => TestPage()));
+            .push(MaterialPageRoute(builder: (context) => const TestPage()));
       }),
     );
   }
 }
 
 class TestPage extends StatefulWidget {
-  const TestPage({Key? key}) : super(key: key);
+  const TestPage({super.key});
 
   @override
   State<TestPage> createState() => _TestPageState();
@@ -174,7 +174,7 @@ class _TestPageState extends State<TestPage> {
                   // initialValue: const ["name1", "name2", "name8", "name3"],
                   // displayCompleteItem: true,
                   checkBoxProperty: CheckBoxProperty(
-                      fillColor: MaterialStateProperty.all<Color>(Colors.red)),
+                      fillColor: WidgetStateProperty.all<Color>(Colors.red)),
                   dropDownList: const [
                     DropDownValueModel(name: 'name1', value: "value1"),
                     DropDownValueModel(
@@ -236,7 +236,98 @@ class _TestPageState extends State<TestPage> {
                 ),
                 const SizedBox(
                   height: 50,
-                )
+                ),
+                const Text(
+                  "Single selection dropdown with prefix widget and custom boxDecoration and boxMargin",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                DropDownTextField(
+                  // initialValue: "name4",
+                  listSpace: 20,
+                  listPadding: ListPadding(top: 20),
+                  enableSearch: true,
+                  validator: (value) {
+                    if (value == null) {
+                      return "Required field";
+                    } else {
+                      return null;
+                    }
+                  },
+                  boxDecoration: BoxDecoration(
+                    color: Colors.blue[200],
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  boxMargin:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  dropDownList: const [
+                    DropDownValueModel(
+                        name: 'name1',
+                        value: "value1",
+                        prefixWidget: Icon(
+                          Icons.person,
+                          size: 24,
+                        )),
+                    DropDownValueModel(
+                        name: 'name2',
+                        value: "value2",
+                        prefixWidget: Icon(
+                          Icons.person,
+                          size: 24,
+                        )),
+                    DropDownValueModel(
+                        name: 'name3',
+                        value: "value3",
+                        prefixWidget: Icon(
+                          Icons.person,
+                          size: 24,
+                        )),
+                    DropDownValueModel(
+                        name: 'name4',
+                        value: "value4",
+                        prefixWidget: Icon(
+                          Icons.person,
+                          size: 24,
+                        )),
+                    DropDownValueModel(
+                        name: 'name5',
+                        value: "value5",
+                        prefixWidget: Icon(
+                          Icons.person,
+                          size: 24,
+                        )),
+                    DropDownValueModel(
+                        name: 'name6',
+                        value: "value6",
+                        prefixWidget: Icon(
+                          Icons.person,
+                          size: 24,
+                        )),
+                    DropDownValueModel(
+                        name: 'name7',
+                        value: "value7",
+                        prefixWidget: Icon(
+                          Icons.person,
+                          size: 24,
+                        )),
+                    DropDownValueModel(
+                        name: 'name8',
+                        value: "value8",
+                        prefixWidget: Icon(
+                          Icons.person,
+                          size: 24,
+                        )),
+                  ],
+                  listTextStyle: const TextStyle(color: Colors.red),
+                  dropDownItemCount: 8,
+
+                  onChanged: (val) {},
+                ),
+                const SizedBox(
+                  height: 50,
+                ),
               ],
             ),
           ),

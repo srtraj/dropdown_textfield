@@ -45,6 +45,8 @@ You need to use `SingleValueDropDownController` for single dropdown and `MultiVa
 ### Properties
 
 - **dropdownRadius**: Defines the radius of the dropdown list. Default value is 12.
+- **boxDecoration**: Add custom BoxDecoration to decorate the dropdown container styling
+- **boxMargin**: Add custom margins to the dropdown container and override the default vertical: 5, horizontal: 4 margins
 - **initialValue**: Sets the initial value. If null or not in the `dropDownList`, it will not display any value.
 - **dropDownList**: A list of dropdown values of type `<DropDownValueModel>`.
 - **onChanged**: Listens for item selection changes. Returns a single `DropDownValueModel` object for single selection dropdown, and a list of `DropDownValueModel` objects for multi-selection dropdown.
