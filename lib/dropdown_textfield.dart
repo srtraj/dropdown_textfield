@@ -812,20 +812,21 @@ class _DropDownTextFieldState extends State<DropDownTextField>
             color: Colors.transparent,
             child: Container(
               margin: _boxMargin ??
-                  EdgeInsets.symmetric(horizontal: 4, vertical: 5),
+                  const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
               decoration: _boxDecoration ??
                   BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).cardColor, // Matches theme
                     borderRadius: BorderRadius.all(
-                        Radius.circular(widget.dropdownRadius)),
-                    boxShadow: const [
+                      Radius.circular(widget.dropdownRadius),
+                    ),
+                    boxShadow: [
                       BoxShadow(
-                        color: Colors.grey,
+                        color: Theme.of(context).shadowColor.withValues(alpha: 0.2),
                         blurRadius: 5,
                       ),
                     ],
                   ),
-              child: !widget.isMultiSelection
+            child: !widget.isMultiSelection
                   ? SingleSelection(
                       mainController: _cnt,
                       autoSort: !widget.readOnly,
