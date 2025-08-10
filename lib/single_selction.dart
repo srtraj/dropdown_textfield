@@ -154,7 +154,9 @@ class _SingleSelectionState extends State<SingleSelection> {
               itemCount: newDropDownList.length,
               itemBuilder: (BuildContext context, int index) {
                 return SizedBox(
-                  height: widget.listTileHeight,
+                  height: widget.listTileHeight +
+                      widget.listPadding.top +
+                      widget.listPadding.bottom,
                   child: Padding(
                     padding: EdgeInsets.only(
                         right: 10,
@@ -165,8 +167,14 @@ class _SingleSelectionState extends State<SingleSelection> {
                         onTap: () {
                           widget.onChanged(newDropDownList[index]);
                         },
-                        child: Text(newDropDownList[index].name,
-                            style: widget.listTextStyle)),
+                        child: Row(
+                          children: [
+                            newDropDownList[index].prefixWidget ??
+                                const SizedBox.shrink(),
+                            Text(newDropDownList[index].name,
+                                style: widget.listTextStyle),
+                          ],
+                        )),
                   ),
                 );
               },
