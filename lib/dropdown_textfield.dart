@@ -17,14 +17,14 @@ class IconProperty {
 class CheckBoxProperty {
   final MouseCursor? mouseCursor;
   final Color? activeColor;
-  final WidgetStateProperty<Color?>? fillColor;
+  final MaterialStateProperty<Color?>? fillColor;
   final Color? checkColor;
   final bool tristate;
   final MaterialTapTargetSize? materialTapTargetSize;
   final VisualDensity? visualDensity;
   final Color? focusColor;
   final Color? hoverColor;
-  final WidgetStateProperty<Color?>? overlayColor;
+  final MaterialStateProperty<Color?>? overlayColor;
   final double? splashRadius;
   final FocusNode? focusNode;
   final bool autofocus;
@@ -51,39 +51,38 @@ class CheckBoxProperty {
 }
 
 class DropDownTextField extends StatefulWidget {
-  const DropDownTextField(
-      {Key? key,
-      this.controller,
-      this.initialValue,
-      required this.dropDownList,
-      this.padding,
-      this.textStyle,
-      this.onChanged,
-      this.validator,
-      this.isEnabled = true,
-      this.enableSearch = false,
-      this.readOnly = true,
-      this.dropdownRadius = 12,
-      this.textFieldDecoration,
-      this.dropDownIconProperty,
-      this.dropDownItemCount = 6,
-      this.searchTextStyle,
-      this.searchFocusNode,
-      this.textFieldFocusNode,
-      this.searchAutofocus = false,
-      this.searchDecoration,
-      this.searchShowCursor,
-      this.searchKeyboardType,
-      this.listSpace = 0,
-      this.clearOption = true,
-      this.clearIconProperty,
-      this.listPadding,
-      this.listTextStyle,
-      this.keyboardType,
-      this.autovalidateMode,
-      this.boxDecoration,
-      this.boxMargin})
-      : assert(
+  const DropDownTextField({
+    Key? key,
+    this.controller,
+    this.initialValue,
+    required this.dropDownList,
+    this.padding,
+    this.textStyle,
+    this.onChanged,
+    this.validator,
+    this.isEnabled = true,
+    this.enableSearch = false,
+    this.readOnly = true,
+    this.dropdownRadius = 12,
+    this.textFieldDecoration,
+    this.dropDownIconProperty,
+    this.dropDownItemCount = 6,
+    this.searchTextStyle,
+    this.searchFocusNode,
+    this.textFieldFocusNode,
+    this.searchAutofocus = false,
+    this.searchDecoration,
+    this.searchShowCursor,
+    this.searchKeyboardType,
+    this.listSpace = 0,
+    this.clearOption = true,
+    this.clearIconProperty,
+    this.listPadding,
+    this.listTextStyle,
+    this.keyboardType,
+    this.autovalidateMode,
+    this.overlayDecoration,
+  })  : assert(
           !(initialValue != null && controller != null),
           "you cannot add both initialValue and singleController,\nset initial value using controller \n\tEg: SingleValueDropDownController(data:initial value) ",
         ),
@@ -103,36 +102,35 @@ class DropDownTextField extends StatefulWidget {
         submitButtonText = null,
         submitButtonTextStyle = null,
         super(key: key);
-  const DropDownTextField.multiSelection({
-    Key? key,
-    this.controller,
-    this.displayCompleteItem = false,
-    this.initialValue,
-    required this.dropDownList,
-    this.padding,
-    this.textStyle,
-    this.onChanged,
-    this.validator,
-    this.isEnabled = true,
-    this.dropdownRadius = 12,
-    this.dropDownIconProperty,
-    this.textFieldDecoration,
-    this.dropDownItemCount = 6,
-    this.searchFocusNode,
-    this.textFieldFocusNode,
-    this.listSpace = 0,
-    this.clearOption = true,
-    this.clearIconProperty,
-    this.submitButtonColor,
-    this.submitButtonText,
-    this.submitButtonTextStyle,
-    this.listPadding,
-    this.listTextStyle,
-    this.checkBoxProperty,
-    this.autovalidateMode,
-    this.boxDecoration,
-    this.boxMargin,
-  })  : assert(initialValue == null || controller == null,
+  const DropDownTextField.multiSelection(
+      {Key? key,
+      this.controller,
+      this.displayCompleteItem = false,
+      this.initialValue,
+      required this.dropDownList,
+      this.padding,
+      this.textStyle,
+      this.onChanged,
+      this.validator,
+      this.isEnabled = true,
+      this.dropdownRadius = 12,
+      this.dropDownIconProperty,
+      this.textFieldDecoration,
+      this.dropDownItemCount = 6,
+      this.searchFocusNode,
+      this.textFieldFocusNode,
+      this.listSpace = 0,
+      this.clearOption = true,
+      this.clearIconProperty,
+      this.submitButtonColor,
+      this.submitButtonText,
+      this.submitButtonTextStyle,
+      this.listPadding,
+      this.listTextStyle,
+      this.checkBoxProperty,
+      this.autovalidateMode,
+      this.overlayDecoration = const BoxDecoration()})
+      : assert(initialValue == null || controller == null,
             "you cannot add both initialValue and multiController\nset initial value using controller\n\tMultiValueDropDownController(data:initial value)"),
         assert(
           !(controller != null &&
@@ -250,12 +248,11 @@ class DropDownTextField extends StatefulWidget {
   final TextInputType? keyboardType;
   final AutovalidateMode? autovalidateMode;
 
-  final BoxDecoration? boxDecoration;
-
-  final EdgeInsets? boxMargin;
-
   ///customize checkbox property
   final CheckBoxProperty? checkBoxProperty;
+
+  ///customize BackgroundColor on dropdown overlay
+  final Decoration? overlayDecoration;
 
   @override
   _DropDownTextFieldState createState() => _DropDownTextFieldState();
@@ -295,8 +292,6 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   late TextStyle _listTileTextStyle;
   late ListPadding _listPadding;
   late TextDirection _currentDirection;
-  late BoxDecoration? _boxDecoration;
-  late EdgeInsets? _boxMargin;
   GlobalKey overlayKey = GlobalKey();
   @override
   void initState() {
@@ -307,8 +302,6 @@ class _DropDownTextFieldState extends State<DropDownTextField>
     _isOutsideClickOverlay = false;
     _searchFocusNode = widget.searchFocusNode ?? FocusNode();
     _textFieldFocusNode = widget.textFieldFocusNode ?? FocusNode();
-    _boxDecoration = widget.boxDecoration;
-    _boxMargin = widget.boxMargin;
     _isExpanded = false;
     _controller = AnimationController(
       vsync: this,
@@ -569,20 +562,19 @@ class _DropDownTextFieldState extends State<DropDownTextField>
             enabled: widget.isEnabled,
             readOnly: widget.readOnly,
             onTapOutside: (event) {
-              final RenderObject? renderObject =
-                  overlayKey.currentContext?.findRenderObject();
-              if (renderObject is RenderBox) {
-                final overlayPosition = renderObject.localToGlobal(Offset.zero);
-                final overlaySize = renderObject.size;
-                bool isOverlayTap = (overlayPosition.dx <= event.position.dx &&
-                        event.position.dx <=
-                            overlayPosition.dx + overlaySize.width) &&
-                    (overlayPosition.dy <= event.position.dy &&
-                        event.position.dy <=
-                            overlayPosition.dy + overlaySize.height);
-                if (!isOverlayTap) {
-                  _textFieldFocusNode.unfocus();
-                }
+              final RenderBox renderBox =
+                  overlayKey.currentContext?.findRenderObject() as RenderBox;
+              final overlayPosition = renderBox.localToGlobal(Offset.zero);
+              final overlaySize = renderBox.size;
+              bool isOverlayTap = (overlayPosition.dx <= event.position.dx &&
+                      event.position.dx <=
+                          overlayPosition.dx + overlaySize.width) &&
+                  (overlayPosition.dy <= event.position.dy &&
+                      event.position.dy <=
+                          overlayPosition.dy + overlaySize.height);
+
+              if (!isOverlayTap) {
+                _textFieldFocusNode.unfocus();
               }
             },
             onTap: () {
@@ -810,116 +802,117 @@ class _DropDownTextFieldState extends State<DropDownTextField>
           child: Material(
             key: overlayKey,
             color: Colors.transparent,
-            child: Container(
-              margin: _boxMargin ??
-                  const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
-              decoration: _boxDecoration ??
-                  BoxDecoration(
-                    color: Theme.of(context).cardColor, // Matches theme
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(widget.dropdownRadius),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius:
+                      BorderRadius.all(Radius.circular(widget.dropdownRadius)),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.grey,
+                      blurRadius: 5,
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Theme.of(context).shadowColor.withValues(alpha: 0.2),
-                        blurRadius: 5,
-                      ),
-                    ],
-                  ),
-            child: !widget.isMultiSelection
-                  ? SingleSelection(
-                      mainController: _cnt,
-                      autoSort: !widget.readOnly,
-                      mainFocusNode: _textFieldFocusNode,
-                      searchTextStyle: widget.searchTextStyle,
-                      searchFocusNode: _searchFocusNode,
-                      enableSearch: widget.enableSearch,
-                      height: _height,
-                      listTileHeight: _listTileHeight,
-                      dropDownList: _dropDownList,
-                      listTextStyle: _listTileTextStyle,
-                      onChanged: (item) {
-                        setState(() {
-                          _cnt.text = item.name;
-                          _isExpanded = !_isExpanded;
-                        });
-                        if (widget.singleController != null) {
-                          widget.singleController!.setDropDown(item);
-                        }
-                        if (widget.onChanged != null) {
-                          widget.onChanged!(item);
-                        }
-                        // Navigator.pop(context, null);
-
-                        hideOverlay();
-                      },
-                      searchHeight: _searchWidgetHeight,
-                      searchKeyboardType: widget.searchKeyboardType,
-                      searchAutofocus: _searchAutofocus,
-                      searchDecoration: widget.searchDecoration,
-                      searchShowCursor: widget.searchShowCursor,
-                      listPadding: _listPadding,
-                      // onSearchTap: () {
-                      //   double posFromBot =
-                      //       MediaQuery.of(context).size.height - _offset.dy;
-                      //   if (posFromBot < _keyboardHeight &&
-                      //       !_isScrollPadding &&
-                      //       _isPortrait) {
-                      //     shiftOverlayEntry1to2();
-                      //   }
-                      // },
-                      // onSearchSubmit: () {
-                      //   if (_isScrollPadding) {
-                      //     shiftOverlayEntry2to1();
-                      //   }
-                      // },
-                      clearIconProperty: widget.clearIconProperty,
-                    )
-                  : MultiSelection(
-                      buttonTextStyle: widget.submitButtonTextStyle,
-                      buttonText: widget.submitButtonText,
-                      buttonColor: widget.submitButtonColor,
-                      height: _height,
-                      listTileHeight: _listTileHeight,
-                      list: _multiSelectionValue,
-                      dropDownList: _dropDownList,
-                      listTextStyle: _listTileTextStyle,
-                      listPadding: _listPadding,
-                      onChanged: (val) {
-                        _isExpanded = !_isExpanded;
-                        _multiSelectionValue = val;
-                        List<DropDownValueModel> result = [];
-                        List completeList = [];
-                        for (int i = 0; i < _multiSelectionValue.length; i++) {
-                          if (_multiSelectionValue[i]) {
-                            result.add(_dropDownList[i]);
-                            completeList.add(_dropDownList[i].name);
+                  ],
+                ),
+                child: !widget.isMultiSelection
+                    ? SingleSelection(
+                        mainController: _cnt,
+                        autoSort: !widget.readOnly,
+                        mainFocusNode: _textFieldFocusNode,
+                        searchTextStyle: widget.searchTextStyle,
+                        searchFocusNode: _searchFocusNode,
+                        enableSearch: widget.enableSearch,
+                        height: _height,
+                        listTileHeight: _listTileHeight,
+                        dropDownList: _dropDownList,
+                        listTextStyle: _listTileTextStyle,
+                        onChanged: (item) {
+                          setState(() {
+                            _cnt.text = item.name;
+                            _isExpanded = !_isExpanded;
+                          });
+                          if (widget.singleController != null) {
+                            widget.singleController!.setDropDown(item);
                           }
-                        }
-                        int count = _multiSelectionValue
-                            .where((element) => element)
-                            .toList()
-                            .length;
+                          if (widget.onChanged != null) {
+                            widget.onChanged!(item);
+                          }
+                          // Navigator.pop(context, null);
 
-                        _cnt.text = (count == 0
-                            ? ""
-                            : widget.displayCompleteItem
-                                ? completeList.join(",")
-                                : "$count item selected");
-                        if (widget.multiController != null) {
-                          widget.multiController!
-                              .setDropDown(result.isNotEmpty ? result : null);
-                        }
-                        if (widget.onChanged != null) {
-                          widget.onChanged!(result);
-                        }
+                          hideOverlay();
+                        },
+                        searchHeight: _searchWidgetHeight,
+                        searchKeyboardType: widget.searchKeyboardType,
+                        searchAutofocus: _searchAutofocus,
+                        searchDecoration: widget.searchDecoration,
+                        searchShowCursor: widget.searchShowCursor,
+                        listPadding: _listPadding,
+                        // onSearchTap: () {
+                        //   double posFromBot =
+                        //       MediaQuery.of(context).size.height - _offset.dy;
+                        //   if (posFromBot < _keyboardHeight &&
+                        //       !_isScrollPadding &&
+                        //       _isPortrait) {
+                        //     shiftOverlayEntry1to2();
+                        //   }
+                        // },
+                        // onSearchSubmit: () {
+                        //   if (_isScrollPadding) {
+                        //     shiftOverlayEntry2to1();
+                        //   }
+                        // },
+                        clearIconProperty: widget.clearIconProperty,
+                        overlayDecoration: widget.overlayDecoration,
+                      )
+                    : MultiSelection(
+                        buttonTextStyle: widget.submitButtonTextStyle,
+                        buttonText: widget.submitButtonText,
+                        buttonColor: widget.submitButtonColor,
+                        height: _height,
+                        listTileHeight: _listTileHeight,
+                        list: _multiSelectionValue,
+                        dropDownList: _dropDownList,
+                        listTextStyle: _listTileTextStyle,
+                        listPadding: _listPadding,
+                        onChanged: (val) {
+                          _isExpanded = !_isExpanded;
+                          _multiSelectionValue = val;
+                          List<DropDownValueModel> result = [];
+                          List completeList = [];
+                          for (int i = 0;
+                              i < _multiSelectionValue.length;
+                              i++) {
+                            if (_multiSelectionValue[i]) {
+                              result.add(_dropDownList[i]);
+                              completeList.add(_dropDownList[i].name);
+                            }
+                          }
+                          int count = _multiSelectionValue
+                              .where((element) => element)
+                              .toList()
+                              .length;
 
-                        hideOverlay();
-
-                        setState(() {});
-                      },
-                      checkBoxProperty: widget.checkBoxProperty,
-                    ),
+                          _cnt.text = (count == 0
+                              ? ""
+                              : widget.displayCompleteItem
+                                  ? completeList.join(",")
+                                  : "$count item selected");
+                          if (widget.multiController != null) {
+                            widget.multiController!
+                                .setDropDown(result.isNotEmpty ? result : null);
+                          }
+                          if (widget.onChanged != null) {
+                            widget.onChanged!(result);
+                          }
+                          hideOverlay();
+                          setState(() {});
+                        },
+                        checkBoxProperty: widget.checkBoxProperty,
+                        overlayDecoration: widget.overlayDecoration,
+                      ),
+              ),
             ),
           ),
         ),
@@ -931,33 +924,27 @@ class _DropDownTextFieldState extends State<DropDownTextField>
 class DropDownValueModel extends Equatable {
   final String name;
   final dynamic value;
-  final Widget? prefixWidget;
 
   ///as of now only added for multiselection dropdown
   final String? toolTipMsg;
 
   const DropDownValueModel(
-      {required this.name,
-      required this.value,
-      this.prefixWidget,
-      this.toolTipMsg});
+      {required this.name, required this.value, this.toolTipMsg});
 
   factory DropDownValueModel.fromJson(Map<String, dynamic> json) =>
       DropDownValueModel(
         name: json["name"],
         value: json["value"],
-        prefixWidget: json["prefixWidget"],
         toolTipMsg: json["toolTipMsg"],
       );
 
   Map<String, dynamic> toJson() => {
         "name": name,
         "value": value,
-        "prefixWidget": prefixWidget,
         "toolTipMsg": toolTipMsg,
       };
   @override
-  List<Object?> get props => [name, value, prefixWidget];
+  List<Object> get props => [name, value];
 
   @override
   bool operator ==(Object other) =>
@@ -965,11 +952,10 @@ class DropDownValueModel extends Equatable {
       other is DropDownValueModel &&
           runtimeType == other.runtimeType &&
           name == other.name &&
-          value == other.value &&
-          prefixWidget == other.prefixWidget;
+          value == other.value;
 
   @override
-  int get hashCode => name.hashCode ^ value.hashCode ^ prefixWidget.hashCode;
+  int get hashCode => name.hashCode ^ value.hashCode;
 }
 
 class SingleValueDropDownController extends ChangeNotifier {

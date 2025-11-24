@@ -3,29 +3,30 @@ import 'package:flutter/material.dart';
 import 'dropdown_textfield.dart';
 
 class SingleSelection extends StatefulWidget {
-  const SingleSelection(
-      {Key? key,
-      required this.dropDownList,
-      required this.onChanged,
-      required this.height,
-      required this.enableSearch,
-      required this.searchHeight,
-      this.searchTextStyle,
-      required this.searchFocusNode,
-      required this.mainFocusNode,
-      this.searchKeyboardType,
-      required this.searchAutofocus,
-      this.searchShowCursor,
-      required this.mainController,
-      required this.autoSort,
-      required this.listTileHeight,
-      this.onSearchTap,
-      this.onSearchSubmit,
-      this.listTextStyle,
-      this.searchDecoration,
-      required this.listPadding,
-      this.clearIconProperty})
-      : super(key: key);
+  const SingleSelection({
+    Key? key,
+    required this.dropDownList,
+    required this.onChanged,
+    required this.height,
+    required this.enableSearch,
+    required this.searchHeight,
+    this.searchTextStyle,
+    required this.searchFocusNode,
+    required this.mainFocusNode,
+    this.searchKeyboardType,
+    required this.searchAutofocus,
+    this.searchShowCursor,
+    required this.mainController,
+    required this.autoSort,
+    required this.listTileHeight,
+    this.onSearchTap,
+    this.onSearchSubmit,
+    this.listTextStyle,
+    this.searchDecoration,
+    required this.listPadding,
+    this.clearIconProperty,
+    this.overlayDecoration,
+  }) : super(key: key);
   final List<DropDownValueModel> dropDownList;
   final ValueSetter onChanged;
   final double height;
@@ -46,6 +47,7 @@ class SingleSelection extends StatefulWidget {
   final ListPadding listPadding;
   final InputDecoration? searchDecoration;
   final IconProperty? clearIconProperty;
+  final Decoration? overlayDecoration;
 
   @override
   State<SingleSelection> createState() => _SingleSelectionState();
@@ -98,90 +100,85 @@ class _SingleSelectionState extends State<SingleSelection> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (widget.enableSearch)
-          SizedBox(
-            height: widget.searchHeight,
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: TextField(
-                style: widget.searchTextStyle,
-                focusNode: widget.searchFocusNode,
-                showCursor: widget.searchShowCursor,
-                keyboardType: widget.searchKeyboardType,
-                controller: _searchCnt,
-                onTap: () {
-                  if (widget.onSearchTap != null) {
-                    widget.onSearchTap!();
-                  }
-                },
-                decoration: _inpDec.copyWith(
-                  hintText: _inpDec.hintText ?? 'Search Here...',
-                  suffixIcon: GestureDetector(
-                    onTap: () {
-                      widget.mainFocusNode.requestFocus();
-                      _searchCnt.clear();
-                      onItemChanged("");
-                    },
-                    child: widget.searchFocusNode.hasFocus
-                        ? InkWell(
-                            child: Icon(
-                              widget.clearIconProperty?.icon ?? Icons.close,
-                              size: widget.clearIconProperty?.size,
-                              color: widget.clearIconProperty?.color,
-                            ),
-                          )
-                        : const SizedBox.shrink(),
+    return Container(
+      decoration: widget.overlayDecoration,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (widget.enableSearch)
+            SizedBox(
+              height: widget.searchHeight,
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: TextField(
+                  style: widget.searchTextStyle,
+                  focusNode: widget.searchFocusNode,
+                  showCursor: widget.searchShowCursor,
+                  keyboardType: widget.searchKeyboardType,
+                  controller: _searchCnt,
+                  onTap: () {
+                    if (widget.onSearchTap != null) {
+                      widget.onSearchTap!();
+                    }
+                  },
+                  decoration: _inpDec.copyWith(
+                    hintText: _inpDec.hintText ?? 'Search Here...',
+                    suffixIcon: GestureDetector(
+                      onTap: () {
+                        widget.mainFocusNode.requestFocus();
+                        _searchCnt.clear();
+                        onItemChanged("");
+                      },
+                      child: widget.searchFocusNode.hasFocus
+                          ? InkWell(
+                              child: Icon(
+                                widget.clearIconProperty?.icon ?? Icons.close,
+                                size: widget.clearIconProperty?.size,
+                                color: widget.clearIconProperty?.color,
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                    ),
                   ),
+                  onChanged: onItemChanged,
+                  onSubmitted: (val) {
+                    widget.mainFocusNode.requestFocus();
+                    if (widget.onSearchSubmit != null) {
+                      widget.onSearchSubmit!();
+                    }
+                  },
                 ),
-                onChanged: onItemChanged,
-                onSubmitted: (val) {
-                  widget.mainFocusNode.requestFocus();
-                  if (widget.onSearchSubmit != null) {
-                    widget.onSearchSubmit!();
-                  }
+              ),
+            ),
+          SizedBox(
+            height: widget.height,
+            child: Scrollbar(
+              child: ListView.builder(
+                padding: EdgeInsets.zero,
+                itemCount: newDropDownList.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return SizedBox(
+                    height: widget.listTileHeight,
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          right: 10,
+                          left: 10,
+                          bottom: widget.listPadding.bottom,
+                          top: widget.listPadding.top),
+                      child: InkWell(
+                          onTap: () {
+                            widget.onChanged(newDropDownList[index]);
+                          },
+                          child: Text(newDropDownList[index].name,
+                              style: widget.listTextStyle)),
+                    ),
+                  );
                 },
               ),
             ),
           ),
-        SizedBox(
-          height: widget.height,
-          child: Scrollbar(
-            child: ListView.builder(
-              padding: EdgeInsets.zero,
-              itemCount: newDropDownList.length,
-              itemBuilder: (BuildContext context, int index) {
-                return SizedBox(
-                  height: widget.listTileHeight +
-                      widget.listPadding.top +
-                      widget.listPadding.bottom,
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                        right: 10,
-                        left: 10,
-                        bottom: widget.listPadding.bottom,
-                        top: widget.listPadding.top),
-                    child: InkWell(
-                        onTap: () {
-                          widget.onChanged(newDropDownList[index]);
-                        },
-                        child: Row(
-                          children: [
-                            newDropDownList[index].prefixWidget ??
-                                const SizedBox.shrink(),
-                            Text(newDropDownList[index].name,
-                                style: widget.listTextStyle),
-                          ],
-                        )),
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
