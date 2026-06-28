@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.3.1
+- **Code structure**: Split monolithic `dropdown_textfield.dart` into `src/` modules
+  (`models.dart`, `controllers.dart`, `single_selection.dart`, `multi_selection.dart`,
+  `tooltip_widget.dart`, `keyboard_visibility_builder.dart`)
+- **Bug fix**: `DropDownValueModel.props` now includes `toolTipMsg` for correct Equatable equality
+- **Bug fix**: Removed redundant manual `==` / `hashCode` override on `DropDownValueModel`
+  (conflicted with Equatable)
+- **Bug fix**: Removed listener leak — `removeListener` is now called in `dispose()`
+- **Naming**: Renamed internal methods to Dart conventions (`clearFun` → `_clearSelection`,
+  `updateFunction` → `_updateDropdownState`, `onItemChanged` → `_onSearchTextChanged`)
+- **Theming**: Submit button and tooltip colors now use `Theme.of(context).colorScheme`
+  instead of hard-coded `Colors.green` / `Colors.white`
+- **Accessibility**: Added `Semantics` wrappers to list items, checkboxes, clear icon, and tooltip
+- **DRY**: Extracted `_buildSuffixIcon()` and `_buildInputDecoration()` to eliminate
+  copy-pasted decoration code
+- **Tooltip**: Removed dead `toolTipDialogue` / `showAnimatedAlertDialog` methods;
+  tap-barrier now dismisses the tooltip overlay; overlay is disposed on widget dispose
+- **API**: `onChanged` in `SingleSelection` / `MultiSelection` now uses typed callbacks
+- **SDK**: Raised minimum SDK to `>=3.0.0 <4.0.0`, Flutter `>=3.10.0`
+- **pub.dev**: Added `topics` for improved discoverability
+- **Lints**: Strengthened `analysis_options.yaml` with strict-casts, strict-inference,
+  and additional lint rules
+
 ## 1.2.0
 - 'WidgetStateProperty' not found - fixed
 
