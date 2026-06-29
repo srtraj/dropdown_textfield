@@ -346,8 +346,11 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   /// Cached tile height — recomputed only when style or padding changes.
   double _listTileHeight = 0;
 
-  /// Cached total dropdown height.
-  double _dropdownHeight = 0;
+  /// Cached preferred total dropdown height.
+  double _preferredDropdownHeight = 0;
+
+  /// Current dropdown height (shrunk if it hits screen edges).
+  double _currentDropdownHeight = 0;
 
   /// Cached [TextStyle] key used to invalidate [_listTileHeight].
   TextStyle? _cachedTextStyle;
@@ -356,7 +359,6 @@ class _DropDownTextFieldState extends State<DropDownTextField>
 
   bool _isExpanded = false;
   bool _isScrollPadding = false;
-  bool _isOutsideClickOverlay = false;
   bool _searchAutofocus = false;
 
   OverlayEntry? _entry;
@@ -607,7 +609,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
     final visibleCount = _dropDownList.length < widget.dropDownItemCount
         ? _dropDownList.length.toDouble()
         : widget.dropDownItemCount.toDouble();
-    _dropdownHeight = visibleCount * _listTileHeight + 10;
+    _preferredDropdownHeight = visibleCount * _listTileHeight + 10;
   }
 
   // ── State sync (controller → UI) ──────────────────────────────────────────
@@ -764,84 +766,76 @@ class _DropDownTextFieldState extends State<DropDownTextField>
     final mediaQuery = MediaQuery.of(context);
 
     final posFromTop = offset.dy;
-    final posFromBot = mediaQuery.size.height - posFromTop;
-    final dropdownListHeight =
-        _dropdownHeight +
-        (widget.enableSearch ? _searchWidgetHeight : 0) +
-        widget.listSpace;
-    final ht = dropdownListHeight + 120;
-    final isBelow = posFromBot < ht;
+    final posFromBot = mediaQuery.size.height - (posFromTop + size.height);
+
+    final searchHeight = widget.enableSearch ? _searchWidgetHeight : 0.0;
+    final submitRowHeight = widget.isMultiSelection
+        ? (_listTileHeight * 0.9 + 25.0)
+        : 0.0;
+    final extraHeight = searchHeight + submitRowHeight + widget.listSpace;
+    final preferredTotalHeight = _preferredDropdownHeight + extraHeight;
+
+    bool isBelow = true;
+    double actualDropdownHeight = _preferredDropdownHeight;
+
+    if (posFromBot >= preferredTotalHeight + 20) {
+      isBelow = true;
+    } else if (posFromTop >= preferredTotalHeight + 20) {
+      isBelow = false;
+    } else {
+      if (posFromBot >= posFromTop) {
+        isBelow = true;
+        actualDropdownHeight = posFromBot - extraHeight - 20;
+      } else {
+        isBelow = false;
+        final safeAreaTop = mediaQuery.padding.top > 0
+            ? mediaQuery.padding.top
+            : 24.0;
+        actualDropdownHeight = posFromTop - safeAreaTop - extraHeight - 20;
+      }
+    }
+
+    if (actualDropdownHeight < _listTileHeight) {
+      actualDropdownHeight = _listTileHeight;
+    }
+
+    _currentDropdownHeight = actualDropdownHeight;
 
     if (_searchAutofocus &&
-        !isBelow &&
         posFromBot < _keyboardHeight &&
-        !_isScrollPadding &&
         mediaQuery.orientation == Orientation.portrait) {
       _isScrollPadding = true;
     }
 
-    _isOutsideClickOverlay =
-        _isScrollPadding ||
-        (widget.readOnly &&
-            dropdownListHeight > (posFromTop - mediaQuery.padding.top - 15) &&
-            isBelow);
+    _openBarrierOverlay(overlay);
 
-    final topPaddingHeight = _isOutsideClickOverlay
-        ? dropdownListHeight - (posFromTop - mediaQuery.padding.top - 15)
-        : 0.0;
-
-    final htPos = isBelow
-        ? size.height - 100 + topPaddingHeight
-        : _isScrollPadding
-        ? size.height - (_keyboardHeight - posFromBot)
-        : size.height;
-
-    if (_isOutsideClickOverlay) _openBarrierOverlay(overlay);
-
-    // Build only the entry that will actually be used.
-    if (_isScrollPadding) {
-      _entry2 = _buildOverlayEntry(
-        size: size,
-        htPos: htPos,
-        forceBottomAnchor: true,
-      );
-      overlay.insert(_entry2!);
-    } else {
-      _entry = _buildOverlayEntry(size: size, htPos: htPos, isBelow: isBelow);
-      overlay.insert(_entry!);
-    }
+    _entry = _buildOverlayEntry(size: size, isBelow: isBelow);
+    overlay.insert(_entry!);
   }
 
-  OverlayEntry _buildOverlayEntry({
-    required Size size,
-    required double htPos,
-    bool isBelow = false,
-    bool forceBottomAnchor = false,
-  }) {
-    final useBottomAnchor = forceBottomAnchor || isBelow;
+  OverlayEntry _buildOverlayEntry({required Size size, required bool isBelow}) {
     final currentDirection = Directionality.of(context);
 
     return OverlayEntry(
       builder: (context) => Positioned(
         width: size.width,
         child: CompositedTransformFollower(
-          targetAnchor: useBottomAnchor
-              ? Alignment.bottomCenter
-              : Alignment.topCenter,
-          followerAnchor: useBottomAnchor
-              ? Alignment.bottomCenter
-              : Alignment.topCenter,
+          targetAnchor: isBelow ? Alignment.bottomLeft : Alignment.topLeft,
+          followerAnchor: isBelow ? Alignment.topLeft : Alignment.bottomLeft,
           link: _layerLink,
           showWhenUnlinked: false,
-          offset: Offset(
-            0,
-            useBottomAnchor
-                ? htPos - widget.listSpace
-                : htPos + widget.listSpace,
-          ),
+          offset: Offset(0, isBelow ? widget.listSpace : -widget.listSpace),
           child: AnimatedBuilder(
             animation: _animController.view,
-            builder: (ctx, _) => _buildOverlayContent(ctx, currentDirection),
+            builder: (ctx, _) => ClipRect(
+              child: Align(
+                alignment: isBelow
+                    ? Alignment.topCenter
+                    : Alignment.bottomCenter,
+                heightFactor: _heightFactor.value,
+                child: _buildOverlayContent(ctx, currentDirection),
+              ),
+            ),
           ),
         ),
       ),
@@ -899,44 +893,36 @@ class _DropDownTextFieldState extends State<DropDownTextField>
     if (_barrierOverlay?.mounted == true) {
       _barrierOverlay!.remove();
       _barrierOverlay = null;
-      _isOutsideClickOverlay = false;
     }
   }
 
   Widget _buildOverlayContent(BuildContext context, TextDirection direction) {
     return Directionality(
       textDirection: direction,
-      child: ClipRect(
-        child: Align(
-          heightFactor: _heightFactor.value,
-          child: Material(
-            key: _overlayKey,
-            color: Colors.transparent,
-            child: Container(
-              margin:
-                  widget.boxMargin ??
-                  const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
-              decoration:
-                  widget.boxDecoration ??
-                  BoxDecoration(
-                    color: widget.dropdownColor ?? Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(widget.dropdownRadius),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Theme.of(
-                          context,
-                        ).shadowColor.withValues(alpha: 0.2),
-                        blurRadius: 5,
-                      ),
-                    ],
+      child: Material(
+        key: _overlayKey,
+        color: Colors.transparent,
+        child: Container(
+          margin:
+              widget.boxMargin ??
+              const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
+          decoration:
+              widget.boxDecoration ??
+              BoxDecoration(
+                color: widget.dropdownColor ?? Theme.of(context).cardColor,
+                borderRadius: BorderRadius.all(
+                  Radius.circular(widget.dropdownRadius),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Theme.of(context).shadowColor.withValues(alpha: 0.2),
+                    blurRadius: 5,
                   ),
-              child: widget.isMultiSelection
-                  ? _buildMultiSelection()
-                  : _buildSingleSelection(),
-            ),
-          ),
+                ],
+              ),
+          child: widget.isMultiSelection
+              ? _buildMultiSelection()
+              : _buildSingleSelection(),
         ),
       ),
     );
@@ -950,7 +936,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
       searchTextStyle: widget.searchTextStyle,
       searchFocusNode: _searchFocusNode,
       enableSearch: widget.enableSearch,
-      height: _dropdownHeight,
+      height: _currentDropdownHeight,
       listTileHeight: _listTileHeight,
       dropDownList: _dropDownList,
       listTextStyle: _listTileTextStyle,
@@ -984,7 +970,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
       buttonText: widget.submitButtonText,
       buttonColor: widget.submitButtonColor,
       buttonDecoration: widget.submitButtonDecoration,
-      height: _dropdownHeight,
+      height: _currentDropdownHeight,
       listTileHeight: _listTileHeight,
       list: _multiSelectionValue,
       dropDownList: _dropDownList,
