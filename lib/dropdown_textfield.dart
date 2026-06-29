@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
@@ -25,6 +23,7 @@ export 'src/models.dart';
 ///     DropDownValueModel(name: 'One', value: 1),
 ///     DropDownValueModel(name: 'Two', value: 2),
 ///   ],
+///   dropdownColor: Colors.blue.shade50, // Sets the background color of the dropdown
 ///   onChanged: (val) => print(val),
 /// )
 /// ```
@@ -58,6 +57,11 @@ class DropDownTextField extends StatefulWidget {
     this.textFieldDecoration,
     this.dropDownIconProperty,
     this.dropDownItemCount = 6,
+    this.autovalidateMode,
+    this.boxDecoration,
+    this.boxMargin,
+    this.dropdownColor,
+    this.selectedItemHighlightColor,
     this.searchTextStyle,
     this.searchFocusNode,
     this.textFieldFocusNode,
@@ -71,9 +75,10 @@ class DropDownTextField extends StatefulWidget {
     this.listPadding,
     this.listTextStyle,
     this.keyboardType,
-    this.autovalidateMode,
-    this.boxDecoration,
-    this.boxMargin,
+    this.textDirection,
+    this.itemTextAlign,
+    this.maxlines = 1,
+    this.clearOnUnmatched = true,
   }) : assert(
          !(initialValue != null && controller != null),
          'You cannot provide both initialValue and controller. '
@@ -95,7 +100,8 @@ class DropDownTextField extends StatefulWidget {
        displayCompleteItem = false,
        submitButtonColor = null,
        submitButtonText = null,
-       submitButtonTextStyle = null;
+       submitButtonTextStyle = null,
+       submitButtonDecoration = null;
 
   // ── Multi-selection constructor ───────────────────────────────────────────
 
@@ -128,6 +134,12 @@ class DropDownTextField extends StatefulWidget {
     this.autovalidateMode,
     this.boxDecoration,
     this.boxMargin,
+    this.dropdownColor,
+    this.selectedItemHighlightColor,
+    this.submitButtonDecoration,
+    this.textDirection,
+    this.itemTextAlign,
+    this.maxlines = 1,
   }) : assert(
          initialValue == null || controller == null,
          'You cannot provide both initialValue and controller. '
@@ -148,7 +160,8 @@ class DropDownTextField extends StatefulWidget {
        searchShowCursor = null,
        singleController = null,
        searchDecoration = null,
-       keyboardType = null;
+       keyboardType = null,
+       clearOnUnmatched = true;
 
   // ── Shared fields ─────────────────────────────────────────────────────────
 
@@ -262,83 +275,178 @@ class DropDownTextField extends StatefulWidget {
   /// Overrides the default [BoxDecoration] of the dropdown container.
   final BoxDecoration? boxDecoration;
 
+  /// Background color of the dropdown list container.
+  /// Used when [boxDecoration] is not provided.
+  final Color? dropdownColor;
+
   /// Margin around the dropdown container.
   final EdgeInsets? boxMargin;
 
   /// Customizes the checkbox appearance in multi-selection mode.
   final CheckBoxProperty? checkBoxProperty;
 
+  /// Highlight color for the selected item in the dropdown list.
+  final Color? selectedItemHighlightColor;
+
+  /// Text direction for the dropdown items.
+  final TextDirection? textDirection;
+
+  /// Text alignment for the dropdown items.
+  final TextAlign? itemTextAlign;
+
+  /// Maximum lines for the text in the textfield and dropdown items.
+  final int maxlines;
+
+  /// Whether to clear the textfield if the typed value doesn't match any item.
+  /// Set to false to allow unknown/free-text values.
+  final bool clearOnUnmatched;
+
+  /// Decoration for the submit button in multi-selection.
+  final BoxDecoration? submitButtonDecoration;
+
   @override
   State<DropDownTextField> createState() => _DropDownTextFieldState();
 }
 
 class _DropDownTextFieldState extends State<DropDownTextField>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, WidgetsBindingObserver {
+  // ── Constants ─────────────────────────────────────────────────────────────
+
+  static const int _animDurationMs = 150;
+  static const double _searchWidgetHeight = 60;
+  static const double _keyboardHeight = 450;
+
+  /// Shared deep-equality instance — avoids re-allocating on every update.
+  static const DeepCollectionEquality _deepEq = DeepCollectionEquality();
+
   static final Animatable<double> _easeInTween = CurveTween(
     curve: Curves.easeIn,
   );
 
-  late TextEditingController _textController;
-  late bool _isExpanded;
+  // ── State ─────────────────────────────────────────────────────────────────
+
+  late final TextEditingController _textController;
+  late final AnimationController _animController;
+  late final Animation<double> _heightFactor;
+  late final LayerLink _layerLink = LayerLink();
+  late final GlobalKey _overlayKey = GlobalKey();
+
+  late FocusNode _searchFocusNode;
+  late FocusNode _textFieldFocusNode;
+
+  /// Cached list — rebuilt only when [widget.dropDownList] reference changes.
+  late List<DropDownValueModel> _dropDownList;
+
+  /// Cached padding — rebuilt only when [widget.listPadding] changes.
+  late ListPadding _listPadding;
+
+  /// Cached text style for list tiles.
+  late TextStyle _listTileTextStyle;
+
+  /// Cached tile height — recomputed only when style or padding changes.
+  double _listTileHeight = 0;
+
+  /// Cached total dropdown height.
+  double _dropdownHeight = 0;
+
+  /// Cached [TextStyle] key used to invalidate [_listTileHeight].
+  TextStyle? _cachedTextStyle;
+
+  List<bool> _multiSelectionValue = [];
+
+  bool _isExpanded = false;
+  bool _isScrollPadding = false;
+  bool _isOutsideClickOverlay = false;
+  bool _searchAutofocus = false;
+
   OverlayEntry? _entry;
   OverlayEntry? _entry2;
   OverlayEntry? _barrierOverlay;
-  final _layerLink = LayerLink();
-  late AnimationController _animController;
-  late Animation<double> _heightFactor;
-  List<bool> _multiSelectionValue = [];
-  late double _dropdownHeight;
-  late List<DropDownValueModel> _dropDownList;
-  late int _maxListItem;
-  final double _searchWidgetHeight = 60;
-  late FocusNode _searchFocusNode;
-  late FocusNode _textFieldFocusNode;
-  late bool _isOutsideClickOverlay;
-  late bool _isScrollPadding;
-  final int _animDurationMs = 150;
-  late Offset _offset;
-  late bool _searchAutofocus;
-  late bool _isPortrait;
-  late double _listTileHeight;
-  final double _keyboardHeight = 450;
-  late TextStyle _listTileTextStyle;
-  late ListPadding _listPadding;
-  late TextDirection _currentDirection;
-  final GlobalKey _overlayKey = GlobalKey();
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _textController = TextEditingController();
-    _isScrollPadding = false;
-    _isOutsideClickOverlay = false;
-    _searchFocusNode = widget.searchFocusNode ?? FocusNode();
-    _textFieldFocusNode = widget.textFieldFocusNode ?? FocusNode();
-    _isExpanded = false;
-    _searchAutofocus = false;
-
     _animController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: _animDurationMs),
+      duration: const Duration(milliseconds: _animDurationMs),
     );
     _heightFactor = _animController.drive(_easeInTween);
+
+    _searchFocusNode = widget.searchFocusNode ?? FocusNode();
+    _textFieldFocusNode = widget.textFieldFocusNode ?? FocusNode();
 
     _searchFocusNode.addListener(_onSearchFocusChanged);
     _textFieldFocusNode.addListener(_onTextFieldFocusChanged);
     widget.singleController?.addListener(_onSingleControllerChanged);
     widget.multiController?.addListener(_onMultiControllerChanged);
 
+    _dropDownList = List.from(widget.dropDownList);
+    _listPadding = widget.listPadding ?? const ListPadding();
+
     _initMultiSelectionState();
     _applyInitialValue();
-    _updateDropdownState();
+
+    // Defer layout-dependent work until after the first frame.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _recalculateDimensions();
+    });
   }
 
   @override
   void didUpdateWidget(covariant DropDownTextField oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _updateDropdownState(oldWidget: oldWidget);
+
+    // Re-subscribe listeners if the controller instance changed.
+    if (oldWidget.singleController != widget.singleController) {
+      oldWidget.singleController?.removeListener(_onSingleControllerChanged);
+      widget.singleController?.addListener(_onSingleControllerChanged);
+    }
+    if (oldWidget.multiController != widget.multiController) {
+      oldWidget.multiController?.removeListener(_onMultiControllerChanged);
+      widget.multiController?.addListener(_onMultiControllerChanged);
+    }
+
+    // Only pay the cost of deep equality when the list reference changes.
+    final bool listChanged =
+        !identical(oldWidget.dropDownList, widget.dropDownList) &&
+        !_deepEq.equals(oldWidget.dropDownList, widget.dropDownList);
+
+    if (listChanged) {
+      _dropDownList = List.from(widget.dropDownList);
+      if (widget.isMultiSelection) {
+        _multiSelectionValue = List.filled(_dropDownList.length, false);
+        _textController.text = '';
+      }
+    }
+
+    final bool paddingChanged = oldWidget.listPadding != widget.listPadding;
+    if (paddingChanged) {
+      _listPadding = widget.listPadding ?? const ListPadding();
+    }
+
+    // Recalculate dimensions only when something that affects layout changed.
+    final bool needsDimensionUpdate =
+        listChanged ||
+        paddingChanged ||
+        oldWidget.listTextStyle != widget.listTextStyle ||
+        oldWidget.dropDownItemCount != widget.dropDownItemCount;
+
+    if (needsDimensionUpdate) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _recalculateDimensions();
+      });
+    }
+
+    // Sync controller → text field only when the value actually changed.
+    if (widget.isMultiSelection) {
+      _syncMultiSelectionState(oldWidget);
+    } else {
+      _syncSingleSelectionState(oldWidget);
+    }
   }
 
   @override
@@ -349,10 +457,22 @@ class _DropDownTextFieldState extends State<DropDownTextField>
     widget.multiController?.removeListener(_onMultiControllerChanged);
     if (widget.searchFocusNode == null) _searchFocusNode.dispose();
     if (widget.textFieldFocusNode == null) _textFieldFocusNode.dispose();
-    if (_animController.isAnimating) _animController.stop();
+    if (_animController.isAnimating) _animController.stop(canceled: true);
     _animController.dispose();
     _textController.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    if (_isExpanded) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _removeOverlayEntries();
+        _showOverlay();
+      });
+    }
   }
 
   // ── Listeners ─────────────────────────────────────────────────────────────
@@ -373,23 +493,66 @@ class _DropDownTextFieldState extends State<DropDownTextField>
         _isExpanded) {
       _isExpanded = false;
       _hideOverlay();
-      if (!widget.readOnly &&
-          widget.singleController?.dropDownValue?.name !=
-              _textController.text) {
-        setState(() => _textController.clear());
+      if (!widget.readOnly) {
+        final currentText = _textController.text.trim();
+        final currentValue = widget.singleController?.dropDownValue;
+
+        final matchesCurrent =
+            currentValue != null &&
+            (currentValue.name.trim() == currentText ||
+                currentValue.displayValue?.trim() == currentText);
+
+        if (!matchesCurrent) {
+          if (widget.clearOnUnmatched) {
+            setState(() => _textController.clear());
+            widget.singleController?.clearDropDown();
+          } else if (currentText.isNotEmpty) {
+            final newItem = DropDownValueModel(
+              name: currentText,
+              value: currentText,
+            );
+            widget.singleController?.setDropDown(newItem);
+            widget.onChanged?.call(newItem);
+          }
+        }
       }
     }
   }
 
   void _onSingleControllerChanged() {
-    if (widget.singleController?.dropDownValue == null) {
+    final ctrl = widget.singleController;
+    if (ctrl == null) return;
+    if (ctrl.dropDownValue == null) {
       _clearSelection();
+    } else {
+      setState(() {
+        _textController.text =
+            ctrl.dropDownValue!.displayValue ?? ctrl.dropDownValue!.name;
+      });
     }
   }
 
   void _onMultiControllerChanged() {
-    if (widget.multiController?.dropDownValueList == null) {
+    final ctrl = widget.multiController;
+    if (ctrl == null) return;
+    final newList = ctrl.dropDownValueList;
+    if (newList == null) {
       _clearSelection();
+    } else {
+      setState(() {
+        _multiSelectionValue = List.filled(_dropDownList.length, false);
+        for (final selected in newList) {
+          final idx = _dropDownList.indexOf(selected);
+          if (idx != -1) _multiSelectionValue[idx] = true;
+        }
+        final count = _multiSelectionValue.where((e) => e).length;
+        final names = newList.map((m) => m.name).toList();
+        _textController.text = count == 0
+            ? ''
+            : widget.displayCompleteItem
+            ? names.join(',')
+            : '$count item selected';
+      });
     }
   }
 
@@ -401,12 +564,12 @@ class _DropDownTextFieldState extends State<DropDownTextField>
 
   void _applyInitialValue() {
     if (widget.initialValue == null) return;
-    _dropDownList = List.from(widget.dropDownList);
 
     if (widget.isMultiSelection) {
-      for (int i = 0; i < (widget.initialValue as List).length; i++) {
+      final initList = widget.initialValue as List;
+      for (int i = 0; i < initList.length; i++) {
         final idx = _dropDownList.indexWhere(
-          (e) => e.name.trim() == widget.initialValue[i].trim(),
+          (e) => e.name.trim() == (initList[i] as String).trim(),
         );
         if (idx != -1) _multiSelectionValue[idx] = true;
       }
@@ -414,88 +577,84 @@ class _DropDownTextFieldState extends State<DropDownTextField>
       _textController.text = count == 0
           ? ''
           : widget.displayCompleteItem
-          ? (widget.initialValue as List<String>).join(',')
+          ? (initList.cast<String>()).join(',')
           : '$count item selected';
     } else {
+      final initStr = widget.initialValue as String;
       final idx = _dropDownList.indexWhere(
-        (e) => e.name.trim() == (widget.initialValue as String).trim(),
+        (e) => e.name.trim() == initStr.trim(),
       );
-      if (idx != -1) _textController.text = widget.initialValue as String;
+      if (idx != -1) _textController.text = initStr;
     }
   }
 
-  void _updateDropdownState({DropDownTextField? oldWidget}) {
-    final bool Function(dynamic, dynamic) eq =
-        const DeepCollectionEquality().equals;
-    _dropDownList = List.from(widget.dropDownList);
-    _listPadding = widget.listPadding ?? const ListPadding();
+  /// Computes tile height and total dropdown height.
+  /// Only called when relevant props actually change (not on every frame).
+  void _recalculateDimensions() {
+    final style =
+        (widget.listTextStyle ?? Theme.of(context).textTheme.titleMedium)!;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-
-      if (widget.isMultiSelection) {
-        _syncMultiSelectionState(oldWidget, eq);
-      } else {
-        _syncSingleSelectionState();
-      }
-
-      _listTileTextStyle =
-          (widget.listTextStyle ?? Theme.of(context).textTheme.titleMedium)!;
+    // Re-measure only when the text style actually changed.
+    if (style != _cachedTextStyle) {
+      _cachedTextStyle = style;
+      _listTileTextStyle = style;
       _listTileHeight =
-          _measureTextHeight('dummy Text', _listTileTextStyle) +
+          _measureTextHeight('dummy Text', style) +
           _listPadding.top +
           _listPadding.bottom;
-      _maxListItem = widget.dropDownItemCount;
+    }
 
-      final visibleCount = _dropDownList.length < _maxListItem
-          ? _dropDownList.length.toDouble()
-          : _maxListItem.toDouble();
-      _dropdownHeight = visibleCount * _listTileHeight + 10;
-    });
+    final visibleCount = _dropDownList.length < widget.dropDownItemCount
+        ? _dropDownList.length.toDouble()
+        : widget.dropDownItemCount.toDouble();
+    _dropdownHeight = visibleCount * _listTileHeight + 10;
   }
 
-  void _syncMultiSelectionState(
-    DropDownTextField? oldWidget,
-    bool Function(dynamic, dynamic) eq,
-  ) {
-    if (oldWidget != null && !eq(oldWidget.dropDownList, _dropDownList)) {
+  // ── State sync (controller → UI) ──────────────────────────────────────────
+
+  void _syncMultiSelectionState(DropDownTextField oldWidget) {
+    final ctrl = widget.multiController;
+    if (ctrl == null) return;
+
+    final newList = ctrl.dropDownValueList;
+    final oldList = oldWidget.multiController?.dropDownValueList;
+
+    // Skip if neither the value list nor displayCompleteItem changed.
+    if (_deepEq.equals(newList, oldList) &&
+        oldWidget.displayCompleteItem == widget.displayCompleteItem) {
+      return;
+    }
+
+    if (newList != null) {
+      _multiSelectionValue = List.filled(_dropDownList.length, false);
+      for (final selected in newList) {
+        final idx = _dropDownList.indexOf(selected);
+        if (idx != -1) _multiSelectionValue[idx] = true;
+      }
+      final count = _multiSelectionValue.where((e) => e).length;
+      final names = newList.map((m) => m.name).toList();
+      _textController.text = count == 0
+          ? ''
+          : widget.displayCompleteItem
+          ? names.join(',')
+          : '$count item selected';
+    } else {
       _multiSelectionValue = List.filled(_dropDownList.length, false);
       _textController.text = '';
     }
-
-    if (widget.multiController != null) {
-      if (widget.multiController?.dropDownValueList != null) {
-        _multiSelectionValue = List.filled(_dropDownList.length, false);
-        for (final selected in widget.multiController!.dropDownValueList!) {
-          final idx = _dropDownList.indexOf(selected);
-          if (idx != -1) _multiSelectionValue[idx] = true;
-        }
-
-        if (oldWidget?.displayCompleteItem != widget.displayCompleteItem) {
-          final names = (widget.multiController?.dropDownValueList ?? [])
-              .map((m) => m.name)
-              .toList();
-          final count = _multiSelectionValue.where((e) => e).length;
-          _textController.text = count == 0
-              ? ''
-              : widget.displayCompleteItem
-              ? names.join(',')
-              : '$count item selected';
-        }
-      } else {
-        _multiSelectionValue = List.filled(_dropDownList.length, false);
-        _textController.text = '';
-      }
-    }
   }
 
-  void _syncSingleSelectionState() {
-    if (widget.singleController != null) {
-      if (widget.singleController!.dropDownValue != null) {
-        _textController.text = widget.singleController!.dropDownValue!.name;
-      } else {
-        _textController.clear();
-      }
+  void _syncSingleSelectionState(DropDownTextField oldWidget) {
+    final ctrl = widget.singleController;
+    if (ctrl == null) return;
+
+    // Skip if the value didn't change.
+    if (ctrl.dropDownValue == oldWidget.singleController?.dropDownValue) return;
+
+    if (ctrl.dropDownValue != null) {
+      _textController.text = ctrl.dropDownValue!.name;
+    } else {
+      _textController.clear();
     }
   }
 
@@ -503,14 +662,11 @@ class _DropDownTextFieldState extends State<DropDownTextField>
 
   @override
   Widget build(BuildContext context) {
-    _isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
-    _currentDirection = Directionality.of(context);
-
     return KeyboardVisibilityBuilder(
       builder: (context, isKeyboardVisible) {
         if (!isKeyboardVisible && _isExpanded && _isScrollPadding) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            _shiftOverlayEntry2to1();
+            if (mounted) _shiftOverlayEntry2to1();
           });
         }
         return CompositedTransformTarget(
@@ -594,128 +750,119 @@ class _DropDownTextFieldState extends State<DropDownTextField>
 
   // ── Overlay ───────────────────────────────────────────────────────────────
 
-  Future<void> _showOverlay() async {
+  void _showOverlay() {
     _animController.forward();
     _isExpanded = true;
 
     final overlay = Overlay.of(context);
-    final renderBox = context.findRenderObject() as RenderBox;
-    final size = renderBox.size;
-    _offset = renderBox.localToGlobal(Offset.zero);
+    final renderObject = context.findRenderObject();
+    if (renderObject is! RenderBox) return;
 
-    final posFromTop = _offset.dy;
-    final posFromBot = MediaQuery.of(context).size.height - posFromTop;
+    final renderBox = renderObject;
+    final size = renderBox.size;
+    final offset = renderBox.localToGlobal(Offset.zero);
+    final mediaQuery = MediaQuery.of(context);
+
+    final posFromTop = offset.dy;
+    final posFromBot = mediaQuery.size.height - posFromTop;
     final dropdownListHeight =
         _dropdownHeight +
         (widget.enableSearch ? _searchWidgetHeight : 0) +
         widget.listSpace;
     final ht = dropdownListHeight + 120;
+    final isBelow = posFromBot < ht;
 
     if (_searchAutofocus &&
-        !(posFromBot < ht) &&
+        !isBelow &&
         posFromBot < _keyboardHeight &&
         !_isScrollPadding &&
-        _isPortrait) {
+        mediaQuery.orientation == Orientation.portrait) {
       _isScrollPadding = true;
     }
 
     _isOutsideClickOverlay =
         _isScrollPadding ||
         (widget.readOnly &&
-            dropdownListHeight >
-                (posFromTop - MediaQuery.of(context).padding.top - 15) &&
-            posFromBot < ht);
+            dropdownListHeight > (posFromTop - mediaQuery.padding.top - 15) &&
+            isBelow);
 
     final topPaddingHeight = _isOutsideClickOverlay
-        ? (dropdownListHeight -
-              (posFromTop - MediaQuery.of(context).padding.top - 15))
+        ? dropdownListHeight - (posFromTop - mediaQuery.padding.top - 15)
         : 0.0;
 
-    final htPos = posFromBot < ht
+    final htPos = isBelow
         ? size.height - 100 + topPaddingHeight
         : _isScrollPadding
         ? size.height - (_keyboardHeight - posFromBot)
         : size.height;
 
-    if (_isOutsideClickOverlay) {
-      _openBarrierOverlay(context);
+    if (_isOutsideClickOverlay) _openBarrierOverlay(overlay);
+
+    // Build only the entry that will actually be used.
+    if (_isScrollPadding) {
+      _entry2 = _buildOverlayEntry(
+        size: size,
+        htPos: htPos,
+        forceBottomAnchor: true,
+      );
+      overlay.insert(_entry2!);
+    } else {
+      _entry = _buildOverlayEntry(size: size, htPos: htPos, isBelow: isBelow);
+      overlay.insert(_entry!);
     }
-
-    _entry = _buildOverlayEntry(
-      size: size,
-      posFromBot: posFromBot,
-      ht: ht,
-      htPos: htPos,
-      useBottomAnchor: posFromBot < ht,
-    );
-
-    _entry2 = _buildOverlayEntry(
-      size: size,
-      posFromBot: posFromBot,
-      ht: ht,
-      htPos: htPos,
-      useBottomAnchor: true,
-      forceBottomAnchor: true,
-    );
-
-    overlay.insert(_isScrollPadding ? _entry2! : _entry!);
   }
 
   OverlayEntry _buildOverlayEntry({
     required Size size,
-    required double posFromBot,
-    required double ht,
     required double htPos,
-    required bool useBottomAnchor,
+    bool isBelow = false,
     bool forceBottomAnchor = false,
   }) {
+    final useBottomAnchor = forceBottomAnchor || isBelow;
+    final currentDirection = Directionality.of(context);
+
     return OverlayEntry(
       builder: (context) => Positioned(
         width: size.width,
         child: CompositedTransformFollower(
-          targetAnchor: (!forceBottomAnchor && posFromBot < ht)
+          targetAnchor: useBottomAnchor
               ? Alignment.bottomCenter
               : Alignment.topCenter,
-          followerAnchor: (!forceBottomAnchor && posFromBot < ht)
+          followerAnchor: useBottomAnchor
               ? Alignment.bottomCenter
               : Alignment.topCenter,
           link: _layerLink,
           showWhenUnlinked: false,
           offset: Offset(
             0,
-            (!forceBottomAnchor && posFromBot < ht)
+            useBottomAnchor
                 ? htPos - widget.listSpace
                 : htPos + widget.listSpace,
           ),
           child: AnimatedBuilder(
             animation: _animController.view,
-            builder: _buildOverlayContent,
+            builder: (ctx, _) => _buildOverlayContent(ctx, currentDirection),
           ),
         ),
       ),
     );
   }
 
-  void _openBarrierOverlay(BuildContext context) {
-    final overlay = Overlay.of(context);
+  void _openBarrierOverlay(OverlayState overlay) {
     _barrierOverlay = OverlayEntry(
-      builder: (context) {
-        final size = MediaQuery.of(context).size;
-        return GestureDetector(
-          onTap: _hideOverlay,
-          child: Container(
-            width: size.width,
-            height: size.height,
-            color: Colors.transparent,
-          ),
-        );
-      },
+      builder: (context) => GestureDetector(
+        onTap: _hideOverlay,
+        child: const SizedBox.expand(
+          child: ColoredBox(color: Colors.transparent),
+        ),
+      ),
     );
     overlay.insert(_barrierOverlay!);
   }
 
   void _hideOverlay() {
     _animController.reverse().then<void>((_) {
+      if (!mounted) return;
       _removeOverlayEntries();
       _isScrollPadding = false;
       _isExpanded = false;
@@ -724,25 +871,23 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   }
 
   void _removeOverlayEntries() {
-    if (_entry != null && _entry!.mounted) {
-      _entry?.remove();
+    if (_entry?.mounted == true) {
+      _entry!.remove();
       _entry = null;
     }
-    if (_entry2 != null && _entry2!.mounted) {
-      _entry2?.remove();
+    if (_entry2?.mounted == true) {
+      _entry2!.remove();
       _entry2 = null;
     }
-    if (_barrierOverlay != null && _barrierOverlay!.mounted) {
-      _barrierOverlay?.remove();
-      _barrierOverlay = null;
-      _isOutsideClickOverlay = false;
-    }
+    _removeBarrier();
   }
 
   void _shiftOverlayEntry2to1() {
     _searchAutofocus = false;
-    _entry2?.remove();
-    _entry2 = null;
+    if (_entry2?.mounted == true) {
+      _entry2!.remove();
+      _entry2 = null;
+    }
     _removeBarrier();
     _animController.reset();
     _isScrollPadding = false;
@@ -751,16 +896,16 @@ class _DropDownTextFieldState extends State<DropDownTextField>
   }
 
   void _removeBarrier() {
-    if (_barrierOverlay != null && _barrierOverlay!.mounted) {
-      _barrierOverlay?.remove();
+    if (_barrierOverlay?.mounted == true) {
+      _barrierOverlay!.remove();
       _barrierOverlay = null;
       _isOutsideClickOverlay = false;
     }
   }
 
-  Widget _buildOverlayContent(BuildContext context, Widget? child) {
+  Widget _buildOverlayContent(BuildContext context, TextDirection direction) {
     return Directionality(
-      textDirection: _currentDirection,
+      textDirection: direction,
       child: ClipRect(
         child: Align(
           heightFactor: _heightFactor.value,
@@ -774,7 +919,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
               decoration:
                   widget.boxDecoration ??
                   BoxDecoration(
-                    color: Theme.of(context).cardColor,
+                    color: widget.dropdownColor ?? Theme.of(context).cardColor,
                     borderRadius: BorderRadius.all(
                       Radius.circular(widget.dropdownRadius),
                     ),
@@ -810,13 +955,13 @@ class _DropDownTextFieldState extends State<DropDownTextField>
       dropDownList: _dropDownList,
       listTextStyle: _listTileTextStyle,
       onChanged: (item) {
-        setState(() {
-          _textController.text = item.name;
-          _isExpanded = false;
-        });
         widget.singleController?.setDropDown(item);
         widget.onChanged?.call(item);
         _hideOverlay();
+        setState(() {
+          _textController.text = item.displayValue ?? item.name;
+          _isExpanded = false;
+        });
       },
       searchHeight: _searchWidgetHeight,
       searchKeyboardType: widget.searchKeyboardType,
@@ -825,6 +970,11 @@ class _DropDownTextFieldState extends State<DropDownTextField>
       searchShowCursor: widget.searchShowCursor,
       listPadding: _listPadding,
       clearIconProperty: widget.clearIconProperty,
+      selectedItemHighlightColor: widget.selectedItemHighlightColor,
+      selectedItem: widget.singleController?.dropDownValue,
+      textAlign: widget.itemTextAlign,
+      textDirection: widget.textDirection,
+      maxLines: widget.maxlines,
     );
   }
 
@@ -833,6 +983,7 @@ class _DropDownTextFieldState extends State<DropDownTextField>
       buttonTextStyle: widget.submitButtonTextStyle,
       buttonText: widget.submitButtonText,
       buttonColor: widget.submitButtonColor,
+      buttonDecoration: widget.submitButtonDecoration,
       height: _dropdownHeight,
       listTileHeight: _listTileHeight,
       list: _multiSelectionValue,
@@ -840,36 +991,41 @@ class _DropDownTextFieldState extends State<DropDownTextField>
       listTextStyle: _listTileTextStyle,
       listPadding: _listPadding,
       onChanged: (selectedBools) {
-        _isExpanded = false;
-        _multiSelectionValue = selectedBools;
-
         final result = <DropDownValueModel>[];
         final names = <String>[];
-        for (int i = 0; i < _multiSelectionValue.length; i++) {
-          if (_multiSelectionValue[i]) {
+        for (int i = 0; i < selectedBools.length; i++) {
+          if (selectedBools[i]) {
             result.add(_dropDownList[i]);
-            names.add(_dropDownList[i].name);
+            names.add(_dropDownList[i].displayValue ?? _dropDownList[i].name);
           }
         }
-
-        final count = result.length;
-        _textController.text = count == 0
+        final text = result.isEmpty
             ? ''
             : widget.displayCompleteItem
             ? names.join(',')
-            : '$count item selected';
+            : '${result.length} item selected';
 
         widget.multiController?.setDropDown(result.isNotEmpty ? result : null);
         widget.onChanged?.call(result);
         _hideOverlay();
-        setState(() {});
+        setState(() {
+          _multiSelectionValue = selectedBools;
+          _textController.text = text;
+          _isExpanded = false;
+        });
       },
       checkBoxProperty: widget.checkBoxProperty,
+      listBackgroundColor: widget.selectedItemHighlightColor,
+      textAlign: widget.itemTextAlign,
+      textDirection: widget.textDirection,
+      maxLines: widget.maxlines,
     );
   }
 
   // ── Utilities ─────────────────────────────────────────────────────────────
 
+  /// Measures the height of a single line of text with the given [style].
+  /// Result is cached externally via [_cachedTextStyle].
   double _measureTextHeight(String text, TextStyle style) {
     final painter = TextPainter(
       text: TextSpan(text: text, style: style),
@@ -884,15 +1040,17 @@ class _DropDownTextFieldState extends State<DropDownTextField>
       _isExpanded = false;
       _hideOverlay();
     }
-    _textController.clear();
     if (widget.isMultiSelection) {
       widget.multiController?.clearDropDown();
       widget.onChanged?.call(<DropDownValueModel>[]);
-      _multiSelectionValue = List.filled(_dropDownList.length, false);
+      setState(() {
+        _textController.clear();
+        _multiSelectionValue = List.filled(_dropDownList.length, false);
+      });
     } else {
       widget.singleController?.clearDropDown();
       widget.onChanged?.call('');
+      setState(() => _textController.clear());
     }
-    setState(() {});
   }
 }

@@ -19,6 +19,11 @@ class MultiSelection extends StatefulWidget {
     required this.listPadding,
     this.listTextStyle,
     this.checkBoxProperty,
+    this.buttonDecoration,
+    this.listBackgroundColor,
+    this.textAlign,
+    this.textDirection,
+    required this.maxLines,
   });
 
   final List<DropDownValueModel> dropDownList;
@@ -34,6 +39,11 @@ class MultiSelection extends StatefulWidget {
   final TextStyle? listTextStyle;
   final ListPadding listPadding;
   final CheckBoxProperty? checkBoxProperty;
+  final BoxDecoration? buttonDecoration;
+  final Color? listBackgroundColor;
+  final TextAlign? textAlign;
+  final TextDirection? textDirection;
+  final int maxLines;
 
   @override
   State<MultiSelection> createState() => _MultiSelectionState();
@@ -62,6 +72,8 @@ class _MultiSelectionState extends State<MultiSelection> {
           itemCount: widget.dropDownList.length,
           itemBuilder: (BuildContext context, int index) {
             final item = widget.dropDownList[index];
+            final isSelected = _selectionState[index];
+
             return SizedBox(
               height:
                   widget.listTileHeight +
@@ -72,56 +84,104 @@ class _MultiSelectionState extends State<MultiSelection> {
                   bottom: widget.listPadding.bottom,
                   top: widget.listPadding.top,
                 ),
-                child: Row(
-                  children: [
-                    Expanded(
+                child: Semantics(
+                  label: item.name,
+                  button: true,
+                  child: Material(
+                    color: isSelected && widget.listBackgroundColor != null
+                        ? widget.listBackgroundColor
+                        : Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(4),
+                      onTap: () {
+                        setState(() {
+                          _selectionState[index] = !_selectionState[index];
+                        });
+                      },
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  item.prefixWidget ?? const SizedBox.shrink(),
-                                  Text(item.name, style: widget.listTextStyle),
-                                ],
+                        padding: EdgeInsets.symmetric(
+                          horizontal:
+                              isSelected && widget.listBackgroundColor != null
+                              ? 8.0
+                              : 0.0,
+                        ),
+                        child: Directionality(
+                          textDirection:
+                              widget.textDirection ??
+                              Directionality.of(context),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Row(
+                                          children: [
+                                            item.prefixWidget ??
+                                                const SizedBox.shrink(),
+                                            Expanded(
+                                              child:
+                                                  item.customListItem ??
+                                                  Text(
+                                                    item.name,
+                                                    style: widget.listTextStyle,
+                                                    textAlign: widget.textAlign,
+                                                    maxLines: widget.maxLines,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      if (item.toolTipMsg != null)
+                                        ToolTipWidget(msg: item.toolTipMsg!),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
-                            if (item.toolTipMsg != null)
-                              ToolTipWidget(msg: item.toolTipMsg!),
-                          ],
+                              Checkbox(
+                                value: _selectionState[index],
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    setState(() {
+                                      _selectionState[index] = value;
+                                    });
+                                  }
+                                },
+                                tristate:
+                                    widget.checkBoxProperty?.tristate ?? false,
+                                mouseCursor:
+                                    widget.checkBoxProperty?.mouseCursor,
+                                activeColor:
+                                    widget.checkBoxProperty?.activeColor,
+                                fillColor: widget.checkBoxProperty?.fillColor,
+                                checkColor: widget.checkBoxProperty?.checkColor,
+                                focusColor: widget.checkBoxProperty?.focusColor,
+                                hoverColor: widget.checkBoxProperty?.hoverColor,
+                                overlayColor:
+                                    widget.checkBoxProperty?.overlayColor,
+                                splashRadius:
+                                    widget.checkBoxProperty?.splashRadius,
+                                materialTapTargetSize: widget
+                                    .checkBoxProperty
+                                    ?.materialTapTargetSize,
+                                visualDensity:
+                                    widget.checkBoxProperty?.visualDensity,
+                                focusNode: widget.checkBoxProperty?.focusNode,
+                                shape: widget.checkBoxProperty?.shape,
+                                side: widget.checkBoxProperty?.side,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                    Semantics(
-                      label: item.name,
-                      child: Checkbox(
-                        value: _selectionState[index],
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() {
-                              _selectionState[index] = value;
-                            });
-                          }
-                        },
-                        tristate: widget.checkBoxProperty?.tristate ?? false,
-                        mouseCursor: widget.checkBoxProperty?.mouseCursor,
-                        activeColor: widget.checkBoxProperty?.activeColor,
-                        fillColor: widget.checkBoxProperty?.fillColor,
-                        checkColor: widget.checkBoxProperty?.checkColor,
-                        focusColor: widget.checkBoxProperty?.focusColor,
-                        hoverColor: widget.checkBoxProperty?.hoverColor,
-                        overlayColor: widget.checkBoxProperty?.overlayColor,
-                        splashRadius: widget.checkBoxProperty?.splashRadius,
-                        materialTapTargetSize:
-                            widget.checkBoxProperty?.materialTapTargetSize,
-                        visualDensity: widget.checkBoxProperty?.visualDensity,
-                        focusNode: widget.checkBoxProperty?.focusNode,
-                        shape: widget.checkBoxProperty?.shape,
-                        side: widget.checkBoxProperty?.side,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             );
@@ -143,29 +203,34 @@ class _MultiSelectionState extends State<MultiSelection> {
             top: 15,
             bottom: 10,
           ),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(12),
-            onTap: () => widget.onChanged(_selectionState),
-            child: Container(
-              height: widget.listTileHeight * 0.9,
-              padding: const EdgeInsets.symmetric(
-                vertical: 5.0,
-                horizontal: 12,
-              ),
-              decoration: BoxDecoration(
-                color: widget.buttonColor ?? theme.colorScheme.primary,
-                borderRadius: const BorderRadius.all(Radius.circular(12)),
-              ),
-              child: Align(
-                child: FittedBox(
-                  child: Text(
-                    widget.buttonText ?? 'Ok',
-                    style:
-                        widget.buttonTextStyle ??
-                        TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: theme.colorScheme.onPrimary,
-                        ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: () => widget.onChanged(_selectionState),
+              child: Container(
+                height: widget.listTileHeight * 0.9,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 5.0,
+                  horizontal: 12,
+                ),
+                decoration:
+                    widget.buttonDecoration ??
+                    BoxDecoration(
+                      color: widget.buttonColor ?? theme.colorScheme.primary,
+                      borderRadius: const BorderRadius.all(Radius.circular(12)),
+                    ),
+                child: Align(
+                  child: FittedBox(
+                    child: Text(
+                      widget.buttonText ?? 'Ok',
+                      style:
+                          widget.buttonTextStyle ??
+                          TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.onPrimary,
+                          ),
+                    ),
                   ),
                 ),
               ),

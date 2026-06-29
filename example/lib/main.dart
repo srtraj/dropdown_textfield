@@ -88,7 +88,9 @@ class _TestPageState extends State<TestPage> {
                   controller: _cnt,
                   clearOption: true,
                   enableSearch: true,
-                  clearIconProperty: IconProperty(color: Colors.green),
+                  dropdownColor: Colors.greenAccent.shade100,
+                    selectedItemHighlightColor: Colors.red,
+                  clearIconProperty: const IconProperty(color: Colors.green),
                   searchTextStyle: const TextStyle(color: Colors.red),
                   searchDecoration: const InputDecoration(
                       hintText: "enter your custom hint text here"),
@@ -171,6 +173,7 @@ class _TestPageState extends State<TestPage> {
                 ),
                 DropDownTextField.multiSelection(
                   controller: _cntMulti,
+                    submitButtonDecoration:BoxDecoration(color: Colors.black),
                   // initialValue: const ["name1", "name2", "name8", "name3"],
                   // displayCompleteItem: true,
                   checkBoxProperty: CheckBoxProperty(

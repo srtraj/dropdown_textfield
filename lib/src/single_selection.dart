@@ -27,6 +27,11 @@ class SingleSelection extends StatefulWidget {
     this.searchDecoration,
     required this.listPadding,
     this.clearIconProperty,
+    this.selectedItemHighlightColor,
+    this.selectedItem,
+    this.textAlign,
+    this.textDirection,
+    required this.maxLines,
   });
 
   final List<DropDownValueModel> dropDownList;
@@ -49,6 +54,11 @@ class SingleSelection extends StatefulWidget {
   final ListPadding listPadding;
   final InputDecoration? searchDecoration;
   final IconProperty? clearIconProperty;
+  final Color? selectedItemHighlightColor;
+  final DropDownValueModel? selectedItem;
+  final TextAlign? textAlign;
+  final TextDirection? textDirection;
+  final int maxLines;
 
   @override
   State<SingleSelection> createState() => _SingleSelectionState();
@@ -161,6 +171,8 @@ class _SingleSelectionState extends State<SingleSelection> {
           itemCount: _filteredList.length,
           itemBuilder: (BuildContext context, int index) {
             final item = _filteredList[index];
+            final isSelected = widget.selectedItem == item;
+
             return SizedBox(
               height:
                   widget.listTileHeight +
@@ -176,14 +188,44 @@ class _SingleSelectionState extends State<SingleSelection> {
                 child: Semantics(
                   label: item.name,
                   button: true,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(4),
-                    onTap: () => widget.onChanged(item),
-                    child: Row(
-                      children: [
-                        item.prefixWidget ?? const SizedBox.shrink(),
-                        Text(item.name, style: widget.listTextStyle),
-                      ],
+                  child: Material(
+                    color:
+                        isSelected && widget.selectedItemHighlightColor != null
+                        ? widget.selectedItemHighlightColor
+                        : Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(4),
+                      onTap: () => widget.onChanged(item),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal:
+                              isSelected &&
+                                  widget.selectedItemHighlightColor != null
+                              ? 8.0
+                              : 0.0,
+                        ),
+                        child: Directionality(
+                          textDirection:
+                              widget.textDirection ??
+                              Directionality.of(context),
+                          child: Row(
+                            children: [
+                              item.prefixWidget ?? const SizedBox.shrink(),
+                              Expanded(
+                                child:
+                                    item.customListItem ??
+                                    Text(
+                                      item.name,
+                                      style: widget.listTextStyle,
+                                      textAlign: widget.textAlign,
+                                      maxLines: widget.maxLines,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),

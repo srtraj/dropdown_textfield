@@ -58,11 +58,19 @@ class DropDownValueModel extends Equatable {
   /// Optional tooltip message. Currently only supported for multi-selection.
   final String? toolTipMsg;
 
+  /// Optional custom widget to render in place of the default text.
+  final Widget? customListItem;
+
+  /// Optional display string for the text field, if different from [name].
+  final String? displayValue;
+
   const DropDownValueModel({
     required this.name,
     required this.value,
     this.prefixWidget,
     this.toolTipMsg,
+    this.customListItem,
+    this.displayValue,
   });
 
   factory DropDownValueModel.fromJson(Map<String, dynamic> json) =>
@@ -71,6 +79,8 @@ class DropDownValueModel extends Equatable {
         value: json['value'],
         prefixWidget: json['prefixWidget'] as Widget?,
         toolTipMsg: json['toolTipMsg'] as String?,
+        customListItem: json['customListItem'] as Widget?,
+        displayValue: json['displayValue'] as String?,
       );
 
   Map<String, dynamic> toJson() => {
@@ -78,10 +88,19 @@ class DropDownValueModel extends Equatable {
     'value': value,
     'prefixWidget': prefixWidget,
     'toolTipMsg': toolTipMsg,
+    'customListItem': customListItem,
+    'displayValue': displayValue,
   };
 
   @override
-  List<Object?> get props => [name, value, prefixWidget, toolTipMsg];
+  List<Object?> get props => [
+    name,
+    value,
+    prefixWidget,
+    toolTipMsg,
+    customListItem,
+    displayValue,
+  ];
 }
 
 /// Controls per-item vertical padding in the dropdown list.
